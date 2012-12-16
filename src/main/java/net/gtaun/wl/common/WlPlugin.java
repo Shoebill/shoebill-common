@@ -13,6 +13,7 @@
 
 package net.gtaun.wl.common;
 
+import net.gtaun.shoebill.object.Player;
 import net.gtaun.shoebill.resource.Plugin;
 
 /**
@@ -37,5 +38,10 @@ public abstract class WlPlugin extends Plugin
 	public void disable() throws Throwable
 	{
 		super.disable();
+	}
+	
+	public boolean config(Player player)
+	{
+		return false;
 	}
 }
