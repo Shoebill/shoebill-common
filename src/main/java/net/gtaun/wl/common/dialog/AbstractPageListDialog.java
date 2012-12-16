@@ -14,6 +14,7 @@
 package net.gtaun.wl.common.dialog;
 
 import net.gtaun.shoebill.Shoebill;
+import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
 
@@ -64,7 +65,7 @@ public class AbstractPageListDialog extends AbstractListDialog
 		String listStr = "";
 		displayedItems.clear();
 		
-		displayedItems.add(new DialogListItem("<< Prev Page <<")
+		displayedItems.add(new DialogListItem(Color.GRAY.toEmbeddingString() + "<< Prev Page <<")
 		{
 			@Override
 			public void onItemSelect()
@@ -85,7 +86,7 @@ public class AbstractPageListDialog extends AbstractListDialog
 			displayedItems.add(item);
 		}
 		
-		if (displayedItems.size() >= itemsPerPage + 1) displayedItems.add(new DialogListItem(">> Next Page >>")
+		if (displayedItems.size() >= itemsPerPage + 1) displayedItems.add(new DialogListItem(Color.GRAY.toEmbeddingString() + ">> Next Page >>")
 		{
 			@Override
 			public void onItemSelect()
