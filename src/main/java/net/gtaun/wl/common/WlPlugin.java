@@ -40,7 +40,7 @@ public abstract class WlPlugin extends Plugin
 		super.disable();
 	}
 	
-	public boolean config(Player player)
+	public boolean configure(Player player)
 	{
 		return false;
 	}
