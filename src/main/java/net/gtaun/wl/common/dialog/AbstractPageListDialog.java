@@ -27,7 +27,7 @@ public class AbstractPageListDialog extends AbstractListDialog
 	private int itemsPerPage = 10;
 	private int currentPage;
 	
-
+	
 	protected AbstractPageListDialog(Player player, Shoebill shoebill, EventManager eventManager)
 	{
 		super(player, shoebill, eventManager);
@@ -79,24 +79,13 @@ public class AbstractPageListDialog extends AbstractListDialog
 		for (int i=0; i<itemsPerPage; i++)
 		{
 			int index = offset+i;
-			if (dialogListItems.size() <= index)
-			{
-				displayedItems.add(new DialogListItem(" - ")
-				{
-					@Override
-					public void onItemSelect()
-					{
-						show();
-					}
-				});
-				continue;
-			}
+			if (dialogListItems.size() <= index) break;
 			
 			DialogListItem item = dialogListItems.get(offset+i);
 			displayedItems.add(item);
 		}
 		
-		displayedItems.add(new DialogListItem(">> Next Page >>")
+		if (displayedItems.size() >= itemsPerPage + 1) displayedItems.add(new DialogListItem(">> Next Page >>")
 		{
 			@Override
 			public void onItemSelect()
