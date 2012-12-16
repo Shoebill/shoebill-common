@@ -28,18 +28,6 @@ public abstract class WlPlugin extends Plugin
 		
 	}
 	
-	@Override
-	public void enable() throws Throwable
-	{
-		super.enable();
-	}
-	
-	@Override
-	public void disable() throws Throwable
-	{
-		super.disable();
-	}
-	
 	public boolean configure(Player player)
 	{
 		return false;
