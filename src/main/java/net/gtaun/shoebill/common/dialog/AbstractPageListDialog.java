@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.gtaun.mk.common.dialog;
+package net.gtaun.shoebill.common.dialog;
 
 import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.data.Color;

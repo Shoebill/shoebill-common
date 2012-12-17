@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.gtaun.mk.common;
+package net.gtaun.shoebill.common;
 
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.shoebill.resource.Plugin;

@@ -8,14 +8,14 @@
 		<version>7</version>
 	</parent>
 	
-	<groupId>net.gtaun.mk</groupId>
-	<artifactId>mk-shoebill-common</artifactId>
+	<groupId>net.gtaun</groupId>
+	<artifactId>shoebill-common</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>mk-shoebill-common</name>
+	<name>shoebill-common</name>
 	<description>MK's Shoebill Common Library</description>
-	<url>https://github.com/GTAUN/mk-shoebill-common</url>
+	<url>https://github.com/GTAUN/shoebill-common</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,9 +29,9 @@
 	</licenses>
 
 	<scm>
-		<url>https://github.com/GTAUN/mk-shoebill-common</url>
-		<connection>scm:git:git://github.com/GTAUN/mk-shoebill-common.git</connection>
-		<developerConnection>scm:git:git@github.com:GTAUN/mk-shoebill-common.git</developerConnection>
+		<url>https://github.com/GTAUN/shoebill-common</url>
+		<connection>scm:git:git://github.com/GTAUN/shoebill-common.git</connection>
+		<developerConnection>scm:git:git@github.com:GTAUN/shoebill-common.git</developerConnection>
 	</scm>
 
 	<developers>

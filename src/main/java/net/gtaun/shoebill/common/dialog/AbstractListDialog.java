@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.gtaun.mk.common.dialog;
+package net.gtaun.shoebill.common.dialog;
 
 import java.util.ArrayList;
 import java.util.List;
