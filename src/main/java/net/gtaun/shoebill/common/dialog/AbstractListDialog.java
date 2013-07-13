@@ -128,6 +128,8 @@ public abstract class AbstractListDialog extends AbstractDialog
 		
 		for (DialogListItem item : dialogListItems)
 		{
+			if (item.isEnabled() == false) continue;
+			
 			listStr += item.toItemString() + "\n";
 			displayedItems.add(item);
 		}
