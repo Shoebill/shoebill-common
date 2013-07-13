@@ -16,10 +16,10 @@
 
 package net.gtaun.shoebill.common;
 
-import org.apache.commons.lang3.math.NumberUtils;
-
 import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.object.Player;
+
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * 玩家工具类。
