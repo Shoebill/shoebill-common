@@ -51,6 +51,60 @@ public abstract class AbstractListDialog extends AbstractDialog
 			return string;
 		}
 		
+		public boolean isEnabled()
+		{
+			return true;
+		}
+		
+		public abstract void onItemSelect();
+	}
+	
+	public static abstract class DialogListItemSwitch extends DialogListItem
+	{
+		private final String string;
+		private final String onMessage;
+		private final String offMessage;
+		
+		private boolean switched;
+
+		public DialogListItemSwitch(String string, boolean switched, String onMessage, String offMessage)
+		{
+			this.string = string;
+			this.switched = switched;
+			this.onMessage = onMessage;
+			this.offMessage = offMessage;
+		}
+		
+		public DialogListItemSwitch(String string, boolean switched)
+		{
+			this.string = string;
+			this.switched = switched;
+			this.onMessage = "ON";
+			this.offMessage = "OFF";
+		}
+		
+		public DialogListItemSwitch(String string)
+		{
+			this.string = string;
+			this.onMessage = "ON";
+			this.offMessage = "OFF";
+		}
+		
+		public String toItemString()
+		{
+			return string + " [" + (switched ? onMessage : offMessage) + "]";
+		}
+		
+		public boolean isEnabled()
+		{
+			return true;
+		}
+		
+		public boolean isSwitched()
+		{
+			return switched;
+		}
+		
 		public abstract void onItemSelect();
 	}
 	
