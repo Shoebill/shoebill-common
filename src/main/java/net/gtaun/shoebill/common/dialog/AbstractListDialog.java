@@ -65,22 +65,11 @@ public abstract class AbstractListDialog extends AbstractDialog
 		private final String onMessage;
 		private final String offMessage;
 		
-		private boolean switched;
-
-		public DialogListItemSwitch(String string, boolean switched, String onMessage, String offMessage)
+		public DialogListItemSwitch(String string, String onMessage, String offMessage)
 		{
 			this.string = string;
-			this.switched = switched;
 			this.onMessage = onMessage;
 			this.offMessage = offMessage;
-		}
-		
-		public DialogListItemSwitch(String string, boolean switched)
-		{
-			this.string = string;
-			this.switched = switched;
-			this.onMessage = "ON";
-			this.offMessage = "OFF";
 		}
 		
 		public DialogListItemSwitch(String string)
@@ -92,7 +81,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 		
 		public String toItemString()
 		{
-			return string + " [" + (switched ? onMessage : offMessage) + "]";
+			return string + " [" + (isSwitched() ? onMessage : offMessage) + "]";
 		}
 		
 		public boolean isEnabled()
@@ -100,11 +89,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 			return true;
 		}
 		
-		public boolean isSwitched()
-		{
-			return switched;
-		}
-		
+		public abstract boolean isSwitched();
 		public abstract void onItemSelect();
 	}
 	
