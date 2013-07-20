@@ -1,5 +1,7 @@
 package net.gtaun.shoebill.common.player;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -59,7 +61,7 @@ public class PlayerLifecycleHolder implements Destroyable
 	
 	public interface PlayerLifecycleObjectFactory<T extends PlayerLifecycleObject> 
 	{
-		T create(Player player);
+		T create(Shoebill shoebill, EventManager eventManager, Player player);
 	}
 	
 	
@@ -99,6 +101,36 @@ public class PlayerLifecycleHolder implements Destroyable
 		return destroyed;
 	}
 	
+	public <T extends PlayerLifecycleObject> void registerClass(final Class<T> clz)
+	{
+		final Constructor<T> constructor;
+		try
+		{
+			constructor = clz.getConstructor(Shoebill.class, EventManager.class, Player.class);
+		}
+		catch (NoSuchMethodException | SecurityException e)
+		{
+			throw new UnsupportedOperationException(e);
+		}
+		
+		registerClass(clz, new PlayerLifecycleObjectFactory<T>()
+		{
+			@Override
+			public T create(Shoebill shoebill, EventManager eventManager, Player player)
+			{
+				try
+				{
+					return constructor.newInstance(shoebill, eventManager, player);
+				}
+				catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+				{
+					e.printStackTrace();
+					return null;
+				}
+			}
+		});
+	}
+	
 	public <T extends PlayerLifecycleObject> void registerClass(Class<T> clz, PlayerLifecycleObjectFactory<T> factory)
 	{
 		if (classFactories.containsKey(clz)) return;
@@ -108,7 +140,7 @@ public class PlayerLifecycleHolder implements Destroyable
 		{
 			Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
 
-			PlayerLifecycleObject object = factory.create(player);
+			PlayerLifecycleObject object = factory.create(shoebill, eventManager, player);
 			playerLifecycleObjects.put(clz, object);
 			object.initialize();
 		}
@@ -153,7 +185,7 @@ public class PlayerLifecycleHolder implements Destroyable
 				Class<?> clz = entry.getKey();
 				PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject> factory = entry.getValue();
 				
-				PlayerLifecycleObject object = factory.create(player);
+				PlayerLifecycleObject object = factory.create(shoebill, eventManager, player);
 				playerLifecycleObjects.put(clz, object);
 				object.initialize();
 			}
