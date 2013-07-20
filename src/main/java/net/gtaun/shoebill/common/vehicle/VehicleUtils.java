@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.gtaun.shoebill.common;
+package net.gtaun.shoebill.common.vehicle;
 
 import java.util.ArrayList;
 import java.util.List;

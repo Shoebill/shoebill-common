@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.gtaun.shoebill.common;
+package net.gtaun.shoebill.common.player;
 
 import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.object.Player;
