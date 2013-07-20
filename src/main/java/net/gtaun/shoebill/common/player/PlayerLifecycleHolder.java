@@ -107,6 +107,7 @@ public class PlayerLifecycleHolder implements Destroyable
 		try
 		{
 			constructor = clz.getConstructor(Shoebill.class, EventManager.class, Player.class);
+			constructor.setAccessible(true);
 		}
 		catch (NoSuchMethodException | SecurityException e)
 		{
