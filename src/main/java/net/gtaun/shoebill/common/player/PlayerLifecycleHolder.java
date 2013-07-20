@@ -3,6 +3,7 @@ package net.gtaun.shoebill.common.player;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,11 @@ public class PlayerLifecycleHolder implements Destroyable
 			this.eventManager = new ManagedEventManager(eventManager);
 			this.player = player;
 			this.destroyables = new LinkedList<>();
+		}
+		
+		public Player getPlayer()
+		{
+			return player;
 		}
 		
 		protected void addDestroyable(Destroyable destroyable)
@@ -171,6 +177,19 @@ public class PlayerLifecycleHolder implements Destroyable
 		
 		Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
 		return clz.cast(playerLifecycleObjects.get(clz));
+	}
+	
+	public <T extends PlayerLifecycleObject> Collection<T> getObjects(Class<T> clz)
+	{
+		if (classFactories.containsKey(clz) == false) return null;
+		
+		Collection<T> objects = new LinkedList<>();
+		for (Entry<Player, Map<Class<?>, PlayerLifecycleObject>> entry : holder.entrySet())
+		{
+			objects.add(clz.cast(entry.getValue().get(clz)));
+		}
+		
+		return objects;
 	}
 	
 	private final PlayerEventHandler playerEventHandler = new PlayerEventHandler()
