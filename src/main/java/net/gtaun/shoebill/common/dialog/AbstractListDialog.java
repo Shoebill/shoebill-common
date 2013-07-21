@@ -34,7 +34,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 {
 	public static abstract class DialogListItem
 	{
-		private final String string;
+		private String string;
 		
 		public DialogListItem()
 		{
