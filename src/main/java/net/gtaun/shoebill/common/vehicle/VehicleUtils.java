@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.gtaun.shoebill.Shoebill;
+import net.gtaun.shoebill.constant.PlayerState;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.shoebill.object.Vehicle;
 
@@ -32,14 +33,14 @@ public final class VehicleUtils
 
 	public static boolean isVehicleDriver(Vehicle vehicle, Player player)
 	{
-		return player.getVehicle() == vehicle && player.getVehicleSeat() == 0;
+		return player.getVehicle() == vehicle && player.getState() == PlayerState.DRIVER;
 	}
 
 	public static Player getVehicleDriver(Vehicle vehicle)
 	{
 		for (Player player : Shoebill.Instance.get().getSampObjectStore().getPlayers())
 		{
-			if (player.getVehicle() == vehicle && player.getVehicleSeat() == 0) return player;
+			if (player.getVehicle() == vehicle && player.getState() == PlayerState.DRIVER) return player;
 		}
 		
 		return null;
@@ -50,7 +51,7 @@ public final class VehicleUtils
 		List<Player> passengers = new ArrayList<>();
 		for (Player player : Shoebill.Instance.get().getSampObjectStore().getPlayers())
 		{
-			if (player.getVehicle() == vehicle && player.getVehicleSeat() != 0) passengers.add(player);
+			if (player.getVehicle() == vehicle && player.getState() == PlayerState.PASSENGER) passengers.add(player);
 		}
 		
 		return passengers;

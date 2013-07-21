@@ -46,6 +46,11 @@ public abstract class AbstractListDialog extends AbstractDialog
 			this.string = string;
 		}
 		
+		public void setItemString(String str)
+		{
+			string = str;
+		}
+		
 		public String toItemString()
 		{
 			return string;
