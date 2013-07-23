@@ -62,6 +62,11 @@ public class AbstractPageListDialog extends AbstractListDialog
 		return (dialogListItems.size()-1) / itemsPerPage;
 	}
 	
+	public void onPageUpdate()
+	{
+		
+	}
+	
 	@Override
 	public void show()
 	{
@@ -75,6 +80,7 @@ public class AbstractPageListDialog extends AbstractListDialog
 			{
 				if (currentPage > getMaxPage()) currentPage = getMaxPage();
 				if (currentPage > 0) currentPage--;
+				onPageUpdate();
 				show();
 			}
 		});
@@ -96,6 +102,7 @@ public class AbstractPageListDialog extends AbstractListDialog
 			{
 				if (currentPage > getMaxPage()) currentPage = getMaxPage();
 				if (currentPage < getMaxPage()) currentPage++;
+				onPageUpdate();
 				show();
 			}
 		});
