@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -21,50 +20,7 @@ import net.gtaun.util.event.ManagedEventManager;
 
 public class PlayerLifecycleHolder implements Destroyable
 {
-	public static abstract class PlayerLifecycleObject
-	{
-		protected final Shoebill shoebill;
-		protected final ManagedEventManager eventManager;
-		protected final Player player;
-
-		private final List<Destroyable> destroyables;
-		
-		
-		public PlayerLifecycleObject(Shoebill shoebill, EventManager eventManager, Player player)
-		{
-			this.shoebill = shoebill;
-			this.eventManager = new ManagedEventManager(eventManager);
-			this.player = player;
-			this.destroyables = new LinkedList<>();
-		}
-		
-		public Player getPlayer()
-		{
-			return player;
-		}
-		
-		protected void addDestroyable(Destroyable destroyable)
-		{
-			destroyables.add(destroyable);
-		}
-
-		private void initialize()
-		{
-			onInitialize();
-		}
-		
-		private void uninitialize()
-		{
-			onUninitialize();
-			for (Destroyable destroyable : destroyables) destroyable.destroy();
-			eventManager.cancelAll();
-		}
-
-		protected abstract void onInitialize();
-		protected abstract void onUninitialize();
-	}
-	
-	public interface PlayerLifecycleObjectFactory<T extends PlayerLifecycleObject> 
+	public interface PlayerLifecycleObjectFactory<T extends AbstractPlayerContext> 
 	{
 		T create(Shoebill shoebill, EventManager eventManager, Player player);
 	}
@@ -73,8 +29,8 @@ public class PlayerLifecycleHolder implements Destroyable
 	private final Shoebill shoebill;
 	private final ManagedEventManager eventManager;
 
-	private final Map<Class<?>, PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject>> classFactories;
-	private final Map<Player, Map<Class<?>, PlayerLifecycleObject>> holder;
+	private final Map<Class<?>, PlayerLifecycleObjectFactory<? extends AbstractPlayerContext>> classFactories;
+	private final Map<Player, Map<Class<?>, AbstractPlayerContext>> holder;
 
 	private boolean destroyed;
 	
@@ -106,7 +62,7 @@ public class PlayerLifecycleHolder implements Destroyable
 		return destroyed;
 	}
 	
-	public <T extends PlayerLifecycleObject> void registerClass(final Class<T> clz)
+	public <T extends AbstractPlayerContext> void registerClass(final Class<T> clz)
 	{
 		final Constructor<T> constructor;
 		try
@@ -137,16 +93,16 @@ public class PlayerLifecycleHolder implements Destroyable
 		});
 	}
 	
-	public <T extends PlayerLifecycleObject> void registerClass(Class<T> clz, PlayerLifecycleObjectFactory<T> factory)
+	public <T extends AbstractPlayerContext> void registerClass(Class<T> clz, PlayerLifecycleObjectFactory<T> factory)
 	{
 		if (classFactories.containsKey(clz)) return;
 		
 		Collection<Player> players = shoebill.getSampObjectStore().getPlayers();
 		for (Player player : players)
 		{
-			Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
+			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
 
-			PlayerLifecycleObject object = factory.create(shoebill, eventManager, player);
+			AbstractPlayerContext object = factory.create(shoebill, eventManager, player);
 			playerLifecycleObjects.put(clz, object);
 			object.initialize();
 		}
@@ -154,15 +110,15 @@ public class PlayerLifecycleHolder implements Destroyable
 		classFactories.put(clz, factory);
 	}
 	
-	public <T extends PlayerLifecycleObject> void unregisterClass(Class<T> clz)
+	public <T extends AbstractPlayerContext> void unregisterClass(Class<T> clz)
 	{
 		if (classFactories.containsKey(clz) == false) return;
 		
 		Collection<Player> players = shoebill.getSampObjectStore().getPlayers();
 		for (Player player : players)
 		{
-			Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
-			PlayerLifecycleObject object = playerLifecycleObjects.get(clz);
+			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
+			AbstractPlayerContext object = playerLifecycleObjects.get(clz);
 			playerLifecycleObjects.remove(clz);
 			object.uninitialize();
 		}
@@ -170,20 +126,20 @@ public class PlayerLifecycleHolder implements Destroyable
 		classFactories.remove(clz);
 	}
 	
-	public <T extends PlayerLifecycleObject> T getObject(Player player, Class<T> clz)
+	public <T extends AbstractPlayerContext> T getObject(Player player, Class<T> clz)
 	{
 		if (classFactories.containsKey(clz) == false) return null;
 		
-		Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
+		Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
 		return clz.cast(playerLifecycleObjects.get(clz));
 	}
 	
-	public <T extends PlayerLifecycleObject> Collection<T> getObjects(Class<T> clz)
+	public <T extends AbstractPlayerContext> Collection<T> getObjects(Class<T> clz)
 	{
 		if (classFactories.containsKey(clz) == false) return null;
 		
 		Collection<T> objects = new LinkedList<>();
-		for (Entry<Player, Map<Class<?>, PlayerLifecycleObject>> entry : holder.entrySet())
+		for (Entry<Player, Map<Class<?>, AbstractPlayerContext>> entry : holder.entrySet())
 		{
 			objects.add(clz.cast(entry.getValue().get(clz)));
 		}
@@ -196,15 +152,15 @@ public class PlayerLifecycleHolder implements Destroyable
 		protected void onPlayerConnect(PlayerConnectEvent event)
 		{
 			Player player = event.getPlayer();
-			Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = new HashMap<>();
+			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = new HashMap<>();
 			holder.put(player, playerLifecycleObjects);
 			
-			for (Entry<Class<?>, PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject>> entry : classFactories.entrySet())
+			for (Entry<Class<?>, PlayerLifecycleObjectFactory<? extends AbstractPlayerContext>> entry : classFactories.entrySet())
 			{
 				Class<?> clz = entry.getKey();
-				PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject> factory = entry.getValue();
+				PlayerLifecycleObjectFactory<? extends AbstractPlayerContext> factory = entry.getValue();
 				
-				PlayerLifecycleObject object = factory.create(shoebill, eventManager, player);
+				AbstractPlayerContext object = factory.create(shoebill, eventManager, player);
 				playerLifecycleObjects.put(clz, object);
 				object.initialize();
 			}
@@ -213,10 +169,10 @@ public class PlayerLifecycleHolder implements Destroyable
 		protected void onPlayerDisconnect(PlayerDisconnectEvent event)
 		{
 			Player player = event.getPlayer();
-			Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
+			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
 			holder.remove(player);
 			
-			for (PlayerLifecycleObject object : playerLifecycleObjects.values())
+			for (AbstractPlayerContext object : playerLifecycleObjects.values())
 			{
 				object.uninitialize();
 			}
