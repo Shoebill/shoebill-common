@@ -65,7 +65,7 @@ public abstract class AbstractPlayerContext implements Destroyable
 	@Override
 	public boolean isDestroyed()
 	{
-		return destroyables != null;
+		return destroyables == null;
 	}
 
 	protected abstract void onInit();
