@@ -9,19 +9,21 @@ import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
 import net.gtaun.util.event.ManagedEventManager;
 
-public abstract class AbstractPlayerContext
+public abstract class AbstractPlayerContext implements Destroyable
 {
 	protected final Shoebill shoebill;
+	protected final EventManager rootEventManager;
 	protected final ManagedEventManager eventManager;
 	protected final Player player;
 
-	private final List<Destroyable> destroyables;
+	private List<Destroyable> destroyables;
 	
 	
-	public AbstractPlayerContext(Shoebill shoebill, EventManager eventManager, Player player)
+	public AbstractPlayerContext(Shoebill shoebill, EventManager rootEventManager, Player player)
 	{
 		this.shoebill = shoebill;
-		this.eventManager = new ManagedEventManager(eventManager);
+		this.rootEventManager = rootEventManager;
+		this.eventManager = new ManagedEventManager(rootEventManager);
 		this.player = player;
 		this.destroyables = new LinkedList<>();
 	}
@@ -36,18 +38,27 @@ public abstract class AbstractPlayerContext
 		destroyables.add(destroyable);
 	}
 
-	public final void initialize()
+	public final void init()
 	{
-		onInitialize();
+		onInit();
 	}
 	
-	public final void uninitialize()
+	@Override
+	public final void destroy()
 	{
-		onUninitialize();
+		onDestroy();
 		for (Destroyable destroyable : destroyables) destroyable.destroy();
 		eventManager.cancelAll();
+		
+		destroyables = null;
+	}
+	
+	@Override
+	public boolean isDestroyed()
+	{
+		return destroyables != null;
 	}
 
-	protected abstract void onInitialize();
-	protected abstract void onUninitialize();
+	protected abstract void onInit();
+	protected abstract void onDestroy();
 }

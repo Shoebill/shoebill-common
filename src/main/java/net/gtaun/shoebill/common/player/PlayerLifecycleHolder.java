@@ -104,7 +104,7 @@ public class PlayerLifecycleHolder implements Destroyable
 
 			AbstractPlayerContext object = factory.create(shoebill, eventManager, player);
 			playerLifecycleObjects.put(clz, object);
-			object.initialize();
+			object.init();
 		}
 		
 		classFactories.put(clz, factory);
@@ -120,7 +120,7 @@ public class PlayerLifecycleHolder implements Destroyable
 			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
 			AbstractPlayerContext object = playerLifecycleObjects.get(clz);
 			playerLifecycleObjects.remove(clz);
-			object.uninitialize();
+			object.destroy();
 		}
 		
 		classFactories.remove(clz);
@@ -162,7 +162,7 @@ public class PlayerLifecycleHolder implements Destroyable
 				
 				AbstractPlayerContext object = factory.create(shoebill, eventManager, player);
 				playerLifecycleObjects.put(clz, object);
-				object.initialize();
+				object.init();
 			}
 		}
 		
@@ -174,7 +174,7 @@ public class PlayerLifecycleHolder implements Destroyable
 			
 			for (AbstractPlayerContext object : playerLifecycleObjects.values())
 			{
-				object.uninitialize();
+				object.destroy();
 			}
 		}
 	};
