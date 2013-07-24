@@ -28,6 +28,13 @@ public abstract class AbstractPlayerContext implements Destroyable
 		this.destroyables = new LinkedList<>();
 	}
 	
+	@Override
+	protected void finalize() throws Throwable
+	{
+		destroy();
+		super.finalize();
+	}
+	
 	public Player getPlayer()
 	{
 		return player;
@@ -46,6 +53,8 @@ public abstract class AbstractPlayerContext implements Destroyable
 	@Override
 	public final void destroy()
 	{
+		if (isDestroyed()) return;
+		
 		onDestroy();
 		for (Destroyable destroyable : destroyables) destroyable.destroy();
 		eventManager.cancelAll();
