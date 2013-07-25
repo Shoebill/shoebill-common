@@ -17,6 +17,8 @@
 package net.gtaun.shoebill.common.vehicle;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.gtaun.shoebill.Shoebill;
@@ -53,6 +55,15 @@ public final class VehicleUtils
 		{
 			if (player.getVehicle() == vehicle && player.getState() == PlayerState.PASSENGER) passengers.add(player);
 		}
+		
+		Collections.sort(passengers, new Comparator<Player>()
+		{
+			@Override
+			public int compare(Player o1, Player o2)
+			{
+				return o1.getVehicleSeat() - o2.getVehicleSeat();
+			}
+		});
 		
 		return passengers;
 	}
