@@ -30,6 +30,11 @@ public abstract class AbstractInputDialog extends AbstractDialog
 {
 	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager)
 	{
-		super(DialogStyle.INPUT, player, shoebill, rootEventManager);
+		this(player, shoebill, rootEventManager, null);
+	}
+	
+	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog)
+	{
+		super(DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
 	}
 }

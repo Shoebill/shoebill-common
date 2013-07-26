@@ -31,10 +31,15 @@ public class AbstractPageListDialog extends AbstractListDialog
 	private int itemsPerPage = 10;
 	private int currentPage;
 	
-	
+
 	protected AbstractPageListDialog(Player player, Shoebill shoebill, EventManager eventManager)
 	{
-		super(player, shoebill, eventManager);
+		this(player, shoebill, eventManager, null);
+	}
+	
+	protected AbstractPageListDialog(Player player, Shoebill shoebill, EventManager eventManager, AbstractDialog parentDialog)
+	{
+		super(player, shoebill, eventManager, parentDialog);
 	}
 	
 	public int getItemsPerPage()

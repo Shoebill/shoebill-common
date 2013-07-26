@@ -38,6 +38,7 @@ public abstract class AbstractDialog
 	protected final Shoebill shoebill;
 	protected final EventManager rootEventManager;
 	protected final Player player;
+	protected final AbstractDialog parentDialog;
 
 	private final ManagedEventManager eventManager;
 	
@@ -51,11 +52,17 @@ public abstract class AbstractDialog
 	
 	protected AbstractDialog(DialogStyle style, Player player, Shoebill shoebill, EventManager rootEventManager)
 	{
+		this(style, player, shoebill, rootEventManager, null);
+	}
+	
+	protected AbstractDialog(DialogStyle style, Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog)
+	{
 		this.style = style;
 		this.shoebill = shoebill;
 		this.player = player;
 		this.rootEventManager = rootEventManager;
 		this.eventManager = new ManagedEventManager(rootEventManager);
+		this.parentDialog = parentDialog;
 		
 		SampObjectFactory factory = shoebill.getSampObjectFactory();
 		dialog = factory.createDialog();
@@ -116,6 +123,12 @@ public abstract class AbstractDialog
 	public String getButtonCancel()
 	{
 		return buttonCancel;
+	}
+	
+	public void showParentDialog()
+	{
+		destroy();
+		if (parentDialog != null) parentDialog.show();
 	}
 	
 	protected void show(String text)

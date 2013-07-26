@@ -31,7 +31,12 @@ public abstract class AbstractMsgboxDialog extends AbstractDialog
 {
 	protected AbstractMsgboxDialog(Player player, Shoebill shoebill, EventManager rootEventManager)
 	{
-		super(DialogStyle.MSGBOX, player, shoebill, rootEventManager);
+		this(player, shoebill, rootEventManager, null);
+	}
+	
+	protected AbstractMsgboxDialog(Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog)
+	{
+		super(DialogStyle.MSGBOX, player, shoebill, rootEventManager, parentDialog);
 	}
 	
 	protected void onDialogButtonOk(DialogResponseEvent event)

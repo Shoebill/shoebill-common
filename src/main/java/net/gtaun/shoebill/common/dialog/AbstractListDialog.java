@@ -102,10 +102,15 @@ public abstract class AbstractListDialog extends AbstractDialog
 	protected final List<DialogListItem> dialogListItems;
 	protected final List<DialogListItem> displayedItems;
 	
-	
+
 	protected AbstractListDialog(Player player, Shoebill shoebill, EventManager eventManager)
 	{
-		super(DialogStyle.LIST, player, shoebill, eventManager);
+		this(player, shoebill, eventManager, null);
+	}
+	
+	protected AbstractListDialog(Player player, Shoebill shoebill, EventManager eventManager, AbstractDialog parentDialog)
+	{
+		super(DialogStyle.LIST, player, shoebill, eventManager, parentDialog);
 		dialogListItems = new ArrayList<>();
 		displayedItems = new ArrayList<>();
 	}
