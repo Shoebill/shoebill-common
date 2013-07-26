@@ -71,8 +71,8 @@ public abstract class AbstractDialog
 	@Override
 	protected void finalize() throws Throwable
 	{
-		super.finalize();
 		destroy();
+		super.finalize();
 	}
 	
 	protected void destroy()
