@@ -59,9 +59,6 @@ public abstract class AbstractDialog
 		
 		SampObjectFactory factory = shoebill.getSampObjectFactory();
 		dialog = factory.createDialog();
-		
-		eventManager.registerHandler(DialogResponseEvent.class, dialog, dialogEventHandler, HandlerPriority.NORMAL);
-		eventManager.registerHandler(DialogCancelEvent.class, dialog, dialogEventHandler, HandlerPriority.NORMAL);
 	}
 	
 	@Override
@@ -80,11 +77,13 @@ public abstract class AbstractDialog
 	{
 		public void onDialogResponse(DialogResponseEvent event)
 		{
+			eventManager.cancelAll();
 			AbstractDialog.this.onDialogResponse(event);
 		}
 		
 		public void onDialogCancel(DialogCancelEvent event)
 		{
+			eventManager.cancelAll();
 			AbstractDialog.this.onDialogCancel(event);
 		}
 	};
@@ -94,9 +93,19 @@ public abstract class AbstractDialog
 		this.caption = caption;
 	}
 	
+	public String getCaption()
+	{
+		return caption;
+	}
+	
 	public void setButtonOk(String buttonOk)
 	{
 		this.buttonOk = buttonOk;
+	}
+	
+	public String getButtonOk()
+	{
+		return buttonOk;
 	}
 	
 	public void setButtonCancel(String buttonCancel)
@@ -104,8 +113,16 @@ public abstract class AbstractDialog
 		this.buttonCancel = buttonCancel;
 	}
 	
+	public String getButtonCancel()
+	{
+		return buttonCancel;
+	}
+	
 	protected void show(String text)
 	{
+		eventManager.registerHandler(DialogResponseEvent.class, dialog, dialogEventHandler, HandlerPriority.NORMAL);
+		eventManager.registerHandler(DialogCancelEvent.class, dialog, dialogEventHandler, HandlerPriority.NORMAL);
+		
 		player.showDialog(dialog, style, caption, text, buttonOk, buttonCancel);
 	}
 	
@@ -113,11 +130,11 @@ public abstract class AbstractDialog
 	
 	protected void onDialogResponse(DialogResponseEvent event)
 	{
-		destroy();
+		
 	}
 	
 	protected void onDialogCancel(DialogCancelEvent event)
 	{
-		destroy();
+		
 	}
 }

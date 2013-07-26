@@ -48,7 +48,7 @@ public abstract class AbstractMsgboxDialog extends AbstractDialog
 		}
 		else
 		{
-			super.onDialogResponse(event);
+			destroy();
 		}
 	}
 }
