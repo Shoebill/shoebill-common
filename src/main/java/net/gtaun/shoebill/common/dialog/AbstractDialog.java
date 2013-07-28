@@ -21,6 +21,7 @@ import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.event.DialogEventHandler;
 import net.gtaun.shoebill.event.dialog.DialogCancelEvent;
+import net.gtaun.shoebill.event.dialog.DialogCancelEvent.DialogCancelType;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Dialog;
 import net.gtaun.shoebill.object.Player;
@@ -50,12 +51,12 @@ public abstract class AbstractDialog
 	private String buttonCancel = "Cancel";
 	
 	
-	protected AbstractDialog(DialogStyle style, Player player, Shoebill shoebill, EventManager rootEventManager)
+	AbstractDialog(DialogStyle style, Player player, Shoebill shoebill, EventManager rootEventManager)
 	{
 		this(style, player, shoebill, rootEventManager, null);
 	}
 	
-	protected AbstractDialog(DialogStyle style, Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog)
+	AbstractDialog(DialogStyle style, Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog)
 	{
 		this.style = style;
 		this.shoebill = shoebill;
@@ -85,13 +86,20 @@ public abstract class AbstractDialog
 		public void onDialogResponse(DialogResponseEvent event)
 		{
 			eventManager.cancelAll();
-			AbstractDialog.this.onDialogResponse(event);
+			if (event.getDialogResponse() == 1)
+			{
+				onClickOk(event);
+			}
+			else
+			{
+				onClickCancel();
+			}
 		}
 		
 		public void onDialogCancel(DialogCancelEvent event)
 		{
 			eventManager.cancelAll();
-			AbstractDialog.this.onDialogCancel(event);
+			AbstractDialog.this.onCancel(event.getType());
 		}
 	};
 	
@@ -141,12 +149,17 @@ public abstract class AbstractDialog
 	
 	public abstract void show();
 	
-	protected void onDialogResponse(DialogResponseEvent event)
+	protected void onCancel(DialogCancelType type)
 	{
 		
 	}
 	
-	protected void onDialogCancel(DialogCancelEvent event)
+	protected void onClickCancel()
+	{
+		
+	}
+	
+	void onClickOk(DialogResponseEvent event)
 	{
 		
 	}

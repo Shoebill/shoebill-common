@@ -18,6 +18,7 @@ package net.gtaun.shoebill.common.dialog;
 
 import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.constant.DialogStyle;
+import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
 
@@ -28,13 +29,44 @@ import net.gtaun.util.event.EventManager;
  */
 public abstract class AbstractInputDialog extends AbstractDialog
 {
+	private final boolean passwordMode;
+	
+	
 	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager)
 	{
 		this(player, shoebill, rootEventManager, null);
 	}
-	
+
 	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog)
 	{
 		super(DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
+		this.passwordMode = false;
+	}
+
+	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, boolean passwordMode)
+	{
+		this(player, shoebill, rootEventManager, passwordMode, null);
+	}
+	
+	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, boolean passwordMode, AbstractDialog parentDialog)
+	{
+		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
+		this.passwordMode = passwordMode;
+	}
+	
+	public boolean isPasswordMode()
+	{
+		return passwordMode;
+	}
+	
+	@Override
+	final void onClickOk(DialogResponseEvent event)
+	{
+		onClickOk(event.getInputText());
+	}
+	
+	public void onClickOk(String inputBox)
+	{
+		
 	}
 }

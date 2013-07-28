@@ -133,18 +133,11 @@ public abstract class AbstractListDialog extends AbstractDialog
 	}
 	
 	@Override
-	protected void onDialogResponse(DialogResponseEvent event)
+	final void onClickOk(DialogResponseEvent event)
 	{
-		if (event.getDialogResponse() == 1)
-		{
-			int itemId = event.getListitem();
-			DialogListItem item = displayedItems.get(itemId);
-			
-			item.onItemSelect();
-		}
-		else
-		{
-			destroy();
-		}
+		int itemId = event.getListitem();
+		DialogListItem item = displayedItems.get(itemId);
+		
+		item.onItemSelect();
 	}
 }

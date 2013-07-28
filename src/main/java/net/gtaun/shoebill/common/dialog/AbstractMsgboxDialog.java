@@ -39,21 +39,14 @@ public abstract class AbstractMsgboxDialog extends AbstractDialog
 		super(DialogStyle.MSGBOX, player, shoebill, rootEventManager, parentDialog);
 	}
 	
-	protected void onDialogButtonOk(DialogResponseEvent event)
+	@Override
+	final void onClickOk(DialogResponseEvent event)
 	{
-		destroy();
+		onClickOk();
 	}
 	
-	@Override
-	protected void onDialogResponse(DialogResponseEvent event)
+	protected void onClickOk()
 	{
-		if (event.getDialogResponse() == 1)
-		{
-			onDialogButtonOk(event);
-		}
-		else
-		{
-			destroy();
-		}
+		
 	}
 }
