@@ -98,7 +98,7 @@ public abstract class AbstractInputDialog extends AbstractDialog
 		onClickOk(event.getInputText());
 	}
 	
-	public void onClickOk(String inputBox)
+	public void onClickOk(String inputText)
 	{
 		
 	}
