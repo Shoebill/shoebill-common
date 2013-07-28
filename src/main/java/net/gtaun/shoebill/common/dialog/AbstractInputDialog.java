@@ -32,6 +32,9 @@ public abstract class AbstractInputDialog extends AbstractDialog
 	private final boolean passwordMode;
 	
 	
+	protected String message = "None";
+	
+	
 	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager)
 	{
 		this(player, shoebill, rootEventManager, null);
@@ -53,6 +56,31 @@ public abstract class AbstractInputDialog extends AbstractDialog
 		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
 		this.passwordMode = passwordMode;
 	}
+
+	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, String caption, String message)
+	{
+		this(player, shoebill, rootEventManager, caption, message, null);
+	}
+
+	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, String caption, String message, AbstractDialog parentDialog)
+	{
+		super(DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
+		this.passwordMode = false;
+		this.caption = caption;
+	}
+
+	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, String caption, String message, boolean passwordMode)
+	{
+		this(player, shoebill, rootEventManager, caption, message, passwordMode, null);
+	}
+	
+	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, String caption, String message, boolean passwordMode, AbstractDialog parentDialog)
+	{
+		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
+		this.passwordMode = passwordMode;
+		this.caption = caption;
+	}
+	
 	
 	public boolean isPasswordMode()
 	{

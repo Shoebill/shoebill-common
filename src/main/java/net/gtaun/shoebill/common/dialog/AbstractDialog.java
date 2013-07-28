@@ -41,14 +41,14 @@ public abstract class AbstractDialog
 	protected final Player player;
 	protected final AbstractDialog parentDialog;
 
-	private final ManagedEventManager eventManager;
+	protected final ManagedEventManager eventManager;
 	
 	private final Dialog dialog;
 	private final DialogStyle style;
 	
-	private String caption = "None";
-	private String buttonOk = "OK";
-	private String buttonCancel = "Cancel";
+	protected String caption = "None";
+	protected String buttonOk = "OK";
+	protected String buttonCancel = "Cancel";
 	
 	
 	AbstractDialog(DialogStyle style, Player player, Shoebill shoebill, EventManager rootEventManager)
@@ -102,36 +102,6 @@ public abstract class AbstractDialog
 			AbstractDialog.this.onCancel(event.getType());
 		}
 	};
-	
-	public void setCaption(String caption)
-	{
-		this.caption = caption;
-	}
-	
-	public String getCaption()
-	{
-		return caption;
-	}
-	
-	public void setButtonOk(String buttonOk)
-	{
-		this.buttonOk = buttonOk;
-	}
-	
-	public String getButtonOk()
-	{
-		return buttonOk;
-	}
-	
-	public void setButtonCancel(String buttonCancel)
-	{
-		this.buttonCancel = buttonCancel;
-	}
-	
-	public String getButtonCancel()
-	{
-		return buttonCancel;
-	}
 	
 	public void showParentDialog()
 	{
