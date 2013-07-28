@@ -81,10 +81,15 @@ public abstract class AbstractInputDialog extends AbstractDialog
 		this.caption = caption;
 	}
 	
-	
 	public boolean isPasswordMode()
 	{
 		return passwordMode;
+	}
+	
+	@Override
+	public void show()
+	{
+		show(message);
 	}
 	
 	@Override
