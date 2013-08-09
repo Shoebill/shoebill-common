@@ -39,7 +39,15 @@ public abstract class AbstractShoebillContext implements Destroyable
 
 	public final void init()
 	{
-		onInit();
+		try
+		{
+			onInit();
+		}
+		catch (Throwable e)
+		{
+			e.printStackTrace();
+			destroy();
+		}
 	}
 	
 	@Override
