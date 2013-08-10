@@ -119,6 +119,7 @@ public class AbstractPageListDialog extends AbstractListDialog
 	
 	protected void show(int page)
 	{
+		currentPage = page;
 		if (currentPage > getMaxPage()) currentPage = getMaxPage();
 		else if (currentPage < 0) currentPage = 0;
 		
