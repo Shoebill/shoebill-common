@@ -36,7 +36,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 {
 	public static abstract class DialogListItem
 	{
-		private String string;
+		protected String itemString;
 		
 		public DialogListItem()
 		{
@@ -45,17 +45,12 @@ public abstract class AbstractListDialog extends AbstractDialog
 		
 		public DialogListItem(String string)
 		{
-			this.string = string;
-		}
-		
-		public void setItemString(String str)
-		{
-			string = str;
+			this.itemString = string;
 		}
 		
 		public String toItemString()
 		{
-			return string;
+			return itemString;
 		}
 		
 		public boolean isEnabled()
@@ -68,27 +63,33 @@ public abstract class AbstractListDialog extends AbstractDialog
 	
 	public static abstract class DialogListItemSwitch extends DialogListItem
 	{
-		private final String string;
-		private final String onMessage;
-		private final String offMessage;
+		protected String onMessage;
+		protected String offMessage;
+		protected Color onColor;
+		protected Color offColor;
+		
+		public DialogListItemSwitch(String string, String onMessage, String offMessage, Color onColor, Color offColor)
+		{
+			this.itemString = string;
+			this.onMessage = onMessage;
+			this.offMessage = offMessage;
+			this.onColor = onColor;
+			this.offColor = offColor;
+		}
 		
 		public DialogListItemSwitch(String string, String onMessage, String offMessage)
 		{
-			this.string = string;
-			this.onMessage = onMessage;
-			this.offMessage = offMessage;
+			this(string, onMessage, offMessage, Color.GREEN, Color.GRAY);
 		}
 		
 		public DialogListItemSwitch(String string)
 		{
-			this.string = string;
-			this.onMessage = "ON";
-			this.offMessage = "OFF";
+			this(string, "ON", "OFF");
 		}
 		
 		public String toItemString()
 		{
-			return string + " [" + (isSwitched() ? onMessage : offMessage) + "]";
+			return itemString + " [" + (isSwitched() ? onMessage : offMessage) + "]";
 		}
 		
 		public boolean isEnabled()
@@ -105,25 +106,22 @@ public abstract class AbstractListDialog extends AbstractDialog
 		public class RadioItem
 		{
 			protected String itemString;
+			protected Color checkedColor;
 
-			public RadioItem()
+			public RadioItem(String itemString, Color checkedColor)
 			{
-				this.itemString = " ";
+				this.itemString = itemString;
+				this.checkedColor = checkedColor;
 			}
 			
 			public RadioItem(String itemString)
 			{
-				this.itemString = itemString;
+				this(itemString, Color.GREEN);
 			}
 			
 			public String getItemString()
 			{
 				return itemString;
-			}
-			
-			public Color getCheckedColor()
-			{
-				return Color.GREEN;
 			}
 			
 			public void onSelected()
@@ -132,13 +130,19 @@ public abstract class AbstractListDialog extends AbstractDialog
 			}
 		}
 		
-		private final String string;
 		private final List<RadioItem> options;
+		protected Color uncheckedColor;
+
+		public DialogListItemRadio(String string, Color uncheckedColor)
+		{
+			this.itemString = string;
+			this.uncheckedColor = uncheckedColor;
+			this.options = new ArrayList<>();
+		}
 		
 		public DialogListItemRadio(String string)
 		{
-			this.string = string;
-			this.options = new ArrayList<>();
+			this(string, Color.GRAY);
 		}
 		
 		public void addItem(RadioItem item)
@@ -148,13 +152,13 @@ public abstract class AbstractListDialog extends AbstractDialog
 		
 		public String toItemString()
 		{
-			String str = string;
+			String str = itemString;
 			for(int i=0; i<options.size(); i++)
 			{
 				int selected = getSelected();
 				RadioItem item = options.get(i);
-				if (i == selected) str += item.getCheckedColor().toEmbeddingString() + " [" + item.getItemString() + "]";
-				else str += Color.GRAY.toEmbeddingString() + " [" + item.getItemString() + "]";
+				if (i == selected) str += item.checkedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
+				else str += uncheckedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
 			}
 			return str;
 		}
@@ -187,15 +191,17 @@ public abstract class AbstractListDialog extends AbstractDialog
 		public abstract class CheckItem
 		{
 			protected String itemString;
+			protected Color checkedColor;
 
-			public CheckItem()
+			public CheckItem(String itemString, Color checkedColor)
 			{
-				this.itemString = " ";
+				this.itemString = itemString;
+				this.checkedColor = checkedColor;
 			}
 			
 			public CheckItem(String itemString)
 			{
-				this.itemString = itemString;
+				this(itemString, Color.GREEN);
 			}
 			
 			public String getItemString()
@@ -203,21 +209,22 @@ public abstract class AbstractListDialog extends AbstractDialog
 				return itemString;
 			}
 			
-			public Color getCheckedColor()
-			{
-				return Color.GREEN;
-			}
-			
 			public abstract boolean isChecked();
 		}
 		
-		private final String string;
 		private final List<CheckItem> options;
+		protected Color uncheckedColor;
+
+		public DialogListItemCheck(String string, Color uncheckedColor)
+		{
+			this.itemString = string;
+			this.uncheckedColor = uncheckedColor;
+			this.options = new ArrayList<>();
+		}
 		
 		public DialogListItemCheck(String string)
 		{
-			this.string = string;
-			this.options = new ArrayList<>();
+			this(string, Color.GRAY);
 		}
 		
 		public void addItem(CheckItem item)
@@ -227,11 +234,11 @@ public abstract class AbstractListDialog extends AbstractDialog
 		
 		public String toItemString()
 		{
-			String str = string;
+			String str = itemString;
 			for(CheckItem item : options)
 			{
-				if (item.isChecked()) str += item.getCheckedColor().toEmbeddingString() + " [" + item.getItemString() + "]";
-				else str += Color.GRAY.toEmbeddingString() + " [" + item.getItemString() + "]";
+				if (item.isChecked()) str += item.checkedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
+				else str += uncheckedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
 			}
 			return str;
 		}
