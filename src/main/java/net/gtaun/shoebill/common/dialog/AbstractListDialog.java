@@ -175,10 +175,10 @@ public abstract class AbstractListDialog extends AbstractDialog
 			int index = (getSelected() + 1) % options.size();
 			RadioItem item = options.get(index);
 			item.onSelected();
-			onItemSelect(item);
+			onItemSelect(item, index);
 		}
 
-		public void onItemSelect(RadioItem item)
+		public void onItemSelect(RadioItem item, int itemIndex)
 		{
 			
 		}
