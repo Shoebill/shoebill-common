@@ -22,6 +22,7 @@ import java.util.List;
 
 import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.constant.DialogStyle;
+import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
@@ -96,6 +97,150 @@ public abstract class AbstractListDialog extends AbstractDialog
 		}
 		
 		public abstract boolean isSwitched();
+		public abstract void onItemSelect();
+	}
+	
+	public static abstract class DialogListItemRadio extends DialogListItem
+	{
+		public class RadioItem
+		{
+			protected String itemString;
+
+			public RadioItem()
+			{
+				this.itemString = " ";
+			}
+			
+			public RadioItem(String itemString)
+			{
+				this.itemString = itemString;
+			}
+			
+			public String getItemString()
+			{
+				return itemString;
+			}
+			
+			public Color getCheckedColor()
+			{
+				return Color.GREEN;
+			}
+			
+			public void onSelected()
+			{
+				
+			}
+		}
+		
+		private final String string;
+		private final List<RadioItem> options;
+		
+		public DialogListItemRadio(String string)
+		{
+			this.string = string;
+			this.options = new ArrayList<>();
+		}
+		
+		public void addItem(RadioItem item)
+		{
+			options.add(item);
+		}
+		
+		public String toItemString()
+		{
+			String str = string;
+			for(int i=0; i<options.size(); i++)
+			{
+				int selected = getSelected();
+				RadioItem item = options.get(i);
+				if (i == selected) str += item.getCheckedColor().toEmbeddingString() + " [" + item.getItemString() + "]";
+				str += Color.GRAY.toEmbeddingString() + " [" + item.getItemString() + "]";
+			}
+			return str;
+		}
+		
+		public boolean isEnabled()
+		{
+			return true;
+		}
+		
+		@Override
+		public final void onItemSelect()
+		{
+			if (options.isEmpty()) return;
+			int index = (getSelected() + 1) % options.size();
+			RadioItem item = options.get(index);
+			item.onSelected();
+			onItemSelect(item);
+		}
+
+		public void onItemSelect(RadioItem item)
+		{
+			
+		}
+		
+		public abstract int getSelected();
+	}
+	
+	public static abstract class DialogListItemCheck extends DialogListItem
+	{
+		public abstract class CheckItem
+		{
+			protected String itemString;
+
+			public CheckItem()
+			{
+				this.itemString = " ";
+			}
+			
+			public CheckItem(String itemString)
+			{
+				this.itemString = itemString;
+			}
+			
+			public String getItemString()
+			{
+				return itemString;
+			}
+			
+			public Color getCheckedColor()
+			{
+				return Color.GREEN;
+			}
+			
+			public abstract boolean isChecked();
+		}
+		
+		private final String string;
+		private final List<CheckItem> options;
+		
+		public DialogListItemCheck(String string)
+		{
+			this.string = string;
+			this.options = new ArrayList<>();
+		}
+		
+		public void addItem(CheckItem item)
+		{
+			options.add(item);
+		}
+		
+		public String toItemString()
+		{
+			String str = string;
+			for(CheckItem item : options)
+			{
+				if (item.isChecked()) str += item.getCheckedColor().toEmbeddingString() + " [" + item.toString() + "]";
+				str += Color.GRAY.toEmbeddingString() + " [" + item.toString() + "]";
+			}
+			return str;
+		}
+		
+		public boolean isEnabled()
+		{
+			return true;
+		}
+
 		public abstract void onItemSelect();
 	}
 	
