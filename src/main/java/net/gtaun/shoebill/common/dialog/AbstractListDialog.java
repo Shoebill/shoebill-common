@@ -154,7 +154,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 				int selected = getSelected();
 				RadioItem item = options.get(i);
 				if (i == selected) str += item.getCheckedColor().toEmbeddingString() + " [" + item.getItemString() + "]";
-				str += Color.GRAY.toEmbeddingString() + " [" + item.getItemString() + "]";
+				else str += Color.GRAY.toEmbeddingString() + " [" + item.getItemString() + "]";
 			}
 			return str;
 		}
@@ -231,7 +231,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 			for(CheckItem item : options)
 			{
 				if (item.isChecked()) str += item.getCheckedColor().toEmbeddingString() + " [" + item.toString() + "]";
-				str += Color.GRAY.toEmbeddingString() + " [" + item.toString() + "]";
+				else str += Color.GRAY.toEmbeddingString() + " [" + item.toString() + "]";
 			}
 			return str;
 		}
