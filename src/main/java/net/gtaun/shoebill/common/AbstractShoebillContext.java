@@ -57,9 +57,9 @@ public abstract class AbstractShoebillContext implements Destroyable
 		
 		onDestroy();
 		for (Destroyable destroyable : destroyables) destroyable.destroy();
-		eventManager.cancelAll();
-		
 		destroyables = null;
+		
+		eventManager.cancelAll();
 	}
 	
 	@Override

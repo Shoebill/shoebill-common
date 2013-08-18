@@ -22,6 +22,11 @@ public class ColorUtils
 		return new Color(r, g, b, a);
 	}
 	
+	public static Color hsbColor(float hue, float saturation, float brightness, int alpha)
+	{
+		return new Color((java.awt.Color.HSBtoRGB(hue, saturation, brightness)<<8) | (alpha & 0xFF));
+	}
+	
 	private ColorUtils()
 	{
 
