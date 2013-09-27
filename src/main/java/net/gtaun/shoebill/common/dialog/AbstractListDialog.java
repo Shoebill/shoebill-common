@@ -36,6 +36,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 {
 	public static abstract class DialogListItem
 	{
+		protected AbstractListDialog currentDialog;
 		protected String itemString;
 		
 		public DialogListItem()
@@ -56,6 +57,11 @@ public abstract class AbstractListDialog extends AbstractDialog
 		public boolean isEnabled()
 		{
 			return true;
+		}
+		
+		public AbstractListDialog getCurrentDialog()
+		{
+			return currentDialog;
 		}
 		
 		public abstract void onItemSelect();
@@ -284,6 +290,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 			if (item.isEnabled() == false) continue;
 			
 			listStr += item.toItemString() + "\n";
+			item.currentDialog = this;
 			displayedItems.add(item);
 		}
 		
