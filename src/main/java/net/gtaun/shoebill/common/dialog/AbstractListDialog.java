@@ -17,7 +17,6 @@
 package net.gtaun.shoebill.common.dialog;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.gtaun.shoebill.Shoebill;
@@ -272,11 +271,6 @@ public abstract class AbstractListDialog extends AbstractDialog
 		super(DialogStyle.LIST, player, shoebill, eventManager, parentDialog);
 		dialogListItems = new ArrayList<>();
 		displayedItems = new ArrayList<>();
-	}
-	
-	public List<DialogListItem> getDialogListItems()
-	{
-		return Collections.unmodifiableList(displayedItems);
 	}
 	
 	@Override
