@@ -94,7 +94,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 		
 		public String toItemString()
 		{
-			return itemString + " [" + (isSwitched() ? onMessage : offMessage) + "]";
+			return itemString + (isSwitched() ? onColor.toEmbeddingString() : offColor.toEmbeddingString()) + " [" + (isSwitched() ? onMessage :  offMessage) + "]";
 		}
 		
 		public boolean isEnabled()
