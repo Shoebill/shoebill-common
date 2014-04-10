@@ -16,8 +16,7 @@
 
 package net.gtaun.shoebill.common.dialog;
 
-import net.gtaun.shoebill.SampObjectFactory;
-import net.gtaun.shoebill.Shoebill;
+import net.gtaun.shoebill.SampObjectManager;
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.event.dialog.DialogCancelEvent;
 import net.gtaun.shoebill.event.dialog.DialogCancelEvent.DialogCancelType;
@@ -35,13 +34,12 @@ import net.gtaun.util.event.HandlerPriority;
  */
 public abstract class AbstractDialog
 {
-	protected final Shoebill shoebill;
 	protected final Player player;
 	protected final AbstractDialog parentDialog;
 
 	protected final EventManagerNode eventManager;
 	
-	private final DialogId dialog;
+	private final DialogId dialogId;
 	private final DialogStyle style;
 	
 	protected String caption = "None";
@@ -49,21 +47,19 @@ public abstract class AbstractDialog
 	protected String buttonCancel = "Cancel";
 	
 	
-	AbstractDialog(DialogStyle style, Player player, Shoebill shoebill, EventManager rootEventManager)
+	AbstractDialog(DialogStyle style, Player player, EventManager rootEventManager)
 	{
-		this(style, player, shoebill, rootEventManager, null);
+		this(style, player, rootEventManager, null);
 	}
 	
-	AbstractDialog(DialogStyle style, Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog)
+	AbstractDialog(DialogStyle style, Player player, EventManager rootEventManager, AbstractDialog parentDialog)
 	{
 		this.style = style;
-		this.shoebill = shoebill;
 		this.player = player;
 		this.eventManager = rootEventManager.createChildNode();
 		this.parentDialog = parentDialog;
 		
-		SampObjectFactory factory = shoebill.getSampObjectFactory();
-		dialog = factory.createDialogId();
+		dialogId = SampObjectManager.get().createDialogId();
 	}
 	
 	@Override
@@ -107,7 +103,7 @@ public abstract class AbstractDialog
 			AbstractDialog.this.onCancel(e.getType());
 		});
 		
-		player.showDialog(dialog, style, caption, text, buttonOk, buttonCancel);
+		player.showDialog(dialogId, style, caption, text, buttonOk, buttonCancel);
 	}
 	
 	public abstract void show();

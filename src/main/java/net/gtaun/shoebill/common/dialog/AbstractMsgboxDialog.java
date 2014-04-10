@@ -16,7 +16,6 @@
 
 package net.gtaun.shoebill.common.dialog;
 
-import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Player;
@@ -29,14 +28,14 @@ import net.gtaun.util.event.EventManager;
  */
 public abstract class AbstractMsgboxDialog extends AbstractDialog
 {
-	protected AbstractMsgboxDialog(Player player, Shoebill shoebill, EventManager rootEventManager)
+	protected AbstractMsgboxDialog(Player player, EventManager rootEventManager)
 	{
-		this(player, shoebill, rootEventManager, null);
+		this(player, rootEventManager, null);
 	}
 	
-	protected AbstractMsgboxDialog(Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog)
+	protected AbstractMsgboxDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog)
 	{
-		super(DialogStyle.MSGBOX, player, shoebill, rootEventManager, parentDialog);
+		super(DialogStyle.MSGBOX, player, rootEventManager, parentDialog);
 	}
 	
 	@Override

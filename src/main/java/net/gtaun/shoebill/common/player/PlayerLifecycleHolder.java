@@ -119,7 +119,7 @@ public class PlayerLifecycleHolder implements Destroyable
 	{
 		if (classFactories.containsKey(clz)) return;
 		
-		Collection<Player> players = shoebill.getSampObjectStore().getPlayers();
+		Collection<Player> players = shoebill.getSampObjectManager().getPlayers();
 		for (Player player : players)
 		{
 			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
@@ -136,7 +136,7 @@ public class PlayerLifecycleHolder implements Destroyable
 	{
 		if (classFactories.containsKey(clz) == false) return;
 		
-		Collection<Player> players = shoebill.getSampObjectStore().getPlayers();
+		Collection<Player> players = shoebill.getSampObjectManager().getPlayers();
 		for (Player player : players)
 		{
 			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);

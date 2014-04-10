@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
@@ -262,14 +261,14 @@ public abstract class AbstractListDialog extends AbstractDialog
 	final List<DialogListItem> displayedItems;
 	
 
-	protected AbstractListDialog(Player player, Shoebill shoebill, EventManager eventManager)
+	protected AbstractListDialog(Player player, EventManager eventManager)
 	{
-		this(player, shoebill, eventManager, null);
+		this(player, eventManager, null);
 	}
 	
-	protected AbstractListDialog(Player player, Shoebill shoebill, EventManager eventManager, AbstractDialog parentDialog)
+	protected AbstractListDialog(Player player, EventManager eventManager, AbstractDialog parentDialog)
 	{
-		super(DialogStyle.LIST, player, shoebill, eventManager, parentDialog);
+		super(DialogStyle.LIST, player, eventManager, parentDialog);
 		dialogListItems = new ArrayList<>();
 		displayedItems = new ArrayList<>();
 	}

@@ -16,7 +16,6 @@
 
 package net.gtaun.shoebill.common.dialog;
 
-import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Player;
@@ -35,49 +34,49 @@ public abstract class AbstractInputDialog extends AbstractDialog
 	protected String message = "None";
 	
 	
-	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager)
+	public AbstractInputDialog(Player player, EventManager rootEventManager)
 	{
-		this(player, shoebill, rootEventManager, null);
+		this(player, rootEventManager, null);
 	}
 
-	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog)
+	public AbstractInputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog)
 	{
-		super(DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
+		super(DialogStyle.INPUT, player, rootEventManager, parentDialog);
 		this.passwordMode = false;
 	}
 
-	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, boolean passwordMode)
+	public AbstractInputDialog(Player player, EventManager rootEventManager, boolean passwordMode)
 	{
-		this(player, shoebill, rootEventManager, null, passwordMode);
+		this(player, rootEventManager, null, passwordMode);
 	}
 	
-	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog, boolean passwordMode)
+	public AbstractInputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog, boolean passwordMode)
 	{
-		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
+		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, rootEventManager, parentDialog);
 		this.passwordMode = passwordMode;
 	}
 
-	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, String caption, String message)
+	public AbstractInputDialog(Player player, EventManager rootEventManager, String caption, String message)
 	{
-		this(player, shoebill, rootEventManager, null, caption, message);
+		this(player, rootEventManager, null, caption, message);
 	}
 
-	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog, String caption, String message)
+	public AbstractInputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog, String caption, String message)
 	{
-		super(DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
+		super(DialogStyle.INPUT, player, rootEventManager, parentDialog);
 		this.passwordMode = false;
 		this.caption = caption;
 		this.message = message;
 	}
 
-	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, String caption, String message, boolean passwordMode)
+	public AbstractInputDialog(Player player, EventManager rootEventManager, String caption, String message, boolean passwordMode)
 	{
-		this(player, shoebill, rootEventManager, null, caption, message, passwordMode);
+		this(player, rootEventManager, null, caption, message, passwordMode);
 	}
 	
-	public AbstractInputDialog(Player player, Shoebill shoebill, EventManager rootEventManager, AbstractDialog parentDialog, String caption, String message, boolean passwordMode)
+	public AbstractInputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog, String caption, String message, boolean passwordMode)
 	{
-		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, shoebill, rootEventManager, parentDialog);
+		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, rootEventManager, parentDialog);
 		this.passwordMode = passwordMode;
 		this.caption = caption;
 		this.message = message;

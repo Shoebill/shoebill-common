@@ -40,7 +40,7 @@ public final class VehicleUtils
 
 	public static Player getVehicleDriver(Vehicle vehicle)
 	{
-		for (Player player : Shoebill.Instance.get().getSampObjectStore().getPlayers())
+		for (Player player : Shoebill.get().getSampObjectManager().getPlayers())
 		{
 			if (player.getVehicle() == vehicle && player.getState() == PlayerState.DRIVER) return player;
 		}
@@ -51,7 +51,7 @@ public final class VehicleUtils
 	public static List<Player> getVehiclePassengers(Vehicle vehicle)
 	{
 		List<Player> passengers = new ArrayList<>();
-		for (Player player : Shoebill.Instance.get().getSampObjectStore().getPlayers())
+		for (Player player : Shoebill.get().getSampObjectManager().getPlayers())
 		{
 			if (player.getVehicle() == vehicle && player.getState() == PlayerState.PASSENGER) passengers.add(player);
 		}

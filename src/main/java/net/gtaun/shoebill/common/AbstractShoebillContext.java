@@ -3,23 +3,20 @@ package net.gtaun.shoebill.common;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.object.Destroyable;
 import net.gtaun.util.event.EventManager;
 import net.gtaun.util.event.EventManagerNode;
 
 public abstract class AbstractShoebillContext implements Destroyable
 {
-	protected final Shoebill shoebill;
 	protected final EventManager rootEventManager;
 	protected final EventManagerNode eventManager;
 
 	private List<Destroyable> destroyables;
 	
 	
-	public AbstractShoebillContext(Shoebill shoebill, EventManager rootEventManager)
+	public AbstractShoebillContext( EventManager rootEventManager)
 	{
-		this.shoebill = shoebill;
 		this.rootEventManager = rootEventManager;
 		this.eventManager = rootEventManager.createChildNode();
 		this.destroyables = new LinkedList<>();

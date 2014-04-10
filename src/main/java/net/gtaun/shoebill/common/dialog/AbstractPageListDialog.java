@@ -16,7 +16,6 @@
 
 package net.gtaun.shoebill.common.dialog;
 
-import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
@@ -32,14 +31,14 @@ public class AbstractPageListDialog extends AbstractListDialog
 	private int currentPage;
 	
 
-	protected AbstractPageListDialog(Player player, Shoebill shoebill, EventManager eventManager)
+	protected AbstractPageListDialog(Player player, EventManager eventManager)
 	{
-		this(player, shoebill, eventManager, null);
+		this(player, eventManager, null);
 	}
 	
-	protected AbstractPageListDialog(Player player, Shoebill shoebill, EventManager eventManager, AbstractDialog parentDialog)
+	protected AbstractPageListDialog(Player player, EventManager eventManager, AbstractDialog parentDialog)
 	{
-		super(player, shoebill, eventManager, parentDialog);
+		super(player, eventManager, parentDialog);
 	}
 	
 	public int getItemsPerPage()
