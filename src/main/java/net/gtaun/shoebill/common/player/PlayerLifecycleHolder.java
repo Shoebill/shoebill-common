@@ -9,14 +9,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.gtaun.shoebill.Shoebill;
-import net.gtaun.shoebill.event.PlayerEventHandler;
 import net.gtaun.shoebill.event.player.PlayerConnectEvent;
 import net.gtaun.shoebill.event.player.PlayerDisconnectEvent;
 import net.gtaun.shoebill.object.Destroyable;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
-import net.gtaun.util.event.EventManager.HandlerPriority;
-import net.gtaun.util.event.ManagedEventManager;
+import net.gtaun.util.event.EventManagerNode;
+import net.gtaun.util.event.HandlerPriority;
 
 public class PlayerLifecycleHolder implements Destroyable
 {
@@ -27,7 +26,7 @@ public class PlayerLifecycleHolder implements Destroyable
 	
 	
 	private final Shoebill shoebill;
-	private final ManagedEventManager eventManager;
+	private final EventManagerNode eventManager;
 
 	private final Map<Class<?>, PlayerLifecycleObjectFactory<? extends AbstractPlayerContext>> classFactories;
 	private final Map<Player, Map<Class<?>, AbstractPlayerContext>> holder;
@@ -39,12 +38,35 @@ public class PlayerLifecycleHolder implements Destroyable
 	{
 		this.shoebill = shoebill;
 		
-		eventManager = new ManagedEventManager(rootEventManager);
+		eventManager = rootEventManager.createChildNode();
 		classFactories = new HashMap<>();
 		holder = new HashMap<>();
 
-		eventManager.registerHandler(PlayerConnectEvent.class, playerEventHandler, HandlerPriority.MONITOR);
-		eventManager.registerHandler(PlayerDisconnectEvent.class, playerEventHandler, HandlerPriority.BOTTOM);
+		eventManager.registerHandler(PlayerConnectEvent.class, HandlerPriority.MONITOR, (PlayerConnectEvent e) ->
+		{
+			Player player = e.getPlayer();
+			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = new HashMap<>();
+			holder.put(player, playerLifecycleObjects);
+			
+			for (Entry<Class<?>, PlayerLifecycleObjectFactory<? extends AbstractPlayerContext>> entry : classFactories.entrySet())
+			{
+				Class<?> clz = entry.getKey();
+				PlayerLifecycleObjectFactory<? extends AbstractPlayerContext> factory = entry.getValue();
+				
+				AbstractPlayerContext object = factory.create(shoebill, eventManager, player);
+				playerLifecycleObjects.put(clz, object);
+				object.init();
+			}
+		});
+		
+		eventManager.registerHandler(PlayerDisconnectEvent.class, HandlerPriority.BOTTOM, (PlayerDisconnectEvent e) ->
+		{
+			Player player = e.getPlayer();
+			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
+			holder.remove(player);
+			
+			for (AbstractPlayerContext object : playerLifecycleObjects.values()) object.destroy();
+		});
 	}
 
 	@Override
@@ -52,7 +74,7 @@ public class PlayerLifecycleHolder implements Destroyable
 	{
 		if (destroyed) return;
 		
-		eventManager.cancelAll();
+		eventManager.destroy();
 		destroyed = true;
 	}
 
@@ -146,36 +168,4 @@ public class PlayerLifecycleHolder implements Destroyable
 		
 		return objects;
 	}
-	
-	private final PlayerEventHandler playerEventHandler = new PlayerEventHandler()
-	{
-		protected void onPlayerConnect(PlayerConnectEvent event)
-		{
-			Player player = event.getPlayer();
-			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = new HashMap<>();
-			holder.put(player, playerLifecycleObjects);
-			
-			for (Entry<Class<?>, PlayerLifecycleObjectFactory<? extends AbstractPlayerContext>> entry : classFactories.entrySet())
-			{
-				Class<?> clz = entry.getKey();
-				PlayerLifecycleObjectFactory<? extends AbstractPlayerContext> factory = entry.getValue();
-				
-				AbstractPlayerContext object = factory.create(shoebill, eventManager, player);
-				playerLifecycleObjects.put(clz, object);
-				object.init();
-			}
-		}
-		
-		protected void onPlayerDisconnect(PlayerDisconnectEvent event)
-		{
-			Player player = event.getPlayer();
-			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
-			holder.remove(player);
-			
-			for (AbstractPlayerContext object : playerLifecycleObjects.values())
-			{
-				object.destroy();
-			}
-		}
-	};
 }

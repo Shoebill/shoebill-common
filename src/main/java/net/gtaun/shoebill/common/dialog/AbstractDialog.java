@@ -19,15 +19,14 @@ package net.gtaun.shoebill.common.dialog;
 import net.gtaun.shoebill.SampObjectFactory;
 import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.constant.DialogStyle;
-import net.gtaun.shoebill.event.DialogEventHandler;
 import net.gtaun.shoebill.event.dialog.DialogCancelEvent;
 import net.gtaun.shoebill.event.dialog.DialogCancelEvent.DialogCancelType;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
-import net.gtaun.shoebill.object.Dialog;
+import net.gtaun.shoebill.object.DialogId;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
-import net.gtaun.util.event.EventManager.HandlerPriority;
-import net.gtaun.util.event.ManagedEventManager;
+import net.gtaun.util.event.EventManagerNode;
+import net.gtaun.util.event.HandlerPriority;
 
 /**
  * 抽象对话框类。
@@ -37,13 +36,12 @@ import net.gtaun.util.event.ManagedEventManager;
 public abstract class AbstractDialog
 {
 	protected final Shoebill shoebill;
-	protected final EventManager rootEventManager;
 	protected final Player player;
 	protected final AbstractDialog parentDialog;
 
-	protected final ManagedEventManager eventManager;
+	protected final EventManagerNode eventManager;
 	
-	private final Dialog dialog;
+	private final DialogId dialog;
 	private final DialogStyle style;
 	
 	protected String caption = "None";
@@ -61,12 +59,11 @@ public abstract class AbstractDialog
 		this.style = style;
 		this.shoebill = shoebill;
 		this.player = player;
-		this.rootEventManager = rootEventManager;
-		this.eventManager = new ManagedEventManager(rootEventManager);
+		this.eventManager = rootEventManager.createChildNode();
 		this.parentDialog = parentDialog;
 		
 		SampObjectFactory factory = shoebill.getSampObjectFactory();
-		dialog = factory.createDialog();
+		dialog = factory.createDialogId();
 	}
 	
 	@Override
@@ -78,30 +75,8 @@ public abstract class AbstractDialog
 	
 	protected void destroy()
 	{
-		eventManager.cancelAll();
+		eventManager.destroy();
 	}
-	
-	private DialogEventHandler dialogEventHandler = new DialogEventHandler()
-	{
-		public void onDialogResponse(DialogResponseEvent event)
-		{
-			eventManager.cancelAll();
-			if (event.getDialogResponse() == 1)
-			{
-				onClickOk(event);
-			}
-			else
-			{
-				onClickCancel();
-			}
-		}
-		
-		public void onDialogCancel(DialogCancelEvent event)
-		{
-			eventManager.cancelAll();
-			AbstractDialog.this.onCancel(event.getType());
-		}
-	};
 	
 	public void showParentDialog()
 	{
@@ -111,8 +86,26 @@ public abstract class AbstractDialog
 	
 	protected void show(String text)
 	{
-		eventManager.registerHandler(DialogResponseEvent.class, dialog, dialogEventHandler, HandlerPriority.NORMAL);
-		eventManager.registerHandler(DialogCancelEvent.class, dialog, dialogEventHandler, HandlerPriority.NORMAL);
+		// FIXME
+		eventManager.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, (DialogResponseEvent e) ->
+		{
+			eventManager.destroy();
+			if (e.getDialogResponse() == 1)
+			{
+				onClickOk(e);
+			}
+			else
+			{
+				onClickCancel();
+			}
+		});
+
+		// FIXME
+		eventManager.registerHandler(DialogCancelEvent.class, HandlerPriority.NORMAL, (DialogCancelEvent e) ->
+		{
+			eventManager.destroy();
+			AbstractDialog.this.onCancel(e.getType());
+		});
 		
 		player.showDialog(dialog, style, caption, text, buttonOk, buttonCancel);
 	}
