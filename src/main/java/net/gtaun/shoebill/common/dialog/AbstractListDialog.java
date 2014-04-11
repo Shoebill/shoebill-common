@@ -17,7 +17,6 @@
 package net.gtaun.shoebill.common.dialog;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.gtaun.shoebill.constant.DialogStyle;
@@ -94,7 +93,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 		
 		public String toItemString()
 		{
-			return itemString + " [" + (isSwitched() ? onMessage : offMessage) + "]";
+			return itemString + (isSwitched() ? onColor.toEmbeddingString() : offColor.toEmbeddingString()) + " [" + (isSwitched() ? onMessage :  offMessage) + "]";
 		}
 		
 		public boolean isEnabled()
@@ -271,11 +270,6 @@ public abstract class AbstractListDialog extends AbstractDialog
 		super(DialogStyle.LIST, player, eventManager, parentDialog);
 		dialogListItems = new ArrayList<>();
 		displayedItems = new ArrayList<>();
-	}
-	
-	public List<DialogListItem> getDialogListItems()
-	{
-		return Collections.unmodifiableList(displayedItems);
 	}
 	
 	@Override

@@ -29,6 +29,9 @@ public class AbstractPageListDialog extends AbstractListDialog
 {
 	private int itemsPerPage = 10;
 	private int currentPage;
+
+	private String prevPageItemText = "<< Prev Page <<";
+	private String nextPageItemText = ">> Next Page >>";
 	
 
 	protected AbstractPageListDialog(Player player, EventManager eventManager)
@@ -71,13 +74,33 @@ public class AbstractPageListDialog extends AbstractListDialog
 		
 	}
 	
+	public String getPrevPageItemText()
+	{
+		return prevPageItemText;
+	}
+	
+	public void setPrevPageItemText(String prevPageItemText)
+	{
+		this.prevPageItemText = prevPageItemText;
+	}
+	
+	public String getNextPageItemText()
+	{
+		return nextPageItemText;
+	}
+	
+	public void setNextPageItemText(String nextPageItemText)
+	{
+		this.nextPageItemText = nextPageItemText;
+	}
+	
 	@Override
 	public void show()
 	{
 		String listStr = "";
 		displayedItems.clear();
 		
-		displayedItems.add(new DialogListItem(Color.GRAY.toEmbeddingString() + "<< Prev Page <<")
+		displayedItems.add(new DialogListItem(Color.GRAY.toEmbeddingString() + prevPageItemText)
 		{
 			@Override
 			public void onItemSelect()
@@ -98,7 +121,7 @@ public class AbstractPageListDialog extends AbstractListDialog
 			displayedItems.add(item);
 		}
 		
-		if (displayedItems.size() >= itemsPerPage + 1) displayedItems.add(new DialogListItem(Color.GRAY.toEmbeddingString() + ">> Next Page >>")
+		if (displayedItems.size() >= itemsPerPage + 1) displayedItems.add(new DialogListItem(Color.GRAY.toEmbeddingString() + nextPageItemText)
 		{
 			@Override
 			public void onItemSelect()
