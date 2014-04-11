@@ -14,8 +14,8 @@
 	<packaging>jar</packaging>
 
 	<name>shoebill-common</name>
-	<description>MK's Shoebill Common Library</description>
-	<url>https://github.com/GTAUN/shoebill-common</url>
+	<description>Shoebill Common Tool Library</description>
+	<url>https://github.com/Shoebill/shoebill-common</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -44,9 +44,9 @@
 	</licenses>
 
 	<scm>
-		<url>https://github.com/GTAUN/shoebill-common</url>
-		<connection>scm:git:git://github.com/GTAUN/shoebill-common.git</connection>
-		<developerConnection>scm:git:git@github.com:GTAUN/shoebill-common.git</developerConnection>
+		<url>https://github.com/Shoebill/shoebill-common</url>
+		<connection>scm:git:git://github.com/Shoebill/shoebill-common.git</connection>
+		<developerConnection>scm:git:git@github.com:Shoebill/shoebill-common.git</developerConnection>
 	</scm>
 
 	<developers>
