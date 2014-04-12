@@ -26,11 +26,75 @@ import net.gtaun.util.event.EventManager;
  */
 public class PageListDialog extends ListDialog
 {
+	@SuppressWarnings("unchecked")
+	public static abstract class AbstractPageListDialogBuilder
+	<DialogType extends PageListDialog, DialogBuilderType extends AbstractListDialogBuilder<DialogType, DialogBuilderType>>
+	extends AbstractListDialogBuilder<DialogType, DialogBuilderType>
+	{
+		protected AbstractPageListDialogBuilder(DialogType dialog)
+		{
+			super(dialog);
+		}
+		
+		public DialogBuilderType itemsPerPage(int itemsPerPage)
+		{
+			dialog.setItemsPerPage(itemsPerPage);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType page(int currentPage)
+		{
+			dialog.setCurrentPage(currentPage);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType prevPage(String itemText)
+		{
+			dialog.setPrevPageItemText(itemText);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType nextPage(String itemText)
+		{
+			dialog.setNextPageItemText(itemText);
+			return (DialogBuilderType) this;
+		}
+
+		public DialogBuilderType onPageTurn(PageTurnHandler handler)
+		{
+			dialog.setPageTurnHandler(handler);
+			return (DialogBuilderType) this;
+		}
+	}
+	
+	private static class PageListDialogBuilder extends AbstractPageListDialogBuilder<PageListDialog, PageListDialogBuilder>
+	{
+		protected PageListDialogBuilder(Player player, EventManager rootEventManager)
+		{
+			super(new PageListDialog(player, rootEventManager));
+		}
+	}
+	
+	public static AbstractPageListDialogBuilder<?, ?> create(Player player, EventManager rootEventManager)
+	{
+		return new PageListDialogBuilder(player, rootEventManager);
+	}
+	
+	
+	@FunctionalInterface
+	public interface PageTurnHandler
+	{
+		void onPageTurn(PageListDialog dialog);
+	}
+	
+	
 	private int itemsPerPage = 10;
 	private int currentPage;
 
 	private String prevPageItemText = "<< Prev Page <<";
 	private String nextPageItemText = ">> Next Page >>";
+	
+	private PageTurnHandler pageTurnHandler;
 	
 
 	protected PageListDialog(Player player, EventManager eventManager)
@@ -63,11 +127,6 @@ public class PageListDialog extends ListDialog
 		return (items.size()-1) / itemsPerPage;
 	}
 	
-	public void onPageUpdate()
-	{
-		
-	}
-	
 	public String getPrevPageItemText()
 	{
 		return prevPageItemText;
@@ -86,6 +145,11 @@ public class PageListDialog extends ListDialog
 	public void setNextPageItemText(String nextPageItemText)
 	{
 		this.nextPageItemText = nextPageItemText;
+	}
+	
+	public void setPageTurnHandler(PageTurnHandler pageTurnHandler)
+	{
+		this.pageTurnHandler = pageTurnHandler;
 	}
 	
 	@Override
@@ -135,11 +199,20 @@ public class PageListDialog extends ListDialog
 	
 	protected void show(int page)
 	{
-		currentPage = page;
-		if (currentPage > getMaxPage()) currentPage = getMaxPage();
-		else if (currentPage < 0) currentPage = 0;
+		if (currentPage != page)
+		{
+			currentPage = page;
+			if (currentPage > getMaxPage()) currentPage = getMaxPage();
+			else if (currentPage < 0) currentPage = 0;
+			
+			onPageTurn();
+		}
 		
-		onPageUpdate();
 		show();
+	}
+	
+	public void onPageTurn()
+	{
+		if (pageTurnHandler != null) pageTurnHandler.onPageTurn(this);
 	}
 }

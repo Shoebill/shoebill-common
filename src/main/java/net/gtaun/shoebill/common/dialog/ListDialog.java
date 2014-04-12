@@ -97,7 +97,7 @@ public class ListDialog extends AbstractDialog
 	
 	public static class ListDialogBuilder extends AbstractListDialogBuilder<ListDialog, ListDialogBuilder>
 	{
-		protected ListDialogBuilder(Player player, EventManager rootEventManager)
+		private ListDialogBuilder(Player player, EventManager rootEventManager)
 		{
 			super(new ListDialog(player, rootEventManager));
 		}
