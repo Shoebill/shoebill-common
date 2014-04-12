@@ -63,19 +63,19 @@ public class ListDialogItem
 			return (ItemBuilderType) this;
 		}
 		
-		public ItemBuilderType enabled(ItemBooleanSupplier<Object> enabledSupplier)
+		public ItemBuilderType enabled(ItemBooleanSupplier<?> enabledSupplier)
 		{
 			item.setItemEnabledSupplier(enabledSupplier);
 			return (ItemBuilderType) this;
 		}
 		
-		public ItemBuilderType electHandler(ItemSelectSimpleHandler selectHandler)
+		public ItemBuilderType selectHandler(ItemSelectSimpleHandler selectHandler)
 		{
 			item.setSelectHandler(selectHandler);
 			return (ItemBuilderType) this;
 		}
 		
-		public ItemBuilderType selectHandler(ItemSelectHandler<Object> selectHandler)
+		public ItemBuilderType selectHandler(ItemSelectHandler<?> selectHandler)
 		{
 			item.setSelectHandler(selectHandler);
 			return (ItemBuilderType) this;
@@ -214,9 +214,10 @@ public class ListDialogItem
 		itemEnabledSupplier = (d) -> enabledSupplier.getAsBoolean();
 	}
 	
-	public void setItemEnabledSupplier(ItemBooleanSupplier<Object> enabledSupplier)
+	@SuppressWarnings("unchecked")
+	public void setItemEnabledSupplier(ItemBooleanSupplier<?> enabledSupplier)
 	{
-		itemEnabledSupplier = enabledSupplier;
+		itemEnabledSupplier = (ItemBooleanSupplier<Object>) enabledSupplier;
 	}
 
 	public void setSelectHandler(ItemSelectSimpleHandler selectHandler)
@@ -224,9 +225,10 @@ public class ListDialogItem
 		this.selectHandler = (i, d) -> selectHandler.onItemSelect(i);
 	}
 	
-	public void setSelectHandler(ItemSelectHandler<Object> selectHandler)
+	@SuppressWarnings("unchecked")
+	public void setSelectHandler(ItemSelectHandler<?> selectHandler)
 	{
-		this.selectHandler = selectHandler;
+		this.selectHandler = (ItemSelectHandler<Object>) selectHandler;
 	}
 	
 	public String getItemText()
