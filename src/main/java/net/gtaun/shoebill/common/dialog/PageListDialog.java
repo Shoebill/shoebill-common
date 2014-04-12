@@ -25,7 +25,7 @@ import net.gtaun.util.event.EventManager;
  * 
  * @author MK124
  */
-public class AbstractPageListDialog extends AbstractListDialog
+public class PageListDialog extends ListDialog
 {
 	private int itemsPerPage = 10;
 	private int currentPage;
@@ -34,12 +34,12 @@ public class AbstractPageListDialog extends AbstractListDialog
 	private String nextPageItemText = ">> Next Page >>";
 	
 
-	protected AbstractPageListDialog(Player player, EventManager eventManager)
+	protected PageListDialog(Player player, EventManager eventManager)
 	{
 		this(player, eventManager, null);
 	}
 	
-	protected AbstractPageListDialog(Player player, EventManager eventManager, AbstractDialog parentDialog)
+	protected PageListDialog(Player player, EventManager eventManager, AbstractDialog parentDialog)
 	{
 		super(player, eventManager, parentDialog);
 	}

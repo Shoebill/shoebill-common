@@ -37,7 +37,7 @@ public abstract class AbstractDialog
 	protected final Player player;
 	protected final AbstractDialog parentDialog;
 
-	protected final EventManagerNode eventManager;
+	protected final EventManagerNode eventManagerNode;
 	
 	private final DialogId dialogId;
 	private final DialogStyle style;
@@ -56,7 +56,7 @@ public abstract class AbstractDialog
 	{
 		this.style = style;
 		this.player = player;
-		this.eventManager = rootEventManager.createChildNode();
+		this.eventManagerNode = rootEventManager.createChildNode();
 		this.parentDialog = parentDialog;
 		
 		dialogId = SampObjectManager.get().createDialogId();
@@ -71,7 +71,52 @@ public abstract class AbstractDialog
 	
 	protected void destroy()
 	{
-		eventManager.destroy();
+		eventManagerNode.destroy();
+	}
+	
+	public Player getPlayer()
+	{
+		return player;
+	}
+	
+	public AbstractDialog getParentDialog()
+	{
+		return parentDialog;
+	}
+	
+	public DialogStyle getStyle()
+	{
+		return style;
+	}
+	
+	public void setCaption(String caption)
+	{
+		this.caption = caption;
+	}
+	
+	public String getCaption()
+	{
+		return caption;
+	}
+	
+	public void setButtonOk(String buttonOk)
+	{
+		this.buttonOk = buttonOk;
+	}
+	
+	public String getButtonOk()
+	{
+		return buttonOk;
+	}
+	
+	public void setButtonCancel(String buttonCancel)
+	{
+		this.buttonCancel = buttonCancel;
+	}
+	
+	public String getButtonCancel()
+	{
+		return buttonCancel;
 	}
 	
 	public void showParentDialog()
@@ -83,9 +128,9 @@ public abstract class AbstractDialog
 	protected void show(String text)
 	{
 		// FIXME
-		eventManager.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, (DialogResponseEvent e) ->
+		eventManagerNode.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, (DialogResponseEvent e) ->
 		{
-			eventManager.destroy();
+			eventManagerNode.destroy();
 			if (e.getDialogResponse() == 1)
 			{
 				onClickOk(e);
@@ -97,9 +142,9 @@ public abstract class AbstractDialog
 		});
 
 		// FIXME
-		eventManager.registerHandler(DialogCancelEvent.class, HandlerPriority.NORMAL, (DialogCancelEvent e) ->
+		eventManagerNode.registerHandler(DialogCancelEvent.class, HandlerPriority.NORMAL, (DialogCancelEvent e) ->
 		{
-			eventManager.destroy();
+			eventManagerNode.destroy();
 			AbstractDialog.this.onCancel(e.getType());
 		});
 		

@@ -30,11 +30,11 @@ import net.gtaun.util.event.EventManager;
  * 
  * @author MK124
  */
-public abstract class AbstractListDialog extends AbstractDialog
+public abstract class ListDialog extends AbstractDialog
 {
 	public static abstract class DialogListItem
 	{
-		protected AbstractListDialog currentDialog;
+		protected ListDialog currentDialog;
 		protected String itemString;
 		
 		public DialogListItem()
@@ -57,7 +57,7 @@ public abstract class AbstractListDialog extends AbstractDialog
 			return true;
 		}
 		
-		public AbstractListDialog getCurrentDialog()
+		public ListDialog getCurrentDialog()
 		{
 			return currentDialog;
 		}
@@ -260,12 +260,12 @@ public abstract class AbstractListDialog extends AbstractDialog
 	final List<DialogListItem> displayedItems;
 	
 
-	protected AbstractListDialog(Player player, EventManager eventManager)
+	protected ListDialog(Player player, EventManager eventManager)
 	{
 		this(player, eventManager, null);
 	}
 	
-	protected AbstractListDialog(Player player, EventManager eventManager, AbstractDialog parentDialog)
+	protected ListDialog(Player player, EventManager eventManager, AbstractDialog parentDialog)
 	{
 		super(DialogStyle.LIST, player, eventManager, parentDialog);
 		dialogListItems = new ArrayList<>();

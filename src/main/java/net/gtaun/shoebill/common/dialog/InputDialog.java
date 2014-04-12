@@ -26,7 +26,7 @@ import net.gtaun.util.event.EventManager;
  * 
  * @author MK124
  */
-public abstract class AbstractInputDialog extends AbstractDialog
+public abstract class InputDialog extends AbstractDialog
 {
 	private final boolean passwordMode;
 	
@@ -34,34 +34,34 @@ public abstract class AbstractInputDialog extends AbstractDialog
 	protected String message = "None";
 	
 	
-	public AbstractInputDialog(Player player, EventManager rootEventManager)
+	public InputDialog(Player player, EventManager rootEventManager)
 	{
 		this(player, rootEventManager, null);
 	}
 
-	public AbstractInputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog)
+	public InputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog)
 	{
 		super(DialogStyle.INPUT, player, rootEventManager, parentDialog);
 		this.passwordMode = false;
 	}
 
-	public AbstractInputDialog(Player player, EventManager rootEventManager, boolean passwordMode)
+	public InputDialog(Player player, EventManager rootEventManager, boolean passwordMode)
 	{
 		this(player, rootEventManager, null, passwordMode);
 	}
 	
-	public AbstractInputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog, boolean passwordMode)
+	public InputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog, boolean passwordMode)
 	{
 		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, rootEventManager, parentDialog);
 		this.passwordMode = passwordMode;
 	}
 
-	public AbstractInputDialog(Player player, EventManager rootEventManager, String caption, String message)
+	public InputDialog(Player player, EventManager rootEventManager, String caption, String message)
 	{
 		this(player, rootEventManager, null, caption, message);
 	}
 
-	public AbstractInputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog, String caption, String message)
+	public InputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog, String caption, String message)
 	{
 		super(DialogStyle.INPUT, player, rootEventManager, parentDialog);
 		this.passwordMode = false;
@@ -69,12 +69,12 @@ public abstract class AbstractInputDialog extends AbstractDialog
 		this.message = message;
 	}
 
-	public AbstractInputDialog(Player player, EventManager rootEventManager, String caption, String message, boolean passwordMode)
+	public InputDialog(Player player, EventManager rootEventManager, String caption, String message, boolean passwordMode)
 	{
 		this(player, rootEventManager, null, caption, message, passwordMode);
 	}
 	
-	public AbstractInputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog, String caption, String message, boolean passwordMode)
+	public InputDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog, String caption, String message, boolean passwordMode)
 	{
 		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, rootEventManager, parentDialog);
 		this.passwordMode = passwordMode;

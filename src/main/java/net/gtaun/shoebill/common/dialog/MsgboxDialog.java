@@ -26,14 +26,14 @@ import net.gtaun.util.event.EventManager;
  * 
  * @author MK124
  */
-public abstract class AbstractMsgboxDialog extends AbstractDialog
+public abstract class MsgboxDialog extends AbstractDialog
 {
-	protected AbstractMsgboxDialog(Player player, EventManager rootEventManager)
+	protected MsgboxDialog(Player player, EventManager rootEventManager)
 	{
 		this(player, rootEventManager, null);
 	}
 	
-	protected AbstractMsgboxDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog)
+	protected MsgboxDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog)
 	{
 		super(DialogStyle.MSGBOX, player, rootEventManager, parentDialog);
 	}
