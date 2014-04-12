@@ -89,7 +89,7 @@ public abstract class AbstractDialog
 			return (DialogBuilderType) this;
 		}
 		
-		public DialogBuilderType clickCancel(ClickCancelHandler handler)
+		public DialogBuilderType onClickCancel(ClickCancelHandler handler)
 		{
 			dialog.setClickCancelHandler(handler);
 			return (DialogBuilderType) this;
