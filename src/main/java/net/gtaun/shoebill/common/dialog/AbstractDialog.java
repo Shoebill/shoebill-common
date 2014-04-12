@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 MK124
+ * Copyright (C) 2012-2014 MK124
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,13 @@ import net.gtaun.util.event.EventManagerNode;
 import net.gtaun.util.event.HandlerPriority;
 
 /**
- * 抽象对话框类。
  * 
  * @author MK124
  */
 public abstract class AbstractDialog
 {
 	@SuppressWarnings("unchecked")
-	static abstract class AbstractDialogBuilder
+	public static abstract class AbstractDialogBuilder
 	<DialogType extends AbstractDialog, DialogBuilderType extends AbstractDialogBuilder<DialogType, DialogBuilderType>>
 	{
 		protected final DialogType dialog;

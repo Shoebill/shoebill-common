@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 MK124
+ * Copyright (C) 2012-2014 MK124
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,253 +18,127 @@ package net.gtaun.shoebill.common.dialog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
+import net.gtaun.shoebill.common.dialog.ListDialogItem.ItemBooleanSupplier;
+import net.gtaun.shoebill.common.dialog.ListDialogItem.ItemSelectHandler;
+import net.gtaun.shoebill.common.dialog.ListDialogItem.ItemTextSupplier;
 import net.gtaun.shoebill.constant.DialogStyle;
-import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
 
 /**
- * 抽象列表对话框类。
  * 
  * @author MK124
  */
-public abstract class ListDialog extends AbstractDialog
+public class ListDialog extends AbstractDialog
 {
-	public static abstract class DialogListItem
+	@SuppressWarnings("unchecked")
+	public static abstract class AbstractListDialogBuilder
+	<DialogType extends ListDialog, DialogBuilderType extends AbstractListDialogBuilder<DialogType, DialogBuilderType>>
+	extends AbstractDialogBuilder<DialogType, DialogBuilderType>
 	{
-		protected ListDialog currentDialog;
-		protected String itemString;
-		
-		public DialogListItem()
+		protected AbstractListDialogBuilder(DialogType dialog)
 		{
-			this("-");
+			super(dialog);
 		}
 		
-		public DialogListItem(String string)
+		public DialogBuilderType item(ListDialogItem item)
 		{
-			this.itemString = string;
+			dialog.items.add(item);
+			return (DialogBuilderType) this;
+		}
+
+		public DialogBuilderType item(String itemText, ItemSelectHandler<Object> handler)
+		{
+			dialog.items.add(new ListDialogItem(itemText, handler));
+			return (DialogBuilderType) this;
 		}
 		
-		public String toItemString()
+		public DialogBuilderType item(Supplier<String> textSupplier, ItemSelectHandler<Object> handler)
 		{
-			return itemString;
+			dialog.items.add(new ListDialogItem(textSupplier, handler));
+			return (DialogBuilderType) this;
 		}
 		
-		public boolean isEnabled()
+		public <DataType> DialogBuilderType item(DataType data, String itemText, ItemSelectHandler<DataType> handler)
 		{
-			return true;
+			dialog.items.add(new ListDialogItem(data, itemText, handler));
+			return (DialogBuilderType) this;
 		}
 		
-		public ListDialog getCurrentDialog()
+		public <DataType> DialogBuilderType item(DataType data, ItemTextSupplier<DataType> textSupplier, ItemSelectHandler<DataType> handler)
 		{
-			return currentDialog;
+			dialog.items.add(new ListDialogItem(data, textSupplier, handler));
+			return (DialogBuilderType) this;
 		}
 		
-		public abstract void onItemSelect();
+		public <DataType> DialogBuilderType item(DataType data, String itemText, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler)
+		{
+			dialog.items.add(new ListDialogItem(data, itemText, enabledSupplier, handler));
+			return (DialogBuilderType) this;
+		}
+		
+		public <DataType> DialogBuilderType item(DataType data, ItemTextSupplier<DataType> textSupplier, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler)
+		{
+			dialog.items.add(new ListDialogItem(data, textSupplier, enabledSupplier, handler));
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType onClickOk(ClickOkHandler handler)
+		{
+			dialog.setClickOkHandler(handler);
+			return (DialogBuilderType) this;
+		}
 	}
 	
-	public static abstract class DialogListItemSwitch extends DialogListItem
+	public static class ListDialogBuilder extends AbstractListDialogBuilder<ListDialog, ListDialogBuilder>
 	{
-		protected String onMessage;
-		protected String offMessage;
-		protected Color onColor;
-		protected Color offColor;
-		
-		public DialogListItemSwitch(String string, String onMessage, String offMessage, Color onColor, Color offColor)
+		protected ListDialogBuilder(Player player, EventManager rootEventManager)
 		{
-			this.itemString = string;
-			this.onMessage = onMessage;
-			this.offMessage = offMessage;
-			this.onColor = onColor;
-			this.offColor = offColor;
+			super(new ListDialog(player, rootEventManager));
 		}
-		
-		public DialogListItemSwitch(String string, String onMessage, String offMessage)
-		{
-			this(string, onMessage, offMessage, Color.GREEN, Color.GRAY);
-		}
-		
-		public DialogListItemSwitch(String string)
-		{
-			this(string, "ON", "OFF");
-		}
-		
-		public String toItemString()
-		{
-			return itemString + (isSwitched() ? onColor.toEmbeddingString() : offColor.toEmbeddingString()) + " [" + (isSwitched() ? onMessage :  offMessage) + "]";
-		}
-		
-		public boolean isEnabled()
-		{
-			return true;
-		}
-		
-		public abstract boolean isSwitched();
-		public abstract void onItemSelect();
 	}
 	
-	public static abstract class DialogListItemRadio extends DialogListItem
+	public static AbstractListDialogBuilder<?, ?> create(Player player, EventManager rootEventManager)
 	{
-		public class RadioItem
-		{
-			protected String itemString;
-			protected Color checkedColor;
-
-			public RadioItem(String itemString, Color checkedColor)
-			{
-				this.itemString = itemString;
-				this.checkedColor = checkedColor;
-			}
-			
-			public RadioItem(String itemString)
-			{
-				this(itemString, Color.GREEN);
-			}
-			
-			public String getItemString()
-			{
-				return itemString;
-			}
-			
-			public void onSelected()
-			{
-				
-			}
-		}
-		
-		private final List<RadioItem> options;
-		protected Color uncheckedColor;
-
-		public DialogListItemRadio(String string, Color uncheckedColor)
-		{
-			this.itemString = string;
-			this.uncheckedColor = uncheckedColor;
-			this.options = new ArrayList<>();
-		}
-		
-		public DialogListItemRadio(String string)
-		{
-			this(string, Color.GRAY);
-		}
-		
-		public void addItem(RadioItem item)
-		{
-			options.add(item);
-		}
-		
-		public String toItemString()
-		{
-			String str = itemString;
-			for(int i=0; i<options.size(); i++)
-			{
-				int selected = getSelected();
-				RadioItem item = options.get(i);
-				if (i == selected) str += item.checkedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
-				else str += uncheckedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
-			}
-			return str;
-		}
-		
-		public boolean isEnabled()
-		{
-			return true;
-		}
-		
-		@Override
-		public final void onItemSelect()
-		{
-			if (options.isEmpty()) return;
-			int index = (getSelected() + 1) % options.size();
-			RadioItem item = options.get(index);
-			item.onSelected();
-			onItemSelect(item, index);
-		}
-
-		public void onItemSelect(RadioItem item, int itemIndex)
-		{
-			
-		}
-		
-		public abstract int getSelected();
+		return new ListDialogBuilder(player, rootEventManager);
 	}
 	
-	public static abstract class DialogListItemCheck extends DialogListItem
+	@FunctionalInterface
+	public interface ClickOkHandler
 	{
-		public abstract class CheckItem
-		{
-			protected String itemString;
-			protected Color checkedColor;
-
-			public CheckItem(String itemString, Color checkedColor)
-			{
-				this.itemString = itemString;
-				this.checkedColor = checkedColor;
-			}
-			
-			public CheckItem(String itemString)
-			{
-				this(itemString, Color.GREEN);
-			}
-			
-			public String getItemString()
-			{
-				return itemString;
-			}
-			
-			public abstract boolean isChecked();
-		}
-		
-		private final List<CheckItem> options;
-		protected Color uncheckedColor;
-
-		public DialogListItemCheck(String string, Color uncheckedColor)
-		{
-			this.itemString = string;
-			this.uncheckedColor = uncheckedColor;
-			this.options = new ArrayList<>();
-		}
-		
-		public DialogListItemCheck(String string)
-		{
-			this(string, Color.GRAY);
-		}
-		
-		public void addItem(CheckItem item)
-		{
-			options.add(item);
-		}
-		
-		public String toItemString()
-		{
-			String str = itemString;
-			for(CheckItem item : options)
-			{
-				if (item.isChecked()) str += item.checkedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
-				else str += uncheckedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
-			}
-			return str;
-		}
-		
-		public boolean isEnabled()
-		{
-			return true;
-		}
-
-		public abstract void onItemSelect();
+		void onClickOk(ListDialog dialog, ListDialogItem item);
 	}
 	
-
-	protected final List<DialogListItem> dialogListItems;
-	final List<DialogListItem> displayedItems;
+	
+	protected final List<ListDialogItem> items;
+	protected final List<ListDialogItem> displayedItems;
+	
+	private ClickOkHandler clickOkHandler = null;
 	
 
 	protected ListDialog(Player player, EventManager eventManager)
 	{
 		super(DialogStyle.LIST, player, eventManager);
-		dialogListItems = new ArrayList<>();
+		items = new ArrayList<>();
 		displayedItems = new ArrayList<>();
+	}
+	
+	public void setClickOkHandler(ClickOkHandler handler)
+	{
+		clickOkHandler = handler;
+	}
+	
+	public List<ListDialogItem> getItems()
+	{
+		return items;
+	}
+	
+	public List<ListDialogItem> getDisplayedItems()
+	{
+		return displayedItems;
 	}
 	
 	@Override
@@ -273,12 +147,11 @@ public abstract class ListDialog extends AbstractDialog
 		String listStr = "";
 		displayedItems.clear();
 		
-		for (DialogListItem item : dialogListItems)
+		for (ListDialogItem item : items)
 		{
 			if (item.isEnabled() == false) continue;
 			
-			listStr += item.toItemString() + "\n";
-			item.currentDialog = this;
+			listStr += item.getItemText() + "\n";
 			displayedItems.add(item);
 		}
 		
@@ -289,14 +162,14 @@ public abstract class ListDialog extends AbstractDialog
 	final void onClickOk(DialogResponseEvent event)
 	{
 		int itemId = event.getListitem();
-		DialogListItem item = displayedItems.get(itemId);
+		ListDialogItem item = displayedItems.get(itemId);
 
 		onClickOk(item);
 		item.onItemSelect();
 	}
 	
-	protected void onClickOk(DialogListItem item)
+	protected void onClickOk(ListDialogItem item)
 	{
-		
+		if (clickOkHandler != null) clickOkHandler.onClickOk(this, item);
 	}
 }

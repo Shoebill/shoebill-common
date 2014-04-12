@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 MK124
+ * Copyright (C) 2012-2014 MK124
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
 
 /**
- * 抽象带分页功能的列表对话框类。
  * 
  * @author MK124
  */
@@ -61,7 +60,7 @@ public class PageListDialog extends ListDialog
 	
 	public int getMaxPage()
 	{
-		return (dialogListItems.size()-1) / itemsPerPage;
+		return (items.size()-1) / itemsPerPage;
 	}
 	
 	public void onPageUpdate()
@@ -95,7 +94,7 @@ public class PageListDialog extends ListDialog
 		String listStr = "";
 		displayedItems.clear();
 		
-		displayedItems.add(new DialogListItem(Color.GRAY.toEmbeddingString() + prevPageItemText)
+		displayedItems.add(new ListDialogItem(Color.GRAY.toEmbeddingString() + prevPageItemText)
 		{
 			@Override
 			public void onItemSelect()
@@ -110,13 +109,13 @@ public class PageListDialog extends ListDialog
 		for (int i=0; i<itemsPerPage; i++)
 		{
 			int index = offset+i;
-			if (dialogListItems.size() <= index) break;
+			if (items.size() <= index) break;
 			
-			DialogListItem item = dialogListItems.get(offset+i);
+			ListDialogItem item = items.get(offset+i);
 			displayedItems.add(item);
 		}
 		
-		if (displayedItems.size() >= itemsPerPage + 1) displayedItems.add(new DialogListItem(Color.GRAY.toEmbeddingString() + nextPageItemText)
+		if (displayedItems.size() >= itemsPerPage + 1) displayedItems.add(new ListDialogItem(Color.GRAY.toEmbeddingString() + nextPageItemText)
 		{
 			@Override
 			public void onItemSelect()
@@ -127,9 +126,9 @@ public class PageListDialog extends ListDialog
 			}
 		});
 
-		for (DialogListItem item : displayedItems)
+		for (ListDialogItem item : displayedItems)
 		{
-			listStr += item.toItemString() + "\n";
+			listStr += item.getItemText() + "\n";
 		}
 		show(listStr);
 	}

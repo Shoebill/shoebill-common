@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 MK124
+ * Copyright (C) 2012-2014 MK124
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import net.gtaun.util.event.EventManager;
  * 
  * @author MK124
  */
-public abstract class MsgboxDialog extends AbstractDialog
+public class MsgboxDialog extends AbstractDialog
 {
 	@SuppressWarnings("unchecked")
 	public static abstract class AbstractMsgboxDialogBuilder
@@ -51,22 +51,20 @@ public abstract class MsgboxDialog extends AbstractDialog
 		
 		public DialogBuilderType onClickOk(ClickOkHandler handler)
 		{
-			dialog.setOnClickOkHandler(handler);
+			dialog.setClickOkHandler(handler);
 			return (DialogBuilderType) this;
 		}
 	}
 	
 	public static class MsgboxDialogBuilder extends AbstractMsgboxDialogBuilder<MsgboxDialog, MsgboxDialogBuilder>
 	{
-		protected MsgboxDialogBuilder(Player player, EventManager rootEventManager)
+		private MsgboxDialogBuilder(Player player, EventManager rootEventManager)
 		{
-			super(new MsgboxDialog(player, rootEventManager)
-			{
-			});
+			super(new MsgboxDialog(player, rootEventManager));
 		}
 	}
 	
-	public static MsgboxDialogBuilder create(Player player, EventManager rootEventManager)
+	public static AbstractMsgboxDialogBuilder<?, ?> create(Player player, EventManager rootEventManager)
 	{
 		return new MsgboxDialogBuilder(player, rootEventManager);
 	}
@@ -97,7 +95,7 @@ public abstract class MsgboxDialog extends AbstractDialog
 		this.messageSupplier = (d) -> message;
 	}
 	
-	public void setOnClickOkHandler(ClickOkHandler onClickOkHandler)
+	public void setClickOkHandler(ClickOkHandler onClickOkHandler)
 	{
 		this.clickOkHandler = onClickOkHandler;
 	}
