@@ -160,7 +160,7 @@ public abstract class AbstractDialog
 
 	public void showParentDialog()
 	{
-		destroy();
+		eventManagerNode.cancelAll();
 		if (parentDialog != null) parentDialog.show();
 	}
 	
@@ -203,7 +203,7 @@ public abstract class AbstractDialog
 	{
 		eventManagerNode.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
-			eventManagerNode.destroy();
+			eventManagerNode.cancelAll();
 			if (e.getDialogResponse() == 1)
 			{
 				onClickOk(e);
@@ -216,7 +216,7 @@ public abstract class AbstractDialog
 
 		eventManagerNode.registerHandler(DialogCancelEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
-			eventManagerNode.destroy();
+			eventManagerNode.cancelAll();
 			AbstractDialog.this.onCancel(e.getType());
 		});
 		
