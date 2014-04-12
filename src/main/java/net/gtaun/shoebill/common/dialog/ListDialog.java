@@ -17,11 +17,13 @@
 package net.gtaun.shoebill.common.dialog;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
 import net.gtaun.shoebill.common.dialog.ListDialogItem.ItemBooleanSupplier;
 import net.gtaun.shoebill.common.dialog.ListDialogItem.ItemSelectHandler;
+import net.gtaun.shoebill.common.dialog.ListDialogItem.ItemSelectSimpleHandler;
 import net.gtaun.shoebill.common.dialog.ListDialogItem.ItemTextSupplier;
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
@@ -50,13 +52,13 @@ public class ListDialog extends AbstractDialog
 			return (DialogBuilderType) this;
 		}
 
-		public DialogBuilderType item(String itemText, ItemSelectHandler<Object> handler)
+		public DialogBuilderType item(String itemText, ItemSelectSimpleHandler handler)
 		{
 			dialog.items.add(new ListDialogItem(itemText, handler));
 			return (DialogBuilderType) this;
 		}
 		
-		public DialogBuilderType item(Supplier<String> textSupplier, ItemSelectHandler<Object> handler)
+		public DialogBuilderType item(Supplier<String> textSupplier, ItemSelectSimpleHandler handler)
 		{
 			dialog.items.add(new ListDialogItem(textSupplier, handler));
 			return (DialogBuilderType) this;
@@ -122,7 +124,45 @@ public class ListDialog extends AbstractDialog
 	protected ListDialog(Player player, EventManager eventManager)
 	{
 		super(DialogStyle.LIST, player, eventManager);
-		items = new ArrayList<>();
+		items = new ArrayList<ListDialogItem>()
+		{
+			private static final long serialVersionUID = 2260194681967627384L;
+
+			@Override
+			public void add(int index, ListDialogItem e)
+			{
+				e.currentDialog = ListDialog.this;
+				super.add(index, e);
+			}
+			
+			@Override
+			public boolean add(ListDialogItem e)
+			{
+				e.currentDialog = ListDialog.this;
+				return super.add(e);
+			}
+			
+			@Override
+			public ListDialogItem set(int index, ListDialogItem e)
+			{
+				e.currentDialog = ListDialog.this;
+				return super.set(index, e);
+			}
+			
+			@Override
+			public boolean addAll(Collection<? extends ListDialogItem> c)
+			{
+				c.forEach((e) -> e.currentDialog = ListDialog.this);
+				return super.addAll(c);
+			}
+			
+			@Override
+			public boolean addAll(int index, Collection<? extends ListDialogItem> c)
+			{
+				c.forEach((e) -> e.currentDialog = ListDialog.this);
+				return super.addAll(index, c);
+			}
+		};
 		displayedItems = new ArrayList<>();
 	}
 	

@@ -126,6 +126,8 @@ public class ListDialogItem
 	}
 	
 	
+	protected ListDialog currentDialog;
+	
 	protected Object data;
 	protected ItemTextSupplier<Object> itemTextSupplier;
 	protected ItemBooleanSupplier<Object> itemEnabledSupplier;
@@ -142,16 +144,16 @@ public class ListDialogItem
 		itemTextSupplier = (d) -> textSupplier.get();
 	}
 	
-	public ListDialogItem(String itemText, ItemSelectHandler<Object> handler)
+	public ListDialogItem(String itemText, ItemSelectSimpleHandler handler)
 	{
 		itemTextSupplier = (d) -> itemText;
-		selectHandler = handler;
+		selectHandler = (i, d) -> handler.onItemSelect(i);
 	}
 	
-	public ListDialogItem(Supplier<String> textSupplier, ItemSelectHandler<Object> handler)
+	public ListDialogItem(Supplier<String> textSupplier, ItemSelectSimpleHandler handler)
 	{
 		itemTextSupplier = (d) -> textSupplier.get();
-		selectHandler = handler;
+		selectHandler = (i, d) -> handler.onItemSelect(i);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -186,6 +188,11 @@ public class ListDialogItem
 		itemTextSupplier = (ItemTextSupplier<Object>) textSupplier;
 		itemEnabledSupplier = (ItemBooleanSupplier<Object>) enabledSupplier;
 		selectHandler = (ItemSelectHandler<Object>) handler;
+	}
+	
+	public ListDialog getCurrentDialog()
+	{
+		return currentDialog;
 	}
 
 	public void setData(Object data)
