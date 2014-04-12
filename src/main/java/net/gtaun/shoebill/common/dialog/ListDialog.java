@@ -262,12 +262,7 @@ public abstract class ListDialog extends AbstractDialog
 
 	protected ListDialog(Player player, EventManager eventManager)
 	{
-		this(player, eventManager, null);
-	}
-	
-	protected ListDialog(Player player, EventManager eventManager, AbstractDialog parentDialog)
-	{
-		super(DialogStyle.LIST, player, eventManager, parentDialog);
+		super(DialogStyle.LIST, player, eventManager);
 		dialogListItems = new ArrayList<>();
 		displayedItems = new ArrayList<>();
 	}

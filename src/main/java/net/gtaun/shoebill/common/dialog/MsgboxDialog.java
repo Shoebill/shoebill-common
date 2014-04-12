@@ -22,20 +22,90 @@ import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
 
 /**
- * 抽象消息对话框类。
  * 
  * @author MK124
  */
 public abstract class MsgboxDialog extends AbstractDialog
 {
-	protected MsgboxDialog(Player player, EventManager rootEventManager)
+	@SuppressWarnings("unchecked")
+	public static abstract class AbstractMsgboxDialogBuilder
+	<DialogType extends MsgboxDialog, DialogBuilderType extends AbstractMsgboxDialogBuilder<DialogType, DialogBuilderType>>
+	extends AbstractDialogBuilder<DialogType, DialogBuilderType>
 	{
-		this(player, rootEventManager, null);
+		protected AbstractMsgboxDialogBuilder(DialogType dialog)
+		{
+			super(dialog);
+		}
+		
+		public DialogBuilderType message(DialogTextSupplier messageSupplier)
+		{
+			dialog.setMessage(messageSupplier);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType message(String message)
+		{
+			dialog.setMessage(message);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType onClickOk(ClickOkHandler handler)
+		{
+			dialog.setOnClickOkHandler(handler);
+			return (DialogBuilderType) this;
+		}
 	}
 	
-	protected MsgboxDialog(Player player, EventManager rootEventManager, AbstractDialog parentDialog)
+	public static class MsgboxDialogBuilder extends AbstractMsgboxDialogBuilder<MsgboxDialog, MsgboxDialogBuilder>
 	{
-		super(DialogStyle.MSGBOX, player, rootEventManager, parentDialog);
+		protected MsgboxDialogBuilder(Player player, EventManager rootEventManager)
+		{
+			super(new MsgboxDialog(player, rootEventManager)
+			{
+			});
+		}
+	}
+	
+	public static MsgboxDialogBuilder create(Player player, EventManager rootEventManager)
+	{
+		return new MsgboxDialogBuilder(player, rootEventManager);
+	}
+	
+	@FunctionalInterface
+	public interface ClickOkHandler
+	{
+		void onClickOk(MsgboxDialog dialog);
+	}
+	
+	
+	private DialogTextSupplier messageSupplier = DialogTextSupplier.EMPTY_MESSAGE_SUPPLIER;
+	private ClickOkHandler clickOkHandler = null;
+	
+	
+	protected MsgboxDialog(Player player, EventManager rootEventManager)
+	{
+		super(DialogStyle.MSGBOX, player, rootEventManager);
+	}
+	
+	public void setMessage(DialogTextSupplier messageSupplier)
+	{
+		this.messageSupplier = messageSupplier;
+	}
+	
+	public void setMessage(String message)
+	{
+		this.messageSupplier = (d) -> message;
+	}
+	
+	public void setOnClickOkHandler(ClickOkHandler onClickOkHandler)
+	{
+		this.clickOkHandler = onClickOkHandler;
+	}
+	
+	@Override
+	public void show()
+	{
+		show(messageSupplier.get(this));
 	}
 	
 	@Override
@@ -46,6 +116,6 @@ public abstract class MsgboxDialog extends AbstractDialog
 	
 	protected void onClickOk()
 	{
-		
+		if (clickOkHandler != null) clickOkHandler.onClickOk(this);
 	}
 }

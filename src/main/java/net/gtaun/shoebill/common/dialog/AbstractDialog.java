@@ -23,6 +23,7 @@ import net.gtaun.shoebill.event.dialog.DialogCancelEvent.DialogCancelType;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.DialogId;
 import net.gtaun.shoebill.object.Player;
+import net.gtaun.util.event.Attentions;
 import net.gtaun.util.event.EventManager;
 import net.gtaun.util.event.EventManagerNode;
 import net.gtaun.util.event.HandlerPriority;
@@ -34,30 +35,93 @@ import net.gtaun.util.event.HandlerPriority;
  */
 public abstract class AbstractDialog
 {
+	@SuppressWarnings("unchecked")
+	static abstract class AbstractDialogBuilder
+	<DialogType extends AbstractDialog, DialogBuilderType extends AbstractDialogBuilder<DialogType, DialogBuilderType>>
+	{
+		protected final DialogType dialog;
+		
+		
+		protected AbstractDialogBuilder(DialogType dialog)
+		{
+			this.dialog = dialog;
+		}
+		
+		public DialogBuilderType parentDialog(AbstractDialog parent)
+		{
+			dialog.setParentDialog(parent);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType caption(String caption)
+		{
+			dialog.setCaption(caption);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType caption(DialogTextSupplier captionSupplier)
+		{
+			dialog.setCaption(captionSupplier);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType buttonOk(String buttonOk)
+		{
+			dialog.setButtonOk(buttonOk);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType buttonOk(DialogTextSupplier buttonOkSupplier)
+		{
+			dialog.setButtonOk(buttonOkSupplier);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType buttonCancel(String buttonCancel)
+		{
+			dialog.setButtonCancel(buttonCancel);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType buttonCancel(DialogTextSupplier buttonCancelSupplier)
+		{
+			dialog.setButtonCancel(buttonCancelSupplier);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType clickCancel(ClickCancelHandler handler)
+		{
+			dialog.setClickCancelHandler(handler);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogType build()
+		{
+			return dialog;
+		}
+	}
+	
+	
 	protected final Player player;
-	protected final AbstractDialog parentDialog;
-
 	protected final EventManagerNode eventManagerNode;
 	
 	private final DialogId dialogId;
 	private final DialogStyle style;
+
+	private AbstractDialog parentDialog;
 	
-	protected String caption = "None";
-	protected String buttonOk = "OK";
-	protected String buttonCancel = "Cancel";
+	private DialogTextSupplier captionSupplier = (d) -> "None";
+	private DialogTextSupplier buttonOkSupplier = (d) -> "OK";
+	private DialogTextSupplier buttonCancelSupplier = (d) -> "Cancel";
+	
+	private ClickCancelHandler clickCancelHandler = null;
 	
 	
 	AbstractDialog(DialogStyle style, Player player, EventManager rootEventManager)
 	{
-		this(style, player, rootEventManager, null);
-	}
-	
-	AbstractDialog(DialogStyle style, Player player, EventManager rootEventManager, AbstractDialog parentDialog)
-	{
 		this.style = style;
 		this.player = player;
 		this.eventManagerNode = rootEventManager.createChildNode();
-		this.parentDialog = parentDialog;
 		
 		dialogId = SampObjectManager.get().createDialogId();
 	}
@@ -79,56 +143,65 @@ public abstract class AbstractDialog
 		return player;
 	}
 	
+	public DialogStyle getStyle()
+	{
+		return style;
+	}
+
 	public AbstractDialog getParentDialog()
 	{
 		return parentDialog;
 	}
 	
-	public DialogStyle getStyle()
+	public void setParentDialog(AbstractDialog parentDialog)
 	{
-		return style;
+		this.parentDialog = parentDialog;
 	}
-	
-	public void setCaption(String caption)
-	{
-		this.caption = caption;
-	}
-	
-	public String getCaption()
-	{
-		return caption;
-	}
-	
-	public void setButtonOk(String buttonOk)
-	{
-		this.buttonOk = buttonOk;
-	}
-	
-	public String getButtonOk()
-	{
-		return buttonOk;
-	}
-	
-	public void setButtonCancel(String buttonCancel)
-	{
-		this.buttonCancel = buttonCancel;
-	}
-	
-	public String getButtonCancel()
-	{
-		return buttonCancel;
-	}
-	
+
 	public void showParentDialog()
 	{
 		destroy();
 		if (parentDialog != null) parentDialog.show();
 	}
 	
+	public void setCaption(String caption)
+	{
+		captionSupplier = (d) -> caption;
+	}
+	
+	public void setCaption(DialogTextSupplier captionSupplier)
+	{
+		this.captionSupplier = captionSupplier;
+	}
+	
+	public void setButtonOk(String buttonOk)
+	{
+		buttonOkSupplier = (d) -> buttonOk;
+	}
+	
+	public void setButtonOk(DialogTextSupplier buttonOkSupplier)
+	{
+		this.buttonOkSupplier = buttonOkSupplier;
+	}
+	
+	public void setButtonCancel(String buttonCancel)
+	{
+		buttonCancelSupplier = (d) -> buttonCancel;
+	}
+	
+	public void setButtonCancel(DialogTextSupplier buttonCancelSupplier)
+	{
+		this.buttonCancelSupplier = buttonCancelSupplier;
+	}
+	
+	public void setClickCancelHandler(ClickCancelHandler onClickCancelHandler)
+	{
+		this.clickCancelHandler = onClickCancelHandler;
+	}
+	
 	protected void show(String text)
 	{
-		// FIXME
-		eventManagerNode.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, (DialogResponseEvent e) ->
+		eventManagerNode.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
 			eventManagerNode.destroy();
 			if (e.getDialogResponse() == 1)
@@ -141,14 +214,13 @@ public abstract class AbstractDialog
 			}
 		});
 
-		// FIXME
-		eventManagerNode.registerHandler(DialogCancelEvent.class, HandlerPriority.NORMAL, (DialogCancelEvent e) ->
+		eventManagerNode.registerHandler(DialogCancelEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
 			eventManagerNode.destroy();
 			AbstractDialog.this.onCancel(e.getType());
 		});
 		
-		player.showDialog(dialogId, style, caption, text, buttonOk, buttonCancel);
+		player.showDialog(dialogId, style, captionSupplier.get(this), text, buttonOkSupplier.get(this), buttonCancelSupplier.get(this));
 	}
 	
 	public abstract void show();
@@ -160,7 +232,7 @@ public abstract class AbstractDialog
 	
 	protected void onClickCancel()
 	{
-		
+		if (clickCancelHandler != null) clickCancelHandler.onClickCancel(this);
 	}
 	
 	void onClickOk(DialogResponseEvent event)

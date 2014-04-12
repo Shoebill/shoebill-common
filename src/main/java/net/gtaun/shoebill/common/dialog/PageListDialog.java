@@ -36,12 +36,7 @@ public class PageListDialog extends ListDialog
 
 	protected PageListDialog(Player player, EventManager eventManager)
 	{
-		this(player, eventManager, null);
-	}
-	
-	protected PageListDialog(Player player, EventManager eventManager, AbstractDialog parentDialog)
-	{
-		super(player, eventManager, parentDialog);
+		super(player, eventManager);
 	}
 	
 	public int getItemsPerPage()
