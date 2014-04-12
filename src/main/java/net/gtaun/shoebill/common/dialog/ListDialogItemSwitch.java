@@ -36,9 +36,9 @@ public class ListDialogItemSwitch extends ListDialogItem
 			return (ItemSwitchBuilder) this;
 		}
 		
-		public ItemSwitchBuilder switchMessage(String on, String off)
+		public ItemSwitchBuilder switchText(String on, String off)
 		{
-			item.setSwitchMessage(on, off);
+			item.setSwitchText(on, off);
 			return (ItemSwitchBuilder) this;
 		}
 		
@@ -48,9 +48,9 @@ public class ListDialogItemSwitch extends ListDialogItem
 			return (ItemSwitchBuilder) this;
 		}
 		
-		public ItemSwitchBuilder switchedSupplier(BooleanSupplier switchedSupplier)
+		public ItemSwitchBuilder statusSupplier(BooleanSupplier statusSupplier)
 		{
-			item.setSwitchedSupplier(switchedSupplier);
+			item.setStatusSupplier(statusSupplier);
 			return (ItemSwitchBuilder) this;
 		}
 		
@@ -79,7 +79,7 @@ public class ListDialogItemSwitch extends ListDialogItem
 	private ConditionSupplier<String> switchTextSupplier = DEFAULT_SWITCH_TEXT_SUPPLIER;
 	private ConditionSupplier<Color> switchColorSupplier = DEFAULT_SWITCH_COLOR_SUPPLIER;
 	
-	private BooleanSupplier switchedSupplier;
+	private BooleanSupplier statusSupplier;
 	
 
 	public ListDialogItemSwitch(String itemText)
@@ -92,7 +92,7 @@ public class ListDialogItemSwitch extends ListDialogItem
 		super(textSupplier);
 	}
 	
-	public void setSwitchMessage(String on, String off)
+	public void setSwitchText(String on, String off)
 	{
 		switchTextSupplier = (s) -> s ? on : off;
 	}
@@ -102,9 +102,9 @@ public class ListDialogItemSwitch extends ListDialogItem
 		switchColorSupplier = (s) -> s ? on : off;
 	}
 	
-	public void setSwitchedSupplier(BooleanSupplier switchedSupplier)
+	public void setStatusSupplier(BooleanSupplier switchedSupplier)
 	{
-		this.switchedSupplier = switchedSupplier;
+		this.statusSupplier = switchedSupplier;
 	}
 	
 	public String getItemText()
@@ -119,7 +119,7 @@ public class ListDialogItemSwitch extends ListDialogItem
 	
 	public boolean isSwitched()
 	{
-		if (switchedSupplier == null) return false;
+		if (statusSupplier == null) return false;
 		return true;
 	}
 }

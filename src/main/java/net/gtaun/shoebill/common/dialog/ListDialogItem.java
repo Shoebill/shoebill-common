@@ -69,13 +69,13 @@ public class ListDialogItem
 			return (ItemBuilderType) this;
 		}
 		
-		public ItemBuilderType selectHandler(ItemSelectSimpleHandler selectHandler)
+		public ItemBuilderType onSelect(ItemSelectSimpleHandler selectHandler)
 		{
 			item.setSelectHandler(selectHandler);
 			return (ItemBuilderType) this;
 		}
 		
-		public ItemBuilderType selectHandler(ItemSelectHandler<?> selectHandler)
+		public ItemBuilderType onSelect(ItemSelectHandler<?> selectHandler)
 		{
 			item.setSelectHandler(selectHandler);
 			return (ItemBuilderType) this;
