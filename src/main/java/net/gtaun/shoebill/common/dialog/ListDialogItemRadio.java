@@ -18,58 +18,167 @@ package net.gtaun.shoebill.common.dialog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntSupplier;
 
 import net.gtaun.shoebill.data.Color;
 
-public abstract class ListDialogItemRadio extends ListDialogItem
+public class ListDialogItemRadio extends ListDialogItem
 {
+	public static class ItemRadioBuilder extends AbstractItemBuilder<ListDialogItemRadio, ItemRadioBuilder>
+	{
+		private ItemRadioBuilder()
+		{
+			super(new ListDialogItemRadio("Unnamed"));
+		}
+		
+		public ItemRadioBuilder item(String itemText, Color checkedColor, RadioItemSelectHandler selectHandler)
+		{
+			item.addItem(item.new RadioItem(itemText, checkedColor, selectHandler));
+			return (ItemRadioBuilder) this;
+		}
+
+		public ItemRadioBuilder item(String itemText, Color checkedColor)
+		{
+			item.addItem(item.new RadioItem(itemText, checkedColor));
+			return (ItemRadioBuilder) this;
+		}
+		
+		public ItemRadioBuilder item(String itemText, RadioItemSelectHandler selectHandler)
+		{
+			item.addItem(item.new RadioItem(itemText, selectHandler));
+			return (ItemRadioBuilder) this;
+		}
+		
+		public ItemRadioBuilder item(String itemText)
+		{
+			item.addItem(item.new RadioItem(itemText));
+			return (ItemRadioBuilder) this;
+		}
+		
+		public ItemRadioBuilder radioColor(Color checkedColor, Color uncheckedColor)
+		{
+			item.setRadioColor(checkedColor, uncheckedColor);
+			return (ItemRadioBuilder) this;
+		}
+		
+		public ItemRadioBuilder selectedIndex(IntSupplier indexSupplier)
+		{
+			item.setSelectedIndexSupplier(indexSupplier);
+			return (ItemRadioBuilder) this;
+		}
+		
+		public ItemRadioBuilder onRadioItemSelect(ItemSelectHandler selectHandler)
+		{
+			item.setRadioItemSelectHandler(selectHandler);
+			return (ItemRadioBuilder) this;
+		}
+	}
+	
+	public static ItemRadioBuilder create()
+	{
+		return new ItemRadioBuilder();
+	}
+	
+	
 	public class RadioItem
 	{
-		protected String itemString;
-		protected Color checkedColor;
+		private String itemText;
+		private Color checkedColor;
+		private RadioItemSelectHandler selectHandler;
 
+		public RadioItem(String itemString, Color checkedColor, RadioItemSelectHandler selectHandler)
+		{
+			this.itemText = itemString;
+			this.checkedColor = checkedColor;
+			this.selectHandler = selectHandler;
+		}
+		
 		public RadioItem(String itemString, Color checkedColor)
 		{
-			this.itemString = itemString;
+			this.itemText = itemString;
 			this.checkedColor = checkedColor;
+		}
+		
+		public RadioItem(String itemString, RadioItemSelectHandler selectHandler)
+		{
+			this(itemString, null, selectHandler);
 		}
 		
 		public RadioItem(String itemString)
 		{
-			this(itemString, Color.GREEN);
+			this(itemString, null, null);
 		}
 		
-		public String getItemString()
+		public String getItemText()
 		{
-			return itemString;
+			return itemText;
 		}
 		
-		public void onSelected()
+		public void onSelect()
 		{
-			
+			if (selectHandler != null) selectHandler.onSelect();
 		}
+	}
+	
+
+	@FunctionalInterface
+	public interface ItemSelectHandler
+	{
+		void onSelect(RadioItem item, int index);
+	}
+	
+	@FunctionalInterface
+	public interface RadioItemSelectHandler
+	{
+		void onSelect();
 	}
 	
 	
 	private final List<RadioItem> options;
-	private Color uncheckedColor;
+	
+	private ConditionSupplier<Color> radioItemColorSupplier;
+	
+	private IntSupplier selectedIndexSupplier;
+	private ItemSelectHandler radioItemSelectHandler;
 
 
 	public ListDialogItemRadio(String itemText)
 	{
 		this(itemText, Color.GRAY);
 	}	
-	
+
 	public ListDialogItemRadio(String itemText, Color uncheckedColor)
 	{
 		super(itemText);
-		this.uncheckedColor = uncheckedColor;
 		this.options = new ArrayList<>();
+		setRadioColor(Color.GREEN, uncheckedColor);
 	}
 	
+	public ListDialogItemRadio(String itemText, Color checkedColor, Color uncheckedColor)
+	{
+		super(itemText);
+		this.options = new ArrayList<>();
+		setRadioColor(checkedColor, uncheckedColor);
+	}
+
 	public void addItem(RadioItem item)
 	{
 		options.add(item);
+	}
+	
+	public void setRadioColor(Color checkedColor, Color uncheckedColor)
+	{
+		radioItemColorSupplier = (c) -> c ? checkedColor : uncheckedColor;
+	}
+	
+	public void setSelectedIndexSupplier(IntSupplier selectedSupplier)
+	{
+		this.selectedIndexSupplier = selectedSupplier;
+	}
+	
+	public void setRadioItemSelectHandler(ItemSelectHandler itemSelectHandler)
+	{
+		this.radioItemSelectHandler = itemSelectHandler;
 	}
 	
 	public String getItemText()
@@ -79,15 +188,14 @@ public abstract class ListDialogItemRadio extends ListDialogItem
 		{
 			int selected = getSelected();
 			RadioItem item = options.get(i);
-			if (i == selected) text += item.checkedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
-			else text += uncheckedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
+			if (i == selected)
+			{
+				if (item.checkedColor != null) text += item.checkedColor.toEmbeddingString() + " [" + item.getItemText() + "]";
+				else text += radioItemColorSupplier.get(true).toEmbeddingString() + " [" + item.getItemText() + "]";
+			}
+			else text += radioItemColorSupplier.get(false).toEmbeddingString() + " [" + item.getItemText() + "]";
 		}
 		return text;
-	}
-	
-	public boolean isEnabled()
-	{
-		return true;
 	}
 	
 	@Override
@@ -96,14 +204,18 @@ public abstract class ListDialogItemRadio extends ListDialogItem
 		if (options.isEmpty()) return;
 		int index = (getSelected() + 1) % options.size();
 		RadioItem item = options.get(index);
-		item.onSelected();
+		item.onSelect();
 		onItemSelect(item, index);
 	}
 
-	public void onItemSelect(RadioItem item, int itemIndex)
+	public void onItemSelect(RadioItem item, int index)
 	{
-		
+		if (radioItemSelectHandler != null) radioItemSelectHandler.onSelect(item, index);
 	}
 	
-	public abstract int getSelected();
+	public int getSelected()
+	{
+		if (selectedIndexSupplier == null) return -1;
+		return selectedIndexSupplier.getAsInt();
+	}
 }

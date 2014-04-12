@@ -66,12 +66,6 @@ public class ListDialogItemSwitch extends ListDialogItem
 	}
 	
 	
-	@FunctionalInterface
-	public interface ConditionSupplier<T>
-	{
-		T get(boolean condition);
-	}
-
 	private static final ConditionSupplier<String> DEFAULT_SWITCH_TEXT_SUPPLIER = (s) -> s ? "ON" : "OFF";
 	private static final ConditionSupplier<Color> DEFAULT_SWITCH_COLOR_SUPPLIER = (s) -> s ? Color.GREEN : Color.GRAY;
 	
