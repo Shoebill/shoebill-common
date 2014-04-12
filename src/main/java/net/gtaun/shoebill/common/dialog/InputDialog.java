@@ -16,6 +16,7 @@
 
 package net.gtaun.shoebill.common.dialog;
 
+import net.gtaun.shoebill.common.dialog.MsgboxDialog.AbstractMsgboxDialogBuilder;
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Player;
@@ -28,10 +29,57 @@ import net.gtaun.util.event.EventManager;
  */
 public abstract class InputDialog extends AbstractDialog
 {
+	@SuppressWarnings("unchecked")
+	public static abstract class AbstractInputDialogBuilder
+	<DialogType extends InputDialog, DialogBuilderType extends AbstractInputDialogBuilder<DialogType, DialogBuilderType>>
+	extends AbstractDialogBuilder<DialogType, DialogBuilderType>
+	{
+		protected AbstractInputDialogBuilder(DialogType dialog)
+		{
+			super(dialog);
+		}
+		
+		public DialogBuilderType message(DialogTextSupplier messageSupplier)
+		{
+			dialog.setMessage(messageSupplier);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType message(String message)
+		{
+			dialog.setMessage(message);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType onClickOk(ClickOkHandler handler)
+		{
+			dialog.setClickOkHandler(handler);
+			return (DialogBuilderType) this;
+		}
+	}
+	
+	public static class MsgboxDialogBuilder extends AbstractMsgboxDialogBuilder<MsgboxDialog, MsgboxDialogBuilder>
+	{
+		protected MsgboxDialogBuilder(Player player, EventManager rootEventManager)
+		{
+			super(new MsgboxDialog(player, rootEventManager)
+			{
+			});
+		}
+	}
+	
+	@FunctionalInterface
+	public interface ClickOkHandler
+	{
+		void onClickOk(InputDialog dialog, String text);
+	}
+	
+	
 	private final boolean passwordMode;
 	
 	
 	private DialogTextSupplier messageSupplier = (d) -> "None";
+	private ClickOkHandler clickOkHandler = null;
 	
 	
 	public InputDialog(Player player, EventManager rootEventManager)
@@ -77,6 +125,11 @@ public abstract class InputDialog extends AbstractDialog
 		setMessage(messageSupplier);
 	}
 	
+	public boolean isPasswordMode()
+	{
+		return passwordMode;
+	}
+	
 	public void setMessage(String message)
 	{
 		this.messageSupplier = (d) -> message;
@@ -87,9 +140,9 @@ public abstract class InputDialog extends AbstractDialog
 		this.messageSupplier = messageSupplier;
 	}
 	
-	public boolean isPasswordMode()
+	public void setClickOkHandler(ClickOkHandler handler)
 	{
-		return passwordMode;
+		clickOkHandler = handler;
 	}
 	
 	@Override
@@ -106,6 +159,6 @@ public abstract class InputDialog extends AbstractDialog
 	
 	public void onClickOk(String inputText)
 	{
-		
+		if (clickOkHandler != null) clickOkHandler.onClickOk(this, inputText);
 	}
 }
