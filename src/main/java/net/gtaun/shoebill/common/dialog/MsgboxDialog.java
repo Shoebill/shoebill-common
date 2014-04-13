@@ -76,7 +76,7 @@ public class MsgboxDialog extends AbstractDialog
 	}
 	
 	
-	private DialogTextSupplier messageSupplier = DialogTextSupplier.EMPTY_MESSAGE_SUPPLIER;
+	private DialogTextSupplier messageSupplier = (d) -> "-";
 	private ClickOkHandler clickOkHandler = null;
 	
 	
