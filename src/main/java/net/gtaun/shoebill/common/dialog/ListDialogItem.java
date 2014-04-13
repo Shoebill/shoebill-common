@@ -134,12 +134,12 @@ public class ListDialogItem
 	protected ItemSelectHandler<Object> selectHandler;
 	
 
-	protected <DataType> ListDialogItem(String itemText)
+	public <DataType> ListDialogItem(String itemText)
 	{
 		setItemText(itemText);
 	}
 	
-	protected <DataType> ListDialogItem(Supplier<String> textSupplier)
+	public <DataType> ListDialogItem(Supplier<String> textSupplier)
 	{
 		setItemText(textSupplier);
 	}
