@@ -19,6 +19,7 @@ package net.gtaun.shoebill.common.dialog;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import net.gtaun.shoebill.common.dialog.ListDialogItem.ItemBooleanSupplier;
@@ -61,6 +62,18 @@ public class ListDialog extends AbstractDialog
 		public DialogBuilderType item(Supplier<String> textSupplier, ItemSelectSimpleHandler handler)
 		{
 			dialog.items.add(new ListDialogItem(textSupplier, handler));
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType item(String itemText, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler)
+		{
+			dialog.items.add(new ListDialogItem(itemText, enabledSupplier, handler));
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType item(Supplier<String> textSupplier, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler)
+		{
+			dialog.items.add(new ListDialogItem(textSupplier, enabledSupplier, handler));
 			return (DialogBuilderType) this;
 		}
 		

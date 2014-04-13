@@ -136,58 +136,68 @@ public class ListDialogItem
 
 	protected <DataType> ListDialogItem(String itemText)
 	{
-		itemTextSupplier = (d) -> itemText;
+		setItemText(itemText);
 	}
 	
 	protected <DataType> ListDialogItem(Supplier<String> textSupplier)
 	{
-		itemTextSupplier = (d) -> textSupplier.get();
+		setItemText(textSupplier);
 	}
 	
 	public ListDialogItem(String itemText, ItemSelectSimpleHandler handler)
 	{
-		itemTextSupplier = (d) -> itemText;
-		selectHandler = (i, d) -> handler.onItemSelect(i);
+		setItemText(itemText);
+		setSelectHandler(handler);
 	}
 	
 	public ListDialogItem(Supplier<String> textSupplier, ItemSelectSimpleHandler handler)
 	{
-		itemTextSupplier = (d) -> textSupplier.get();
-		selectHandler = (i, d) -> handler.onItemSelect(i);
+		setItemText(textSupplier);
+		setSelectHandler(handler);
+	}
+
+	public ListDialogItem(String itemText, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler)
+	{
+		setItemText(itemText);
+		setItemEnabledSupplier(enabledSupplier);
+		setSelectHandler(handler);
 	}
 	
-	@SuppressWarnings("unchecked")
+	public ListDialogItem(Supplier<String> textSupplier, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler)
+	{
+		setItemText(textSupplier);
+		setItemEnabledSupplier(enabledSupplier);
+		setSelectHandler(handler);
+	}
+	
 	public <DataType> ListDialogItem(DataType data, String itemText, ItemSelectHandler<DataType> handler)
 	{
-		this.data = data;
-		itemTextSupplier = (d) -> itemText;
-		selectHandler = (ItemSelectHandler<Object>) handler;
+		setData(data);
+		setItemText(itemText);
+		setSelectHandler(handler);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <DataType> ListDialogItem(DataType data, ItemTextSupplier<DataType> textSupplier, ItemSelectHandler<DataType> handler)
 	{
-		this.data = data;
-		itemTextSupplier = (ItemTextSupplier<Object>) textSupplier;
-		selectHandler = (ItemSelectHandler<Object>) handler;
+		setData(data);
+		setItemText(textSupplier);
+		setSelectHandler(handler);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <DataType> ListDialogItem(DataType data, String itemText, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler)
 	{
-		this.data = data;
-		itemTextSupplier = (d) -> itemText;
-		itemEnabledSupplier = (ItemBooleanSupplier<Object>) enabledSupplier;
-		selectHandler = (ItemSelectHandler<Object>) handler;
+		setData(data);
+		setItemText(itemText);
+		setItemEnabledSupplier(enabledSupplier);
+		setSelectHandler(handler);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <DataType> ListDialogItem(DataType data, ItemTextSupplier<DataType> textSupplier, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler)
 	{
-		this.data = data;
-		itemTextSupplier = (ItemTextSupplier<Object>) textSupplier;
-		itemEnabledSupplier = (ItemBooleanSupplier<Object>) enabledSupplier;
-		selectHandler = (ItemSelectHandler<Object>) handler;
+		setData(data);
+		setItemText(textSupplier);
+		setItemEnabledSupplier(enabledSupplier);
+		setSelectHandler(handler);
 	}
 	
 	public ListDialog getCurrentDialog()
