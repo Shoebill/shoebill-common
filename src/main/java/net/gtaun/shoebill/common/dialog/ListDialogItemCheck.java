@@ -18,50 +18,111 @@ package net.gtaun.shoebill.common.dialog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import net.gtaun.shoebill.data.Color;
 
-public abstract class ListDialogItemCheck extends ListDialogItem
+public class ListDialogItemCheck extends ListDialogItem
 {
-	public abstract class CheckItem
+	public static class ItemCheckBuilder extends AbstractItemBuilder<ListDialogItemCheck, ItemCheckBuilder>
 	{
-		protected String itemString;
-		protected Color checkedColor;
+		private ItemCheckBuilder()
+		{
+			super(new ListDialogItemCheck("Unnamed"));
+		}
+		
+		public ItemCheckBuilder item(CheckItem checkItem)
+		{
+			item.addItem(checkItem);
+			return (ItemCheckBuilder) this;
+		}
+		
+		public ItemCheckBuilder item(String itemText, Color checkedColor, BooleanSupplier statusSupplier)
+		{
+			item.addItem(new CheckItem(itemText, checkedColor, statusSupplier));
+			return (ItemCheckBuilder) this;
+		}
 
-		public CheckItem(String itemString, Color checkedColor)
+		public ItemCheckBuilder item(String itemText, BooleanSupplier statusSupplier)
 		{
-			this.itemString = itemString;
+			item.addItem(new CheckItem(itemText, statusSupplier));
+			return (ItemCheckBuilder) this;
+		}
+	}
+	
+	public static ItemCheckBuilder create()
+	{
+		return new ItemCheckBuilder();
+	}
+	
+	
+	public static class CheckItem
+	{
+		protected String itemText;
+		protected Color checkedColor;
+		
+		private BooleanSupplier statusSupplier;
+
+		public CheckItem(String itemText, Color checkedColor, BooleanSupplier statusSupplier)
+		{
+			this.itemText = itemText;
 			this.checkedColor = checkedColor;
+			this.statusSupplier = statusSupplier;
 		}
 		
-		public CheckItem(String itemString)
+		public CheckItem(String itemText, BooleanSupplier statusSupplier)
 		{
-			this(itemString, Color.GREEN);
+			this(itemText, null, statusSupplier);
 		}
-		
-		public String getItemString()
+
+		protected CheckItem(String itemText, Color checkedColor)
 		{
-			return itemString;
+			this(itemText, checkedColor, null);
 		}
 		
-		public abstract boolean isChecked();
+		protected CheckItem(String itemText)
+		{
+			this(itemText, null, null);
+		}
+		
+		public void setStatusSupplier(BooleanSupplier statusSupplier)
+		{
+			this.statusSupplier = statusSupplier;
+		}
+		
+		public String getItemText()
+		{
+			return itemText;
+		}
+		
+		public boolean isChecked()
+		{
+			if (statusSupplier == null) return false;
+			return statusSupplier.getAsBoolean();
+		}
 	}
 	
 	
 	private final List<CheckItem> options;
-	private Color uncheckedColor;
 
+	private ConditionSupplier<Color> checkItemColorSupplier;
 	
-	public ListDialogItemCheck(String itemText, Color uncheckedColor)
-	{
-		super(itemText);
-		this.uncheckedColor = uncheckedColor;
-		this.options = new ArrayList<>();
-	}
 	
 	public ListDialogItemCheck(String itemText)
 	{
 		this(itemText, Color.GRAY);
+	}
+	
+	public ListDialogItemCheck(String itemText, Color uncheckedColor)
+	{
+		this(itemText, Color.GREEN, uncheckedColor);
+	}
+	
+	public ListDialogItemCheck(String itemText, Color checkedColor, Color uncheckedColor)
+	{
+		super(itemText);
+		this.options = new ArrayList<>();
+		setCheckItemColorSupplier(checkedColor, uncheckedColor);
 	}
 	
 	public void addItem(CheckItem item)
@@ -69,21 +130,23 @@ public abstract class ListDialogItemCheck extends ListDialogItem
 		options.add(item);
 	}
 	
+	public void setCheckItemColorSupplier(Color checkedColor, Color uncheckedColor)
+	{
+		checkItemColorSupplier = (c) -> c ? checkedColor : uncheckedColor;
+	}
+	
 	public String getItemText()
 	{
 		String text = super.getItemText();
 		for(CheckItem item : options)
 		{
-			if (item.isChecked()) text += item.checkedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
-			else text += uncheckedColor.toEmbeddingString() + " [" + item.getItemString() + "]";
+			if (item.isChecked())
+			{
+				if (item.checkedColor != null) text += item.checkedColor.toEmbeddingString() + " [" + item.getItemText() + "]";
+				else text += checkItemColorSupplier.get(true).toEmbeddingString() + " [" + item.getItemText() + "]";
+			}
+			else text += checkItemColorSupplier.get(false).toEmbeddingString() + " [" + item.getItemText() + "]";
 		}
 		return text;
 	}
-	
-	public boolean isEnabled()
-	{
-		return true;
-	}
-
-	public abstract void onItemSelect();
 }

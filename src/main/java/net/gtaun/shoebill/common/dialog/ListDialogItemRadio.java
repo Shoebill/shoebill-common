@@ -31,27 +31,33 @@ public class ListDialogItemRadio extends ListDialogItem
 			super(new ListDialogItemRadio("Unnamed"));
 		}
 		
+		public ItemRadioBuilder item(RadioItem radioItem)
+		{
+			item.addItem(radioItem);
+			return (ItemRadioBuilder) this;
+		}
+		
 		public ItemRadioBuilder item(String itemText, Color checkedColor, RadioItemSelectHandler selectHandler)
 		{
-			item.addItem(item.new RadioItem(itemText, checkedColor, selectHandler));
+			item.addItem(new RadioItem(itemText, checkedColor, selectHandler));
 			return (ItemRadioBuilder) this;
 		}
 
 		public ItemRadioBuilder item(String itemText, Color checkedColor)
 		{
-			item.addItem(item.new RadioItem(itemText, checkedColor));
+			item.addItem(new RadioItem(itemText, checkedColor));
 			return (ItemRadioBuilder) this;
 		}
 		
 		public ItemRadioBuilder item(String itemText, RadioItemSelectHandler selectHandler)
 		{
-			item.addItem(item.new RadioItem(itemText, selectHandler));
+			item.addItem(new RadioItem(itemText, selectHandler));
 			return (ItemRadioBuilder) this;
 		}
 		
 		public ItemRadioBuilder item(String itemText)
 		{
-			item.addItem(item.new RadioItem(itemText));
+			item.addItem(new RadioItem(itemText));
 			return (ItemRadioBuilder) this;
 		}
 		
@@ -80,7 +86,7 @@ public class ListDialogItemRadio extends ListDialogItem
 	}
 	
 	
-	public class RadioItem
+	public static class RadioItem
 	{
 		private String itemText;
 		private Color checkedColor;
