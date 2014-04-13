@@ -37,6 +37,12 @@ import net.gtaun.util.event.EventManager;
  */
 public class ListDialog extends AbstractDialog
 {
+	@FunctionalInterface
+	public interface BuilderFunction<Builder>
+	{
+		void call(Builder builder);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static abstract class AbstractListDialogBuilder
 	<DialogType extends ListDialog, DialogBuilderType extends AbstractListDialogBuilder<DialogType, DialogBuilderType>>
@@ -47,9 +53,27 @@ public class ListDialog extends AbstractDialog
 			super(dialog);
 		}
 		
+		public DialogBuilderType execute(BuilderFunction<DialogBuilderType> func)
+		{
+			func.call((DialogBuilderType) this);
+			return (DialogBuilderType) this;
+		}
+		
 		public DialogBuilderType item(ListDialogItem item)
 		{
 			dialog.items.add(item);
+			return (DialogBuilderType) this;
+		}
+
+		public DialogBuilderType item(String itemText)
+		{
+			dialog.items.add(new ListDialogItem(itemText));
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType item(Supplier<String> textSupplier)
+		{
+			dialog.items.add(new ListDialogItem(textSupplier));
 			return (DialogBuilderType) this;
 		}
 
