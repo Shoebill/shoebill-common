@@ -86,7 +86,7 @@ public class PlayerLifecycleHolder implements Destroyable
 		final Constructor<T> constructor;
 		try
 		{
-			constructor = clz.getConstructor(Shoebill.class, EventManager.class, Player.class);
+			constructor = clz.getConstructor(EventManager.class, Player.class);
 			constructor.setAccessible(true);
 		}
 		catch (NoSuchMethodException | SecurityException e)
