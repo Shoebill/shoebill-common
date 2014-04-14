@@ -21,11 +21,10 @@ public class PlayerLifecycleHolder implements Destroyable
 {
 	public interface PlayerLifecycleObjectFactory<T extends AbstractPlayerContext> 
 	{
-		T create(Shoebill shoebill, EventManager eventManager, Player player);
+		T create(EventManager eventManager, Player player);
 	}
 	
 	
-	private final Shoebill shoebill;
 	private final EventManagerNode eventManager;
 
 	private final Map<Class<?>, PlayerLifecycleObjectFactory<? extends AbstractPlayerContext>> classFactories;
@@ -34,10 +33,8 @@ public class PlayerLifecycleHolder implements Destroyable
 	private boolean destroyed;
 	
 	
-	public PlayerLifecycleHolder(Shoebill shoebill, EventManager rootEventManager)
+	public PlayerLifecycleHolder(EventManager rootEventManager)
 	{
-		this.shoebill = shoebill;
-		
 		eventManager = rootEventManager.createChildNode();
 		classFactories = new HashMap<>();
 		holder = new HashMap<>();
@@ -53,7 +50,7 @@ public class PlayerLifecycleHolder implements Destroyable
 				Class<?> clz = entry.getKey();
 				PlayerLifecycleObjectFactory<? extends AbstractPlayerContext> factory = entry.getValue();
 				
-				AbstractPlayerContext object = factory.create(shoebill, eventManager, player);
+				AbstractPlayerContext object = factory.create(eventManager, player);
 				playerLifecycleObjects.put(clz, object);
 				object.init();
 			}
@@ -100,11 +97,11 @@ public class PlayerLifecycleHolder implements Destroyable
 		registerClass(clz, new PlayerLifecycleObjectFactory<T>()
 		{
 			@Override
-			public T create(Shoebill shoebill, EventManager eventManager, Player player)
+			public T create(EventManager eventManager, Player player)
 			{
 				try
 				{
-					return constructor.newInstance(shoebill, eventManager, player);
+					return constructor.newInstance(eventManager, player);
 				}
 				catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
 				{
@@ -118,16 +115,15 @@ public class PlayerLifecycleHolder implements Destroyable
 	public <T extends AbstractPlayerContext> void registerClass(Class<T> clz, PlayerLifecycleObjectFactory<T> factory)
 	{
 		if (classFactories.containsKey(clz)) return;
-		
-		Collection<Player> players = shoebill.getSampObjectManager().getPlayers();
-		for (Player player : players)
+
+		Player.get().forEach((player) ->
 		{
 			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
 
-			AbstractPlayerContext object = factory.create(shoebill, eventManager, player);
+			AbstractPlayerContext object = factory.create(eventManager, player);
 			playerLifecycleObjects.put(clz, object);
 			object.init();
-		}
+		});
 		
 		classFactories.put(clz, factory);
 	}
@@ -136,14 +132,13 @@ public class PlayerLifecycleHolder implements Destroyable
 	{
 		if (classFactories.containsKey(clz) == false) return;
 		
-		Collection<Player> players = shoebill.getSampObjectManager().getPlayers();
-		for (Player player : players)
+		Player.get().forEach((player) ->
 		{
 			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
 			AbstractPlayerContext object = playerLifecycleObjects.get(clz);
 			playerLifecycleObjects.remove(clz);
 			object.destroy();
-		}
+		});
 		
 		classFactories.remove(clz);
 	}
