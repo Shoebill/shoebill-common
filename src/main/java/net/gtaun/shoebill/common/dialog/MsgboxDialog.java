@@ -101,6 +101,13 @@ public class MsgboxDialog extends AbstractDialog
 		setMessage(messageSupplier);
 	}
 	
+	public MsgboxDialog(Player player, EventManager rootEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier)
+	{
+		super(DialogStyle.MSGBOX, player, rootEventManager);
+		setCaption(captionSupplier);
+		setMessage(messageSupplier);
+	}
+	
 	public void setMessage(String message)
 	{
 		this.messageSupplier = (d) -> message;
