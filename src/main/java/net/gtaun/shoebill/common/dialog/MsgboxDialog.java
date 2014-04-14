@@ -16,6 +16,8 @@
 
 package net.gtaun.shoebill.common.dialog;
 
+import java.util.function.Supplier;
+
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Player;
@@ -79,20 +81,39 @@ public class MsgboxDialog extends AbstractDialog
 	private DialogTextSupplier messageSupplier = (d) -> "-";
 	private ClickOkHandler clickOkHandler = null;
 	
-	
+
 	protected MsgboxDialog(Player player, EventManager rootEventManager)
 	{
 		super(DialogStyle.MSGBOX, player, rootEventManager);
 	}
 	
-	public void setMessage(DialogTextSupplier messageSupplier)
+	public MsgboxDialog(Player player, EventManager rootEventManager, String caption, String message)
 	{
-		this.messageSupplier = messageSupplier;
+		super(DialogStyle.MSGBOX, player, rootEventManager);
+		setCaption(caption);
+		setMessage(message);
+	}
+	
+	public MsgboxDialog(Player player, EventManager rootEventManager, Supplier<String> captionSupplier, Supplier<String> messageSupplier)
+	{
+		super(DialogStyle.MSGBOX, player, rootEventManager);
+		setCaption(captionSupplier);
+		setMessage(messageSupplier);
 	}
 	
 	public void setMessage(String message)
 	{
 		this.messageSupplier = (d) -> message;
+	}
+
+	public void setMessage(Supplier<String> messageSupplier)
+	{
+		this.messageSupplier = (d) -> messageSupplier.get();
+	}
+	
+	public void setMessage(DialogTextSupplier messageSupplier)
+	{
+		this.messageSupplier = messageSupplier;
 	}
 	
 	public void setClickOkHandler(ClickOkHandler onClickOkHandler)

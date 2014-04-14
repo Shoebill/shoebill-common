@@ -16,6 +16,8 @@
 
 package net.gtaun.shoebill.common.dialog;
 
+import java.util.function.Supplier;
+
 import net.gtaun.shoebill.SampObjectManager;
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.event.dialog.DialogCancelEvent;
@@ -168,6 +170,11 @@ public abstract class AbstractDialog
 		captionSupplier = (d) -> caption;
 	}
 	
+	public void setCaption(Supplier<String> captionSupplier)
+	{
+		this.captionSupplier = (d) -> captionSupplier.get();
+	}
+	
 	public void setCaption(DialogTextSupplier captionSupplier)
 	{
 		this.captionSupplier = captionSupplier;
@@ -177,7 +184,12 @@ public abstract class AbstractDialog
 	{
 		buttonOkSupplier = (d) -> buttonOk;
 	}
-	
+
+	public void setButtonOk(Supplier<String> buttonOkSupplier)
+	{
+		this.buttonOkSupplier = (d) -> buttonOkSupplier.get();
+	}
+
 	public void setButtonOk(DialogTextSupplier buttonOkSupplier)
 	{
 		this.buttonOkSupplier = buttonOkSupplier;
@@ -186,6 +198,11 @@ public abstract class AbstractDialog
 	public void setButtonCancel(String buttonCancel)
 	{
 		buttonCancelSupplier = (d) -> buttonCancel;
+	}
+	
+	public void setButtonCancel(Supplier<String> buttonCancelSupplier)
+	{
+		this.buttonCancelSupplier = (d) -> buttonCancelSupplier.get();
 	}
 	
 	public void setButtonCancel(DialogTextSupplier buttonCancelSupplier)
