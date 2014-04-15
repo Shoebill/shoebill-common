@@ -18,9 +18,13 @@ public class CommandEntry
 	private CommandHandlerInternal handler;
 	
 	
-	public CommandEntry(String command, Class<?>[] paramTypes, short priority, boolean strictMode, CommandHandlerInternal commandHandler)
+	public CommandEntry(String command, Class<?>[] paramTypes, short priority, boolean strictMode, CommandHandlerInternal handler)
 	{
-		
+		this.command = command;
+		this.paramTypes = paramTypes;
+		this.priority = priority;
+		this.strictMode = strictMode;
+		this.handler = handler;
 	}
 	
 	public String getCommand()

@@ -16,6 +16,7 @@ import java.util.function.Function;
 import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.object.Player;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class CommandGroup
@@ -29,6 +30,8 @@ public class CommandGroup
 		{
 			String name = m.getName();
 			Class<?>[] paramTypes = m.getParameterTypes();
+			if (m.getReturnType() != boolean.class) return;
+			if (paramTypes.length < 1) return;
 			
 			Command command = m.getAnnotation(Command.class);
 			if (command == null) return;
@@ -43,7 +46,7 @@ public class CommandGroup
 			{
 				try
 				{
-					m.invoke(object, params);
+					return (boolean) m.invoke(object, params);
 				}
 				catch (Exception e)
 				{
@@ -123,6 +126,7 @@ public class CommandGroup
 		{
 			Queue<Object> paramQueue = new LinkedList<>();
 			Collections.addAll(paramQueue, params);
+			paramQueue.poll();
 			return handler.handle(player, paramQueue);
 		}));
 	}
@@ -147,15 +151,18 @@ public class CommandGroup
 	public boolean processCommand(Player player, String command, String paramText)
 	{
 		SortedSet<CommandEntry> entries = commands.get(command);
+		if (entries == null) return false;
+		
 		for (CommandEntry e : entries)
 		{
 			Class<?>[] types = e.getParamTypes();
 			String[] paramStrs = StringUtils.split(paramText, " ", types.length);
-			if (types.length != paramStrs.length) continue;
+			if (types.length != paramStrs.length && types.length != 0) continue;
 			
 			try
 			{
 				Object[] params = parseParams(types, paramStrs);
+				params = ArrayUtils.add(params, 0, player);
 				if (e.handle(player, params)) return true;
 			}
 			catch (NumberFormatException ex)
