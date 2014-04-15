@@ -3,6 +3,7 @@ package net.gtaun.shoebill.common.player;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -147,18 +148,17 @@ public class PlayerLifecycleHolder implements Destroyable
 		if (classFactories.containsKey(clz) == false) return null;
 		
 		Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
+		if (playerLifecycleObjects == null) return null;
+		
 		return clz.cast(playerLifecycleObjects.get(clz));
 	}
 	
 	public <T extends AbstractPlayerContext> Collection<T> getObjects(Class<T> clz)
 	{
-		if (classFactories.containsKey(clz) == false) return null;
+		if (classFactories.containsKey(clz) == false) return Collections.emptyList();
 		
 		Collection<T> objects = new LinkedList<>();
-		for (Entry<Player, Map<Class<?>, AbstractPlayerContext>> entry : holder.entrySet())
-		{
-			objects.add(clz.cast(entry.getValue().get(clz)));
-		}
+		holder.values().forEach((obj) -> objects.add(clz.cast(obj)));
 		
 		return objects;
 	}
