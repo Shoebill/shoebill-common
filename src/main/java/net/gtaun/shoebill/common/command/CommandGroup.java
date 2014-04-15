@@ -136,7 +136,7 @@ public class CommandGroup
 		SortedSet<CommandEntry> entries = commands.get(entry.getCommand());
 		if (entries == null)
 		{
-			entries = new TreeSet<CommandEntry>((e1, e2) -> e1.getParamTypes().length - e2.getParamTypes().length);
+			entries = new TreeSet<CommandEntry>((e1, e2) -> e2.getParamTypes().length - e1.getParamTypes().length);
 			commands.put(entry.getCommand(), entries);
 		}
 		entries.add(entry);
