@@ -158,7 +158,7 @@ public class PlayerLifecycleHolder implements Destroyable
 		if (classFactories.containsKey(clz) == false) return Collections.emptyList();
 		
 		Collection<T> objects = new LinkedList<>();
-		holder.values().forEach((obj) -> objects.add(clz.cast(obj)));
+		holder.values().forEach((m) -> objects.add(clz.cast(m.get(clz))));
 		
 		return objects;
 	}
