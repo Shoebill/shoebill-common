@@ -180,6 +180,11 @@ public abstract class AbstractDialog
 		this.captionSupplier = captionSupplier;
 	}
 	
+	public String getCaption()
+	{
+		return captionSupplier.get(this);
+	}
+	
 	public void setButtonOk(String buttonOk)
 	{
 		buttonOkSupplier = (d) -> buttonOk;
