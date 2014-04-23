@@ -10,7 +10,6 @@ import net.gtaun.shoebill.object.Player;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class CommandGroup
@@ -218,12 +217,13 @@ public class CommandGroup
 				Object[] params = parseParams(types, paramStrs);
 				params = ArrayUtils.add(params, 0, player);
 				if (e.handle(player, params)) return true;
-				if (matchedCmds != null) matchedCmds.add(new ImmutablePair<>(path, e));
 			}
 			catch (NumberFormatException ex)
 			{
-				continue;
+
 			}
+
+			if (matchedCmds != null) matchedCmds.add(new ImmutablePair<>(path, e));
 		}
 
 		for (CommandGroup group : groups)
