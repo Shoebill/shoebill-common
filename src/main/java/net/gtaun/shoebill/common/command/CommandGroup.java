@@ -204,26 +204,28 @@ public class CommandGroup
 	protected boolean processCommand(String path, List<Pair<String, CommandEntry>> matchedCmds, Player player, String command, String paramText)
 	{
 		SortedSet<CommandEntry> entries = commands.get(command);
-		if (entries == null) return false;
-
-		for (CommandEntry e : entries)
+		if (entries != null)
 		{
-			Class<?>[] types = e.getParamTypes();
-			String[] paramStrs = StringUtils.split(paramText, " ", types.length);
-			if (types.length != paramStrs.length && types.length != 0) continue;
-
-			try
+			for (CommandEntry e : entries)
 			{
-				Object[] params = parseParams(types, paramStrs);
-				params = ArrayUtils.add(params, 0, player);
-				if (e.handle(player, params)) return true;
-			}
-			catch (NumberFormatException ex)
-			{
+				Class<?>[] types = e.getParamTypes();
+				String[] paramStrs = StringUtils.split(paramText, " ", types.length);
+				if (types.length == paramStrs.length || (types.length == 0 && e.isStrictMode() == false))
+				{
+					try
+					{
+						Object[] params = parseParams(types, paramStrs);
+						params = ArrayUtils.add(params, 0, player);
+						if (e.handle(player, params)) return true;
+					} catch (Throwable ex)
+					{
 
-			}
+					}
+				}
 
-			if (matchedCmds != null) matchedCmds.add(new ImmutablePair<>(path, e));
+				System.out.println(e.getCommand());
+				if (matchedCmds != null) matchedCmds.add(new ImmutablePair<>(path, e));
+			}
 		}
 
 		for (CommandGroup group : groups)
