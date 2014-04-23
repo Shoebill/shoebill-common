@@ -217,13 +217,13 @@ public class CommandGroup
 						Object[] params = parseParams(types, paramStrs);
 						params = ArrayUtils.add(params, 0, player);
 						if (e.handle(player, params)) return true;
-					} catch (Throwable ex)
+					}
+					catch (Throwable ex)
 					{
 
 					}
 				}
 
-				System.out.println(e.getCommand());
 				if (matchedCmds != null) matchedCmds.add(new ImmutablePair<>(path, e));
 			}
 		}
