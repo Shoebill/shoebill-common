@@ -1,16 +1,7 @@
 package net.gtaun.shoebill.common.command;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.lang.reflect.Parameter;
+import java.util.*;
 import java.util.function.Function;
 
 import net.gtaun.shoebill.data.Color;
@@ -18,6 +9,9 @@ import net.gtaun.shoebill.object.Player;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class CommandGroup
 {
@@ -29,26 +23,33 @@ public class CommandGroup
 		Arrays.stream(clz.getMethods()).forEach((m) ->
 		{
 			String name = m.getName();
-			Class<?>[] paramTypes = m.getParameterTypes();
+			Parameter[] methodParams = m.getParameters();
 			if (m.getReturnType() != boolean.class) return;
-			if (paramTypes.length < 1) return;
+			if (methodParams.length < 1) return;
 			
 			Command command = m.getAnnotation(Command.class);
 			if (command == null) return;
-			if (paramTypes[0] != Player.class) return;
-			
-			paramTypes = Arrays.copyOfRange(paramTypes, 1, paramTypes.length);
-			
+			if (methodParams[0].getType() != Player.class) return;
+
+			Class<?>[] paramTypes = new Class<?>[methodParams.length-1];
+			String[] paramNames = new String[paramTypes.length-1];
+
+			for (int i=1; i<methodParams.length; i++)
+			{
+				paramTypes[i-1] = methodParams[i].getType();
+				paramNames[i-1] = methodParams[i].getName();
+			}
+
 			short priority = command.priority();
 			boolean strictMode = command.strictMode();
 			
-			entries.add(new CommandEntry(name, paramTypes, priority, strictMode, (player, params) ->
+			entries.add(new CommandEntry(name, paramTypes, paramNames, priority, strictMode, (player, params) ->
 			{
 				try
 				{
 					return (boolean) m.invoke(object, params);
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					e.printStackTrace();
 				}
@@ -90,7 +91,7 @@ public class CommandGroup
 		
 		TYPE_PARSER.put(char.class,			(s) -> s.length() > 0 ? s.charAt(0) : 0);
 		TYPE_PARSER.put(Character.class,	(s) -> s.length() > 0 ? s.charAt(0) : 0);
-		
+
 		TYPE_PARSER.put(float.class,		(s) -> Float.parseFloat(s));
 		TYPE_PARSER.put(Float.class,		(s) -> Float.parseFloat(s));
 		
@@ -103,11 +104,15 @@ public class CommandGroup
 	
 	
 	private Map<String, SortedSet<CommandEntry>> commands;
+	private Set<CommandGroup> groups;
+	private Map<String, CommandGroup> childGroups;
 	
 	
 	public CommandGroup()
 	{
 		commands = new HashMap<>();
+		groups = new HashSet<>();
+		childGroups = new HashMap<>();
 	}
 	
 	public void registerCommands(Object object)
@@ -115,14 +120,14 @@ public class CommandGroup
 		generateCommandEntries(object).forEach((e) -> registerCommand(e));
 	}
 	
-	public void registerCommand(String command, Class<?>[] paramTypes, CommandHandler handler)
+	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, CommandHandler handler)
 	{
-		registerCommand(command, paramTypes, (short) 0, false, handler);
+		registerCommand(command, paramTypes, paramNames, (short) 0, false, handler);
 	}
 	
-	public void registerCommand(String command, Class<?>[] paramTypes, short priority, boolean strictMode, CommandHandler handler)
+	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, short priority, boolean strictMode, CommandHandler handler)
 	{
-		registerCommand(new CommandEntry(command, paramTypes, priority, strictMode, (player, params) ->
+		registerCommand(new CommandEntry(command, paramTypes, paramNames, priority, strictMode, (player, params) ->
 		{
 			Queue<Object> paramQueue = new LinkedList<>();
 			Collections.addAll(paramQueue, params);
@@ -141,36 +146,96 @@ public class CommandGroup
 		}
 		entries.add(entry);
 	}
+
+	public void registerGroup(CommandGroup group)
+	{
+		groups.add(group);
+	}
+
+	public void unregisterGroup(CommandGroup group)
+	{
+		groups.remove(group);
+	}
+
+	public boolean containsGroup(CommandGroup group)
+	{
+		return groups.contains(group);
+	}
+
+	public void registerChildGroup(CommandGroup group, String childName)
+	{
+		childGroups.put(childName, group);
+	}
+
+	public void unregisterChildGroup(CommandGroup group)
+	{
+		for (Iterator<Map.Entry<String, CommandGroup>> it = childGroups.entrySet().iterator(); it.hasNext(); )
+		{
+			if (it.next().getValue() == group) it.remove();
+		}
+	}
+
+	public boolean containsChildGroup(CommandGroup group)
+	{
+		for (Iterator<Map.Entry<String, CommandGroup>> it = childGroups.entrySet().iterator(); it.hasNext(); )
+		{
+			if (it.next().getValue() == group) return true;
+		}
+
+		return false;
+	}
 	
 	public boolean processCommand(Player player, String commandText)
 	{
-		String[] splits = StringUtils.split(commandText, " ", 2);
-		return processCommand(player, splits[0], splits.length == 2 ? splits[1] : "");
+		return processCommand("", null, player, commandText);
 	}
 	
 	public boolean processCommand(Player player, String command, String paramText)
 	{
+		return processCommand("", null, player, command.trim(), paramText);
+	}
+
+	protected boolean processCommand(String path, List<Pair<String, CommandEntry>> matchedCmds, Player player, String commandText)
+	{
+		String[] splits = StringUtils.split(commandText, " ", 2);
+		if (splits.length < 1) return false;
+		return processCommand(path, matchedCmds, player, splits[0], splits.length == 2 ? splits[1] : "");
+	}
+
+	protected boolean processCommand(String path, List<Pair<String, CommandEntry>> matchedCmds, Player player, String command, String paramText)
+	{
 		SortedSet<CommandEntry> entries = commands.get(command);
 		if (entries == null) return false;
-		
+
 		for (CommandEntry e : entries)
 		{
 			Class<?>[] types = e.getParamTypes();
 			String[] paramStrs = StringUtils.split(paramText, " ", types.length);
 			if (types.length != paramStrs.length && types.length != 0) continue;
-			
+
 			try
 			{
 				Object[] params = parseParams(types, paramStrs);
 				params = ArrayUtils.add(params, 0, player);
 				if (e.handle(player, params)) return true;
+				if (matchedCmds != null) matchedCmds.add(new ImmutablePair<>(path, e));
 			}
 			catch (NumberFormatException ex)
 			{
 				continue;
 			}
 		}
-		
+
+		for (CommandGroup group : groups)
+		{
+			if (group.processCommand(path, matchedCmds, player, command, paramText)) return true;
+		}
+
+		CommandGroup child = childGroups.get(command);
+		if (child == null) return false;
+
+		if (child.processCommand(path + " " + command, matchedCmds, player, paramText)) return true;
+
 		return false;
 	}
 }

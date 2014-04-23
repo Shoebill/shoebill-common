@@ -13,15 +13,17 @@ public class CommandEntry
 	
 	private String command;
 	private Class<?>[] paramTypes;
+	private String[] paramNames;
 	private short priority;
 	private boolean strictMode;
 	private CommandHandlerInternal handler;
 	
 	
-	public CommandEntry(String command, Class<?>[] paramTypes, short priority, boolean strictMode, CommandHandlerInternal handler)
+	public CommandEntry(String command, Class<?>[] paramTypes, String[] paramNames, short priority, boolean strictMode, CommandHandlerInternal handler)
 	{
 		this.command = command;
 		this.paramTypes = paramTypes;
+		this.paramNames = paramNames;
 		this.priority = priority;
 		this.strictMode = strictMode;
 		this.handler = handler;
@@ -36,7 +38,12 @@ public class CommandEntry
 	{
 		return paramTypes.clone();
 	}
-	
+
+	public String[] getParamNames()
+	{
+		return paramNames.clone();
+	}
+
 	public short getPriority()
 	{
 		return priority;
