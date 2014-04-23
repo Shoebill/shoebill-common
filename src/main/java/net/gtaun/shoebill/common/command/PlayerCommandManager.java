@@ -35,7 +35,7 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 
 	private void sendUsageMessage(Player player, String path, CommandEntry entry)
 	{
-		String command = (path + " " + entry).trim();
+		String command = (path + " " + entry.getCommand()).trim();
 		String message = "Usage: /" + command;
 		for (String paramName : entry.getParamNames()) message += " [" + paramName + "]";
 
