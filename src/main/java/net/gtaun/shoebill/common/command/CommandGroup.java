@@ -32,7 +32,7 @@ public class CommandGroup
 			if (methodParams[0].getType() != Player.class) return;
 
 			Class<?>[] paramTypes = new Class<?>[methodParams.length-1];
-			String[] paramNames = new String[paramTypes.length-1];
+			String[] paramNames = new String[paramTypes.length];
 
 			for (int i=1; i<methodParams.length; i++)
 			{
