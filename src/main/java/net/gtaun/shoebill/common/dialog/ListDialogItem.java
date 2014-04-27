@@ -134,6 +134,11 @@ public class ListDialogItem
 	protected ItemSelectHandler<Object> selectHandler;
 	
 
+	public <DataType> ListDialogItem()
+	{
+		setItemText("-");
+	}
+	
 	public <DataType> ListDialogItem(String itemText)
 	{
 		setItemText(itemText);

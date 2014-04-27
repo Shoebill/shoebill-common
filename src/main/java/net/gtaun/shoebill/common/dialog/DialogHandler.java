@@ -17,7 +17,7 @@
 package net.gtaun.shoebill.common.dialog;
 
 @FunctionalInterface
-public interface ClickCancelHandler
+public interface DialogHandler
 {
-	void onClickCancel(AbstractDialog dialog);
+	void handle(AbstractDialog dialog);
 }

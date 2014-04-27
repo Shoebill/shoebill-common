@@ -90,9 +90,15 @@ public abstract class AbstractDialog
 			return (DialogBuilderType) this;
 		}
 		
-		public DialogBuilderType onClickCancel(ClickCancelHandler handler)
+		public DialogBuilderType onClickCancel(DialogHandler handler)
 		{
 			dialog.setClickCancelHandler(handler);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType cancelHandler(DialogHandler cancelHandler)
+		{
+			dialog.setCancelHandler(cancelHandler);
 			return (DialogBuilderType) this;
 		}
 		
@@ -114,8 +120,9 @@ public abstract class AbstractDialog
 	private DialogTextSupplier captionSupplier = (d) -> "None";
 	private DialogTextSupplier buttonOkSupplier = (d) -> "OK";
 	private DialogTextSupplier buttonCancelSupplier = (d) -> "Cancel";
-	
-	private ClickCancelHandler clickCancelHandler = null;
+
+	private DialogHandler clickCancelHandler = null;
+	private DialogHandler cancelHandler = null;
 	
 	
 	AbstractDialog(DialogStyle style, Player player, EventManager rootEventManager)
@@ -215,9 +222,14 @@ public abstract class AbstractDialog
 		this.buttonCancelSupplier = buttonCancelSupplier;
 	}
 	
-	public void setClickCancelHandler(ClickCancelHandler onClickCancelHandler)
+	public void setClickCancelHandler(DialogHandler onClickCancelHandler)
 	{
 		this.clickCancelHandler = onClickCancelHandler;
+	}
+	
+	public void setCancelHandler(DialogHandler cancelHandler)
+	{
+		this.cancelHandler = cancelHandler;
 	}
 	
 	protected void show(String text)
@@ -253,11 +265,11 @@ public abstract class AbstractDialog
 	
 	protected void onClickCancel()
 	{
-		if (clickCancelHandler != null) clickCancelHandler.onClickCancel(this);
+		if (clickCancelHandler != null) clickCancelHandler.handle(this);
 	}
 	
 	void onClickOk(DialogResponseEvent event)
 	{
-		
+		if (cancelHandler != null) cancelHandler.handle(this);
 	}
 }
