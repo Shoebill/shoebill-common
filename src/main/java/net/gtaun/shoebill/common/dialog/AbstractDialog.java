@@ -96,13 +96,13 @@ public abstract class AbstractDialog
 			return (DialogBuilderType) this;
 		}
 		
-		public DialogBuilderType onShowHandler(DialogHandler handler)
+		public DialogBuilderType onShow(DialogHandler handler)
 		{
 			dialog.setShowHandler(handler);
 			return (DialogBuilderType) this;
 		}
 		
-		public DialogBuilderType onCloseHandler(DialogCloseHandler handler)
+		public DialogBuilderType onClose(DialogCloseHandler handler)
 		{
 			dialog.setCloseHandler(handler);
 			return (DialogBuilderType) this;
