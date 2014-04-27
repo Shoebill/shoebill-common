@@ -203,6 +203,61 @@ public class ListDialog extends AbstractDialog
 		displayedItems = new ArrayList<>();
 	}
 	
+	public void addItem(ListDialogItem item)
+	{
+		items.add(item);
+	}
+
+	public void addItem(String itemText)
+	{
+		items.add(new ListDialogItem(itemText));
+	}
+	
+	public void addItem(Supplier<String> textSupplier)
+	{
+		items.add(new ListDialogItem(textSupplier));
+	}
+
+	public void addItem(String itemText, ItemSelectSimpleHandler handler)
+	{
+		items.add(new ListDialogItem(itemText, handler));
+	}
+	
+	public void addItem(Supplier<String> textSupplier, ItemSelectSimpleHandler handler)
+	{
+		items.add(new ListDialogItem(textSupplier, handler));
+	}
+	
+	public void addItem(String itemText, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler)
+	{
+		items.add(new ListDialogItem(itemText, enabledSupplier, handler));
+	}
+	
+	public void addItem(Supplier<String> textSupplier, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler)
+	{
+		items.add(new ListDialogItem(textSupplier, enabledSupplier, handler));
+	}
+	
+	public <DataType> void addItem(DataType data, String itemText, ItemSelectHandler<DataType> handler)
+	{
+		items.add(new ListDialogItem(data, itemText, handler));
+	}
+	
+	public <DataType> void addItem(DataType data, ItemTextSupplier<DataType> textSupplier, ItemSelectHandler<DataType> handler)
+	{
+		items.add(new ListDialogItem(data, textSupplier, handler));
+	}
+	
+	public <DataType> void addItem(DataType data, String itemText, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler)
+	{
+		items.add(new ListDialogItem(data, itemText, enabledSupplier, handler));
+	}
+	
+	public <DataType> void addItem(DataType data, ItemTextSupplier<DataType> textSupplier, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler)
+	{
+		items.add(new ListDialogItem(data, textSupplier, enabledSupplier, handler));
+	}
+	
 	public void setClickOkHandler(ClickOkHandler handler)
 	{
 		clickOkHandler = handler;
