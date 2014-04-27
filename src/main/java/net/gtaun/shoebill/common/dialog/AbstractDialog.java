@@ -20,8 +20,8 @@ import java.util.function.Supplier;
 
 import net.gtaun.shoebill.SampObjectManager;
 import net.gtaun.shoebill.constant.DialogStyle;
-import net.gtaun.shoebill.event.dialog.DialogCancelEvent;
-import net.gtaun.shoebill.event.dialog.DialogCancelEvent.DialogCancelType;
+import net.gtaun.shoebill.event.dialog.DialogCloseEvent;
+import net.gtaun.shoebill.event.dialog.DialogCloseEvent.DialogCloseType;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.DialogId;
 import net.gtaun.shoebill.object.Player;
@@ -96,9 +96,15 @@ public abstract class AbstractDialog
 			return (DialogBuilderType) this;
 		}
 		
-		public DialogBuilderType cancelHandler(DialogHandler cancelHandler)
+		public DialogBuilderType onShowHandler(DialogHandler handler)
 		{
-			dialog.setCancelHandler(cancelHandler);
+			dialog.setShowHandler(handler);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType onCloseHandler(DialogCloseHandler handler)
+		{
+			dialog.setCloseHandler(handler);
 			return (DialogBuilderType) this;
 		}
 		
@@ -109,8 +115,16 @@ public abstract class AbstractDialog
 	}
 	
 	
+	@FunctionalInterface
+	public interface DialogCloseHandler
+	{
+		void onCancel(AbstractDialog dialog, DialogCloseType type);
+	}
+	
+	
 	protected final Player player;
 	protected final EventManagerNode eventManagerNode;
+	private final EventManagerNode eventManagerInternal;
 	
 	private final DialogId dialogId;
 	private final DialogStyle style;
@@ -121,15 +135,18 @@ public abstract class AbstractDialog
 	private DialogTextSupplier buttonOkSupplier = (d) -> "OK";
 	private DialogTextSupplier buttonCancelSupplier = (d) -> "Cancel";
 
+	private DialogHandler showHandler = null;
+	private DialogCloseHandler closeHandler = null;
 	private DialogHandler clickCancelHandler = null;
-	private DialogHandler cancelHandler = null;
 	
 	
 	AbstractDialog(DialogStyle style, Player player, EventManager rootEventManager)
 	{
 		this.style = style;
 		this.player = player;
-		this.eventManagerNode = rootEventManager.createChildNode();
+		
+		eventManagerInternal = rootEventManager.createChildNode();
+		eventManagerNode = eventManagerInternal.createChildNode();
 		
 		dialogId = SampObjectManager.get().createDialogId();
 	}
@@ -227,16 +244,22 @@ public abstract class AbstractDialog
 		this.clickCancelHandler = onClickCancelHandler;
 	}
 	
-	public void setCancelHandler(DialogHandler cancelHandler)
+	public void setShowHandler(DialogHandler showHandler)
 	{
-		this.cancelHandler = cancelHandler;
+		this.showHandler = showHandler;
+	}
+	
+	public void setCloseHandler(DialogCloseHandler closeHandler)
+	{
+		this.closeHandler = closeHandler;
 	}
 	
 	protected void show(String text)
 	{
+		onShow();
+		
 		eventManagerNode.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
-			eventManagerNode.cancelAll();
 			if (e.getDialogResponse() == 1)
 			{
 				onClickOk(e);
@@ -247,10 +270,10 @@ public abstract class AbstractDialog
 			}
 		});
 
-		eventManagerNode.registerHandler(DialogCancelEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
+		eventManagerNode.registerHandler(DialogCloseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
 			eventManagerNode.cancelAll();
-			AbstractDialog.this.onCancel(e.getType());
+			onClose(e.getType());
 		});
 		
 		player.showDialog(dialogId, style, captionSupplier.get(this), text, buttonOkSupplier.get(this), buttonCancelSupplier.get(this));
@@ -258,7 +281,17 @@ public abstract class AbstractDialog
 	
 	public abstract void show();
 	
-	protected void onCancel(DialogCancelType type)
+	protected void onShow()
+	{
+		if (showHandler != null) showHandler.handle(this);
+	}
+
+	protected void onClose(DialogCloseType type)
+	{
+		if (closeHandler != null) closeHandler.onCancel(this, type);
+	}
+
+	void onClickOk(DialogResponseEvent event)
 	{
 		
 	}
@@ -266,10 +299,5 @@ public abstract class AbstractDialog
 	protected void onClickCancel()
 	{
 		if (clickCancelHandler != null) clickCancelHandler.handle(this);
-	}
-	
-	void onClickOk(DialogResponseEvent event)
-	{
-		if (cancelHandler != null) cancelHandler.handle(this);
 	}
 }
