@@ -118,7 +118,7 @@ public abstract class AbstractDialog
 	@FunctionalInterface
 	public interface DialogCloseHandler
 	{
-		void onCancel(AbstractDialog dialog, DialogCloseType type);
+		void onClose(AbstractDialog dialog, DialogCloseType type);
 	}
 	
 	
@@ -146,7 +146,7 @@ public abstract class AbstractDialog
 		this.player = player;
 		
 		eventManagerInternal = rootEventManager.createChildNode();
-		eventManagerNode = eventManagerInternal.createChildNode();
+		eventManagerNode = rootEventManager.createChildNode();
 		
 		dialogId = SampObjectManager.get().createDialogId();
 	}
@@ -258,7 +258,7 @@ public abstract class AbstractDialog
 	{
 		onShow();
 		
-		eventManagerNode.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
+		eventManagerInternal.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
 			if (e.getDialogResponse() == 1)
 			{
@@ -270,9 +270,9 @@ public abstract class AbstractDialog
 			}
 		});
 
-		eventManagerNode.registerHandler(DialogCloseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
+		eventManagerInternal.registerHandler(DialogCloseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
-			eventManagerNode.cancelAll();
+			eventManagerInternal.cancelAll();
 			onClose(e.getType());
 		});
 		
@@ -288,7 +288,7 @@ public abstract class AbstractDialog
 
 	protected void onClose(DialogCloseType type)
 	{
-		if (closeHandler != null) closeHandler.onCancel(this, type);
+		if (closeHandler != null) closeHandler.onClose(this, type);
 	}
 
 	void onClickOk(DialogResponseEvent event)
