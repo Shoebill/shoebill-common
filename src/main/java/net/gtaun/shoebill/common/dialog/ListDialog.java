@@ -296,8 +296,8 @@ public class ListDialog extends AbstractDialog
 		int itemId = event.getListitem();
 		ListDialogItem item = displayedItems.get(itemId);
 
-		onClickOk(item);
 		item.onItemSelect();
+		onClickOk(item);
 	}
 	
 	protected void onClickOk(ListDialogItem item)
