@@ -160,6 +160,7 @@ public abstract class AbstractDialog
 	
 	protected void destroy()
 	{
+		eventManagerInternal.destroy();
 		eventManagerNode.destroy();
 	}
 	
@@ -258,8 +259,10 @@ public abstract class AbstractDialog
 	{
 		onShow();
 		
+		eventManagerInternal.cancelAll();
 		eventManagerInternal.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
+			eventManagerInternal.cancelAll();
 			if (e.getDialogResponse() == 1)
 			{
 				onClickOk(e);
@@ -272,7 +275,7 @@ public abstract class AbstractDialog
 
 		eventManagerInternal.registerHandler(DialogCloseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
 		{
-			eventManagerInternal.cancelAll();
+			if (e.getType() != DialogCloseType.RESPOND) eventManagerInternal.cancelAll();
 			onClose(e.getType());
 		});
 		
