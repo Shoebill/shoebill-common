@@ -1,5 +1,9 @@
 package net.gtaun.shoebill.common.command;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.event.player.PlayerCommandEvent;
 import net.gtaun.shoebill.event.player.PlayerTextEvent;
@@ -9,11 +13,8 @@ import net.gtaun.util.event.EventManager;
 import net.gtaun.util.event.EventManagerNode;
 import net.gtaun.util.event.HandlerPriority;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class PlayerCommandManager extends CommandGroup implements Destroyable
 {
@@ -100,15 +101,18 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 	public String getUsageMessage(Player player, String commandText, String prefix)
 	{
 		String message = "";
-        for (Pair<String, CommandEntry> e : getMatchedCommands(commandText)) {
-            message += "\n" + getUsageMessage(player, e.getLeft(), prefix, e.getRight());
-        }
+		for (Iterator<Pair<String, CommandEntry>> it = getMatchedCommands(commandText).iterator(); it.hasNext(); )
+		{
+			Pair<String, CommandEntry> e = it.next();
+ 			message += getUsageMessage(player, e.getLeft(), prefix, e.getRight());
+ 			if (it.hasNext()) message += "\n"; 
+ 		}
 		return message;
 	}
 
 	private String getUsageMessage(Player player, String path, String prefix, CommandEntry entry)
 	{
-		String command = (path + entry.getCommand()).trim();
+		String command = StringUtils.isBlank(path) ? entry.getCommand() : path + entry.getCommand();
 		return usageMessageSupplier.get(player, command, prefix, entry.getParamNames());
 	}
 	
