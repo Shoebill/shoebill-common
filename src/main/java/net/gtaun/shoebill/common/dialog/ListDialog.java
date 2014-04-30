@@ -281,7 +281,7 @@ public class ListDialog extends AbstractDialog
 		
 		for (ListDialogItem item : items)
 		{
-			if (!item.isEnabled()) continue;
+			if (item.isEnabled() == false) continue;
 			
 			listStr += item.getItemText() + "\n";
 			displayedItems.add(item);

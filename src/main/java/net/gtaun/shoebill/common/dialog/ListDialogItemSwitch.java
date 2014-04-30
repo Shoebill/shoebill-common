@@ -113,6 +113,7 @@ public class ListDialogItemSwitch extends ListDialogItem
 	
 	public boolean isSwitched()
 	{
-        return statusSupplier != null && statusSupplier.getAsBoolean();
-    }
+		if (statusSupplier == null) return false;
+		return statusSupplier.getAsBoolean();
+	}
 }

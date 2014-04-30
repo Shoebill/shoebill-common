@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.constant.PlayerState;
@@ -51,9 +50,20 @@ public final class VehicleUtils
 	
 	public static List<Player> getVehiclePassengers(Vehicle vehicle)
 	{
-		List<Player> passengers = Shoebill.get().getSampObjectManager().getPlayers().stream().filter(player -> player.getVehicle() == vehicle && player.getState() == PlayerState.PASSENGER).collect(Collectors.toList());
-
-        Collections.sort(passengers, (o1, o2) -> o1.getVehicleSeat() - o2.getVehicleSeat());
+		List<Player> passengers = new ArrayList<>();
+		for (Player player : Shoebill.get().getSampObjectManager().getPlayers())
+		{
+			if (player.getVehicle() == vehicle && player.getState() == PlayerState.PASSENGER) passengers.add(player);
+		}
+		
+		Collections.sort(passengers, new Comparator<Player>()
+		{
+			@Override
+			public int compare(Player o1, Player o2)
+			{
+				return o1.getVehicleSeat() - o2.getVehicleSeat();
+			}
+		});
 		
 		return passengers;
 	}
