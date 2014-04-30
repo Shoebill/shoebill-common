@@ -31,11 +31,14 @@ public class CommandGroup
 			if (methodParams[0].getType() != Player.class) return;
 			
 			Class<?>[] paramTypes = new Class<?>[methodParams.length-1];
-			paramTypes = Arrays.copyOfRange(paramTypes, 1, paramTypes.length);
-			
 			String[] paramNames = new String[paramTypes.length];
-			paramNames = Arrays.copyOfRange(paramNames, 1, paramNames.length);
-
+			
+			for (int i=1; i<methodParams.length; i++)
+			{
+				paramTypes[i-1] = methodParams[i].getType();
+				paramNames[i-1] = methodParams[i].getName();
+			}
+			
 			if (!StringUtils.isBlank(command.name())) name = command.name();
 			short priority = command.priority();
 			
