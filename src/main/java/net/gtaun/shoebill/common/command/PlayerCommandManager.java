@@ -12,6 +12,7 @@ import net.gtaun.util.event.HandlerPriority;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class PlayerCommandManager extends CommandGroup implements Destroyable
@@ -20,12 +21,8 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 	
 	public static final UsageMessageSupplier DEFAULT_USAGE_MESSAGE_SUPPLIER = (player, cmd, prefix, params) ->
 	{
-		String message = "Usage: " + prefix + cmd + " ";
-		for (int i=0; i<params.length; i++)
-		{
-			message += "[" + params[i] + "]";
-			if (i != params.length-1) message += " ";
-		}
+		String message = "Usage: " + prefix + cmd;
+		for (String param : params) message += " [" + param + "]";
 		return message;
 	};
 	
@@ -95,25 +92,45 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 		return true;
 	}
 	
-	public void sendUsageMessage(Player player, String path)
+	public String getUsageMessage(Player player, String commandText)
 	{
-		sendUsageMessages(player, "/", getMatchedCommands(path));
+		return getUsageMessage(player, commandText, "/");
 	}
 	
-	public void sendUsageMessage(Player player, String path, String prefix)
+	public String getUsageMessage(Player player, String commandText, String prefix)
 	{
-		sendUsageMessages(player, prefix, getMatchedCommands(path));
+		String message = "";
+		for (Iterator<Pair<String, CommandEntry>> it = getMatchedCommands(commandText).iterator(); it.hasNext(); )
+		{
+			Pair<String, CommandEntry> e = it.next();
+			message += getUsageMessage(player, e.getLeft(), message, e.getRight());
+			if (it.hasNext()) message += "\n"; 
+		}
+		return message;
 	}
 
-	private void sendUsageMessage(Player player, String path, String prefix, CommandEntry entry)
+	private String getUsageMessage(Player player, String path, String prefix, CommandEntry entry)
 	{
 		String command = (path + " " + entry.getCommand()).trim();
-		player.sendMessage(Color.RED, usageMessageSupplier.get(player, command, prefix, entry.getParamNames()));
+		return usageMessageSupplier.get(player, command, prefix, entry.getParamNames());
+	}
+	
+	public void sendUsageMessage(Player player, String commandText)
+	{
+		sendUsageMessage(player, commandText, "/");
+	}
+	
+	public void sendUsageMessage(Player player, String commandText, String prefix)
+	{
+		sendUsageMessages(player, prefix, getMatchedCommands(commandText));
 	}
 	
 	private void sendUsageMessages(Player player, String prefix, List<Pair<String, CommandEntry>> commands)
 	{
-		for (Pair<String, CommandEntry> e : commands) sendUsageMessage(player, prefix, e.getLeft(), e.getRight());
+		for (Pair<String, CommandEntry> e : commands)
+		{
+			player.sendMessage(Color.RED, getUsageMessage(player, e.getLeft(), prefix, e.getRight()));
+		}
 	}
 	
 	public void setUsageMessageSupplier(UsageMessageSupplier usageMessageSupplier)
