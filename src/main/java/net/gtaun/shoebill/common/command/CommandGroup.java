@@ -31,13 +31,10 @@ public class CommandGroup
 			if (methodParams[0].getType() != Player.class) return;
 			
 			Class<?>[] paramTypes = new Class<?>[methodParams.length-1];
+			paramTypes = Arrays.copyOfRange(paramTypes, 1, paramTypes.length);
+			
 			String[] paramNames = new String[paramTypes.length];
-
-			for (int i=1; i<methodParams.length; i++)
-			{
-				paramTypes[i-1] = methodParams[i].getType();
-				paramNames[i-1] = methodParams[i].getName();
-			}
+			paramNames = Arrays.copyOfRange(paramNames, 1, paramNames.length);
 
 			if (!StringUtils.isBlank(command.name())) name = command.name();
 			short priority = command.priority();
@@ -249,4 +246,40 @@ public class CommandGroup
 		
 		for (CommandGroup group : groups) group.getCommandEntries(path, command, commandEntries);
 	}
+	
+	protected List<Pair<String, CommandEntry>> getMatchedCommands(String commandText)
+	{
+		List<Pair<String, CommandEntry>> entries = new ArrayList<>();
+		getMatchedCommands("", entries, commandText);
+		return entries;
+	}
+	
+	private void getMatchedCommands(String path, List<Pair<String, CommandEntry>> matchedCmds, String commandText)
+	{
+		String[] splits = StringUtils.split(commandText, " ", 2);
+
+		if (splits.length == 0) return;
+		
+		String command = splits[0];
+		commandText = splits.length > 1 ? splits[1] : null;
+		
+		List<Pair<String, CommandEntry>> commands = new ArrayList<>();
+		getCommandEntries(path, command, commands);
+		Collections.sort(commands, (p1, p2) ->
+		{
+			final int weights = 1000;
+			CommandEntry e1 = p1.getRight(), e2 = p2.getRight();
+			return (e2.getPriority()*weights + e2.getParamTypes().length) - (e1.getPriority()*weights + e1.getParamTypes().length);
+		});
+		
+		matchedCmds.addAll(commands);
+
+		if (commandText != null)
+		{
+			CommandGroup child = childGroups.get(command);
+			if (child == null) return;
+			child.getMatchedCommands(path + " " + command, matchedCmds, commandText);
+		}
+	}
+	
 }

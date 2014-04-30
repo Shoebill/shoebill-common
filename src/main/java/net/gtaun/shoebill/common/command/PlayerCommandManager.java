@@ -22,15 +22,24 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 		eventManagerNode = eventManager.createChildNode();
 		eventManagerNode.registerHandler(PlayerCommandEvent.class, priority, (e) ->
 		{
-			List<Pair<String, CommandEntry>> matchedCommands = new ArrayList<>();
-			if (processCommand("", matchedCommands, e.getPlayer(), e.getCommand().substring(1))) e.setProcessed();
-			else
-			{
-				if (matchedCommands.isEmpty()) return;
-				for (Pair<String, CommandEntry> cmd : matchedCommands) sendUsageMessage(e.getPlayer(), cmd.getLeft(), cmd.getRight());
-				e.setProcessed();
-			}
+			if (processCommand(e.getPlayer(), e.getCommand().substring(1))) e.setProcessed();
 		});
+	}
+	
+	public boolean processCommand(Player player, String commandText, boolean sendUsages)
+	{
+		List<Pair<String, CommandEntry>> matchedCommands = new ArrayList<>();
+		if (processCommand("", matchedCommands, player, commandText)) return true;
+		if (!sendUsages) return false;
+		
+		if (matchedCommands.isEmpty()) return false;
+		sendUsageMessages(player, matchedCommands);
+		return true;
+	}
+	
+	public void sendUsageMessage(Player player, String path)
+	{
+		sendUsageMessages(player, getMatchedCommands(path));
 	}
 
 	private void sendUsageMessage(Player player, String path, CommandEntry entry)
@@ -40,6 +49,11 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 		for (String paramName : entry.getParamNames()) message += " [" + paramName + "]";
 
 		player.sendMessage(Color.RED, message);
+	}
+	
+	private void sendUsageMessages(Player player, List<Pair<String, CommandEntry>> commands)
+	{
+		for (Pair<String, CommandEntry> e : commands) sendUsageMessage(player, e.getLeft(), e.getRight());
 	}
 	
 	@Override
