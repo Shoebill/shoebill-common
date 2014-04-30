@@ -16,7 +16,23 @@ import java.util.List;
 
 public class PlayerCommandManager extends CommandGroup implements Destroyable
 {
+	public interface UsageMessageSupplier		{ String get(Player player, String command, String prefix, String[] params); }
+	
+	public static final UsageMessageSupplier DEFAULT_USAGE_MESSAGE_SUPPLIER = (player, cmd, prefix, params) ->
+	{
+		String message = "Usage: " + prefix + cmd + " ";
+		for (int i=0; i<params.length; i++)
+		{
+			message += "[" + params[i] + "]";
+			if (i != params.length-1) message += " ";
+		}
+		return message;
+	};
+	
+	
 	private EventManagerNode eventManagerNode;
+
+	private UsageMessageSupplier usageMessageSupplier = DEFAULT_USAGE_MESSAGE_SUPPLIER;
 	
 	
 	public PlayerCommandManager(EventManager eventManager)
@@ -101,5 +117,10 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 	private void sendUsageMessages(Player player, String prefix, List<Pair<String, CommandEntry>> commands)
 	{
 		for (Pair<String, CommandEntry> e : commands) sendUsageMessage(player, prefix, e.getLeft(), e.getRight());
+	}
+	
+	public void setUsageMessageSupplier(UsageMessageSupplier usageMessageSupplier)
+	{
+		this.usageMessageSupplier = usageMessageSupplier;
 	}
 }
