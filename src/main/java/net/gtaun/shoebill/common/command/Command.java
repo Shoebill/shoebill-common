@@ -11,5 +11,4 @@ public @interface Command
 {
 	String name() default "";
 	short priority() default 0;
-	boolean strictMode() default true;
 }

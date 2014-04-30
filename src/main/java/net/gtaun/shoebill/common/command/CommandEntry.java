@@ -15,17 +15,15 @@ public class CommandEntry
 	private Class<?>[] paramTypes;
 	private String[] paramNames;
 	private short priority;
-	private boolean strictMode;
 	private CommandHandlerInternal handler;
 	
 	
-	public CommandEntry(String command, Class<?>[] paramTypes, String[] paramNames, short priority, boolean strictMode, CommandHandlerInternal handler)
+	public CommandEntry(String command, Class<?>[] paramTypes, String[] paramNames, short priority, CommandHandlerInternal handler)
 	{
 		this.command = command;
 		this.paramTypes = paramTypes;
 		this.paramNames = paramNames;
 		this.priority = priority;
-		this.strictMode = strictMode;
 		this.handler = handler;
 	}
 	
@@ -47,11 +45,6 @@ public class CommandEntry
 	public short getPriority()
 	{
 		return priority;
-	}
-	
-	public boolean isStrictMode()
-	{
-		return strictMode;
 	}
 	
 	public CommandHandlerInternal getHandler()

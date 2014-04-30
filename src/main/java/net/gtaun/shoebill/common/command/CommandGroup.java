@@ -29,7 +29,7 @@ public class CommandGroup
 			Command command = m.getAnnotation(Command.class);
 			if (command == null) return;
 			if (methodParams[0].getType() != Player.class) return;
-
+			
 			Class<?>[] paramTypes = new Class<?>[methodParams.length-1];
 			String[] paramNames = new String[paramTypes.length];
 
@@ -39,10 +39,10 @@ public class CommandGroup
 				paramNames[i-1] = methodParams[i].getName();
 			}
 
+			if (!StringUtils.isBlank(command.name())) name = command.name();
 			short priority = command.priority();
-			boolean strictMode = command.strictMode();
 			
-			entries.add(new CommandEntry(name, paramTypes, paramNames, priority, strictMode, (player, params) ->
+			entries.add(new CommandEntry(name, paramTypes, paramNames, priority, (player, params) ->
 			{
 				try
 				{
@@ -102,7 +102,7 @@ public class CommandGroup
 	}
 	
 	
-	private Map<String, SortedSet<CommandEntry>> commands;
+	private Map<String, Collection<CommandEntry>> commands;
 	private Set<CommandGroup> groups;
 	private Map<String, CommandGroup> childGroups;
 	
@@ -126,7 +126,7 @@ public class CommandGroup
 	
 	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, short priority, boolean strictMode, CommandHandler handler)
 	{
-		registerCommand(new CommandEntry(command, paramTypes, paramNames, priority, strictMode, (player, params) ->
+		registerCommand(new CommandEntry(command, paramTypes, paramNames, priority, (player, params) ->
 		{
 			Queue<Object> paramQueue = new LinkedList<>();
 			Collections.addAll(paramQueue, params);
@@ -137,10 +137,10 @@ public class CommandGroup
 	
 	private void registerCommand(CommandEntry entry)
 	{
-		SortedSet<CommandEntry> entries = commands.get(entry.getCommand());
+		Collection<CommandEntry> entries = commands.get(entry.getCommand());
 		if (entries == null)
 		{
-			entries = new TreeSet<CommandEntry>((e1, e2) -> e2.getParamTypes().length - e1.getParamTypes().length);
+			entries = new ArrayList<>();
 			commands.put(entry.getCommand(), entries);
 		}
 		entries.add(entry);
@@ -203,35 +203,36 @@ public class CommandGroup
 
 	protected boolean processCommand(String path, List<Pair<String, CommandEntry>> matchedCmds, Player player, String command, String paramText)
 	{
-		SortedSet<CommandEntry> entries = commands.get(command);
-		if (entries != null)
+		List<Pair<String, CommandEntry>> commands = new ArrayList<>();
+		getCommandEntries(path, command, commands);
+		Collections.sort(commands, (p1, p2) ->
 		{
-			for (CommandEntry e : entries)
+			final int weights = 1000;
+			CommandEntry e1 = p1.getRight(), e2 = p2.getRight();
+			return (e2.getPriority()*weights + e2.getParamTypes().length) - (e1.getPriority()*weights + e1.getParamTypes().length);
+		});
+		
+		for (Pair<String, CommandEntry> e : commands)
+		{
+			CommandEntry entry = e.getRight();
+			Class<?>[] types = entry.getParamTypes();
+			String[] paramStrs = StringUtils.split(paramText, " ", types.length);
+			if (types.length == paramStrs.length)
 			{
-				Class<?>[] types = e.getParamTypes();
-				String[] paramStrs = StringUtils.split(paramText, " ", types.length);
-				if (types.length == paramStrs.length || (types.length == 0 && e.isStrictMode() == false))
+				try
 				{
-					try
-					{
-						Object[] params = parseParams(types, paramStrs);
-						params = ArrayUtils.add(params, 0, player);
-						if (e.handle(player, params)) return true;
-					}
-					catch (Throwable ex)
-					{
-
-					}
+					Object[] params = parseParams(types, paramStrs);
+					params = ArrayUtils.add(params, 0, player);
+					if (entry.handle(player, params)) return true;
 				}
-
-				if (matchedCmds != null) matchedCmds.add(new ImmutablePair<>(path, e));
+				catch (Throwable ex)
+				{
+					
+				}
 			}
 		}
-
-		for (CommandGroup group : groups)
-		{
-			if (group.processCommand(path, matchedCmds, player, command, paramText)) return true;
-		}
+		
+		matchedCmds.addAll(commands);
 
 		CommandGroup child = childGroups.get(command);
 		if (child == null) return false;
@@ -239,5 +240,13 @@ public class CommandGroup
 		if (child.processCommand(path + " " + command, matchedCmds, player, paramText)) return true;
 
 		return false;
+	}
+	
+	private void getCommandEntries(String path, String command, List<Pair<String, CommandEntry>> commandEntries)
+	{
+		Collection<CommandEntry> entries = commands.get(command);
+		entries.forEach((e) -> commandEntries.add(new ImmutablePair<>(path, e)));
+		
+		for (CommandGroup group : groups) group.getCommandEntries(path, command, commandEntries);
 	}
 }
