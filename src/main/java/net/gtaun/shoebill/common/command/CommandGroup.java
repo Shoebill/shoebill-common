@@ -79,25 +79,25 @@ public class CommandGroup
 	{
 		TYPE_PARSER.put(String.class,		(s) -> s);
 		
-		TYPE_PARSER.put(int.class,			(s) -> Integer.parseInt(s));
-		TYPE_PARSER.put(Integer.class,		(s) -> Integer.parseInt(s));
+		TYPE_PARSER.put(int.class, Integer::parseInt);
+		TYPE_PARSER.put(Integer.class, Integer::parseInt);
 		
-		TYPE_PARSER.put(short.class,		(s) -> Short.parseShort(s));
-		TYPE_PARSER.put(Short.class,		(s) -> Short.parseShort(s));
+		TYPE_PARSER.put(short.class, Short::parseShort);
+		TYPE_PARSER.put(Short.class, Short::parseShort);
 		
-		TYPE_PARSER.put(byte.class,			(s) -> Byte.parseByte(s));
-		TYPE_PARSER.put(Byte.class,			(s) -> Byte.parseByte(s));
+		TYPE_PARSER.put(byte.class, Byte::parseByte);
+		TYPE_PARSER.put(Byte.class, Byte::parseByte);
 		
 		TYPE_PARSER.put(char.class,			(s) -> s.length() > 0 ? s.charAt(0) : 0);
 		TYPE_PARSER.put(Character.class,	(s) -> s.length() > 0 ? s.charAt(0) : 0);
 
-		TYPE_PARSER.put(float.class,		(s) -> Float.parseFloat(s));
-		TYPE_PARSER.put(Float.class,		(s) -> Float.parseFloat(s));
+		TYPE_PARSER.put(float.class, Float::parseFloat);
+		TYPE_PARSER.put(Float.class, Float::parseFloat);
 		
-		TYPE_PARSER.put(double.class,		(s) -> Double.parseDouble(s));
-		TYPE_PARSER.put(Double.class,		(s) -> Double.parseDouble(s));
+		TYPE_PARSER.put(double.class, Double::parseDouble);
+		TYPE_PARSER.put(Double.class, Double::parseDouble);
 		
-		TYPE_PARSER.put(Player.class,		(s) -> Player.getByNameOrId(s));
+		TYPE_PARSER.put(Player.class, Player::getByNameOrId);
 		TYPE_PARSER.put(Color.class,		(s) -> new Color(Integer.parseUnsignedInt(s, 16)));
 	}
 	
@@ -116,7 +116,7 @@ public class CommandGroup
 	
 	public void registerCommands(Object object)
 	{
-		generateCommandEntries(object).forEach((e) -> registerCommand(e));
+		generateCommandEntries(object).forEach(this::registerCommand);
 	}
 	
 	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, CommandHandler handler)
@@ -176,10 +176,9 @@ public class CommandGroup
 
 	public boolean containsChildGroup(CommandGroup group)
 	{
-		for (Iterator<Map.Entry<String, CommandGroup>> it = childGroups.entrySet().iterator(); it.hasNext(); )
-		{
-			if (it.next().getValue() == group) return true;
-		}
+        for (Map.Entry<String, CommandGroup> stringCommandGroupEntry : childGroups.entrySet()) {
+            if (stringCommandGroupEntry.getValue() == group) return true;
+        }
 
 		return false;
 	}
@@ -197,9 +196,8 @@ public class CommandGroup
 	protected boolean processCommand(String path, List<Pair<String, CommandEntry>> matchedCmds, Player player, String commandText)
 	{
 		String[] splits = StringUtils.split(commandText, " ", 2);
-		if (splits.length < 1) return false;
-		return processCommand(path, matchedCmds, player, splits[0], splits.length == 2 ? splits[1] : "");
-	}
+        return splits.length >= 1 && processCommand(path, matchedCmds, player, splits[0], splits.length == 2 ? splits[1] : "");
+    }
 
 	protected boolean processCommand(String path, List<Pair<String, CommandEntry>> matchedCmds, Player player, String command, String paramText)
 	{
@@ -225,7 +223,7 @@ public class CommandGroup
 					params = ArrayUtils.add(params, 0, player);
 					if (entry.handle(player, params)) return true;
 				}
-				catch (Throwable ex)
+				catch (Throwable ignored)
 				{
 					
 				}
@@ -235,12 +233,9 @@ public class CommandGroup
 		matchedCmds.addAll(commands);
 
 		CommandGroup child = childGroups.get(command);
-		if (child == null) return false;
+        return child != null && child.processCommand(path + " " + command, matchedCmds, player, paramText);
 
-		if (child.processCommand(path + " " + command, matchedCmds, player, paramText)) return true;
-
-		return false;
-	}
+    }
 	
 	private void getCommandEntries(String path, String command, List<Pair<String, CommandEntry>> commandEntries)
 	{
