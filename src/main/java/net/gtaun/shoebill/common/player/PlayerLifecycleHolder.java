@@ -19,69 +19,66 @@ import net.gtaun.util.event.HandlerPriority;
 
 public class PlayerLifecycleHolder implements Destroyable
 {
-	public interface PlayerLifecycleObjectFactory<T extends AbstractPlayerContext> 
+	public interface PlayerLifecycleObjectFactory<T extends PlayerLifecycleObject> 
 	{
 		T create(EventManager eventManager, Player player);
 	}
 	
 	
-	private final EventManagerNode eventManager;
+	private final EventManagerNode eventManagerNode;
 
-	private final Map<Class<?>, PlayerLifecycleObjectFactory<? extends AbstractPlayerContext>> classFactories;
-	private final Map<Player, Map<Class<?>, AbstractPlayerContext>> holder;
-
-	private boolean destroyed;
+	private final Map<Class<?>, PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject>> objectFactories;
+	private final Map<Player, Map<Class<?>, PlayerLifecycleObject>> holder;
 	
 	
-	public PlayerLifecycleHolder(EventManager rootEventManager)
+	public PlayerLifecycleHolder(EventManager eventManager)
 	{
-		eventManager = rootEventManager.createChildNode();
-		classFactories = new HashMap<>();
+		eventManagerNode = eventManager.createChildNode();
+		objectFactories = new HashMap<>();
 		holder = new HashMap<>();
 
-		eventManager.registerHandler(PlayerConnectEvent.class, HandlerPriority.MONITOR, (PlayerConnectEvent e) ->
+		eventManagerNode.registerHandler(PlayerConnectEvent.class, HandlerPriority.MONITOR, (PlayerConnectEvent e) ->
 		{
 			Player player = e.getPlayer();
-			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = new HashMap<>();
+			Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = new HashMap<>();
 			holder.put(player, playerLifecycleObjects);
 			
-			for (Entry<Class<?>, PlayerLifecycleObjectFactory<? extends AbstractPlayerContext>> entry : classFactories.entrySet())
+			for (Entry<Class<?>, PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject>> entry : objectFactories.entrySet())
 			{
 				Class<?> clz = entry.getKey();
-				PlayerLifecycleObjectFactory<? extends AbstractPlayerContext> factory = entry.getValue();
+				PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject> factory = entry.getValue();
 				
-				AbstractPlayerContext object = factory.create(eventManager, player);
+				PlayerLifecycleObject object = factory.create(eventManagerNode, player);
 				playerLifecycleObjects.put(clz, object);
 				object.init();
 			}
 		});
 		
-		eventManager.registerHandler(PlayerDisconnectEvent.class, HandlerPriority.BOTTOM, (PlayerDisconnectEvent e) ->
+		eventManagerNode.registerHandler(PlayerDisconnectEvent.class, HandlerPriority.BOTTOM, (PlayerDisconnectEvent e) ->
 		{
 			Player player = e.getPlayer();
-			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
+			Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
 			holder.remove(player);
 			
-			for (AbstractPlayerContext object : playerLifecycleObjects.values()) object.destroy();
+			for (PlayerLifecycleObject object : playerLifecycleObjects.values()) object.destroy();
 		});
 	}
 
 	@Override
 	public void destroy()
 	{
-		if (destroyed) return;
+		if (isDestroyed()) return;
 		
-		eventManager.destroy();
-		destroyed = true;
+		eventManagerNode.destroy();
 	}
 
 	@Override
 	public boolean isDestroyed()
 	{
-		return destroyed;
+		return eventManagerNode.isDestroy();
 	}
 	
-	public <T extends AbstractPlayerContext> void registerClass(final Class<T> clz)
+	public <T extends PlayerLifecycleObject> void registerClass(final Class<T> clz)
 	{
 		final Constructor<T> constructor;
 		try
@@ -112,50 +109,50 @@ public class PlayerLifecycleHolder implements Destroyable
 		});
 	}
 	
-	public <T extends AbstractPlayerContext> void registerClass(Class<T> clz, PlayerLifecycleObjectFactory<T> factory)
+	public <T extends PlayerLifecycleObject> void registerClass(Class<T> clz, PlayerLifecycleObjectFactory<T> factory)
 	{
-		if (classFactories.containsKey(clz)) return;
+		if (objectFactories.containsKey(clz)) return;
 
 		Player.get().forEach((player) ->
 		{
-			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
+			Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
 
-			AbstractPlayerContext object = factory.create(eventManager, player);
+			PlayerLifecycleObject object = factory.create(eventManagerNode, player);
 			playerLifecycleObjects.put(clz, object);
 			object.init();
 		});
 		
-		classFactories.put(clz, factory);
+		objectFactories.put(clz, factory);
 	}
 	
-	public <T extends AbstractPlayerContext> void unregisterClass(Class<T> clz)
+	public <T extends PlayerLifecycleObject> void unregisterClass(Class<T> clz)
 	{
-		if (classFactories.containsKey(clz) == false) return;
+		if (objectFactories.containsKey(clz) == false) return;
 		
 		Player.get().forEach((player) ->
 		{
-			Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
-			AbstractPlayerContext object = playerLifecycleObjects.get(clz);
+			Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
+			PlayerLifecycleObject object = playerLifecycleObjects.get(clz);
 			playerLifecycleObjects.remove(clz);
 			object.destroy();
 		});
 		
-		classFactories.remove(clz);
+		objectFactories.remove(clz);
 	}
 	
-	public <T extends AbstractPlayerContext> T getObject(Player player, Class<T> clz)
+	public <T extends PlayerLifecycleObject> T getObject(Player player, Class<T> clz)
 	{
-		if (classFactories.containsKey(clz) == false) return null;
+		if (objectFactories.containsKey(clz) == false) return null;
 		
-		Map<Class<?>, AbstractPlayerContext> playerLifecycleObjects = holder.get(player);
+		Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
 		if (playerLifecycleObjects == null) return null;
 		
 		return clz.cast(playerLifecycleObjects.get(clz));
 	}
 	
-	public <T extends AbstractPlayerContext> Collection<T> getObjects(Class<T> clz)
+	public <T extends PlayerLifecycleObject> Collection<T> getObjects(Class<T> clz)
 	{
-		if (classFactories.containsKey(clz) == false) return Collections.emptyList();
+		if (objectFactories.containsKey(clz) == false) return Collections.emptyList();
 		
 		Collection<T> objects = new LinkedList<>();
 		holder.values().forEach((m) -> objects.add(clz.cast(m.get(clz))));

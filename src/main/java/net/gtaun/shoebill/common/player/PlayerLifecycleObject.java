@@ -4,14 +4,14 @@ import net.gtaun.shoebill.common.AbstractShoebillContext;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
 
-public abstract class AbstractPlayerContext extends AbstractShoebillContext
+public abstract class PlayerLifecycleObject extends AbstractShoebillContext
 {
 	protected final Player player;
 	
 	
-	public AbstractPlayerContext(EventManager rootEventManager, Player player)
+	public PlayerLifecycleObject(EventManager eventManager, Player player)
 	{
-		super(rootEventManager);
+		super(eventManager);
 		this.player = player;
 	}
 	
