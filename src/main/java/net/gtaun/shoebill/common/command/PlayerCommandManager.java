@@ -100,18 +100,15 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 	public String getUsageMessage(Player player, String commandText, String prefix)
 	{
 		String message = "";
-		for (Iterator<Pair<String, CommandEntry>> it = getMatchedCommands(commandText).iterator(); it.hasNext(); )
-		{
-			Pair<String, CommandEntry> e = it.next();
-			message += getUsageMessage(player, e.getLeft(), message, e.getRight());
-			if (it.hasNext()) message += "\n"; 
-		}
+        for (Pair<String, CommandEntry> e : getMatchedCommands(commandText)) {
+            message += "\n" + getUsageMessage(player, e.getLeft(), prefix, e.getRight());
+        }
 		return message;
 	}
 
 	private String getUsageMessage(Player player, String path, String prefix, CommandEntry entry)
 	{
-		String command = (path + " " + entry.getCommand()).trim();
+		String command = (path + entry.getCommand()).trim();
 		return usageMessageSupplier.get(player, command, prefix, entry.getParamNames());
 	}
 	

@@ -97,9 +97,8 @@ public class ListDialogItemCheck extends ListDialogItem
 		
 		public boolean isChecked()
 		{
-			if (statusSupplier == null) return false;
-			return statusSupplier.getAsBoolean();
-		}
+            return statusSupplier != null && statusSupplier.getAsBoolean();
+        }
 	}
 	
 	
