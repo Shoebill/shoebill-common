@@ -126,7 +126,7 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 
 	private String getUsageMessage(Player player, String path, String prefix, CommandEntryInternal entry)
 	{
-		String command = StringUtils.isBlank(path) ? entry.getCommand() : path + entry.getCommand();
+		String command = StringUtils.isBlank(path) ? entry.getCommand() : path + " " + entry.getCommand();
 		return usageMessageSupplier.get(player, command, prefix, entry.getParamNames());
 	}
 	
