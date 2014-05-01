@@ -1,59 +1,53 @@
 package net.gtaun.shoebill.common.command;
 
+import org.apache.commons.lang3.StringUtils;
+
+import net.gtaun.shoebill.common.command.CommandEntryInternal.CommandHandlerInternal;
 import net.gtaun.shoebill.object.Player;
 
 public class CommandEntry
 {
-	@FunctionalInterface
-	public interface CommandHandlerInternal
+	private CommandEntryInternal entry;
+	private String path;
+	
+	
+	public CommandEntry(CommandEntryInternal entry, String path)
 	{
-		boolean handle(Player player, Object[] params);
+		this.entry = entry;
 	}
 	
-	
-	private String command;
-	private Class<?>[] paramTypes;
-	private String[] paramNames;
-	private short priority;
-	private CommandHandlerInternal handler;
-	
-	
-	public CommandEntry(String command, Class<?>[] paramTypes, String[] paramNames, short priority, CommandHandlerInternal handler)
+	public String getPath()
 	{
-		this.command = command;
-		this.paramTypes = paramTypes;
-		this.paramNames = paramNames;
-		this.priority = priority;
-		this.handler = handler;
+		return path;
 	}
 	
 	public String getCommand()
 	{
-		return command;
+		return StringUtils.isBlank(path) ? entry.getCommand() : path + " " + entry.getCommand();
 	}
 	
 	public Class<?>[] getParamTypes()
 	{
-		return paramTypes.clone();
+		return entry.getParamTypes();
 	}
 
 	public String[] getParamNames()
 	{
-		return paramNames.clone();
+		return entry.getParamNames();
 	}
 
 	public short getPriority()
 	{
-		return priority;
+		return entry.getPriority();
 	}
 	
 	public CommandHandlerInternal getHandler()
 	{
-		return handler;
+		return entry.getHandler();
 	}
 	
 	public boolean handle(Player player, Object[] params)
 	{
-		return handler.handle(player, params);
+		return entry.handle(player, params);
 	}
 }

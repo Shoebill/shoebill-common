@@ -84,13 +84,27 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 	
 	public boolean processCommand(Player player, String commandText, String prefix, boolean sendUsages)
 	{
-		List<Pair<String, CommandEntry>> matchedCommands = new ArrayList<>();
+		List<Pair<String, CommandEntryInternal>> matchedCommands = new ArrayList<>();
 		if (processCommand("", matchedCommands, player, commandText)) return true;
 		if (!sendUsages) return false;
 		
 		if (matchedCommands.isEmpty()) return false;
 		sendUsageMessages(player, prefix, matchedCommands);
 		return true;
+	}
+
+	public List<CommandEntry> getCommandEntries()
+	{
+		List<CommandEntry> entries = new ArrayList<>();
+		getCommandEntries(entries, "");
+		return entries;
+	}
+	
+	public List<CommandEntry> getCommandEntries(String path)
+	{
+		List<CommandEntry> entries = new ArrayList<>();
+		getCommandEntries(entries, "", path);
+		return entries;
 	}
 	
 	public String getUsageMessage(Player player, String commandText)
@@ -101,16 +115,16 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 	public String getUsageMessage(Player player, String commandText, String prefix)
 	{
 		String message = "";
-		for (Iterator<Pair<String, CommandEntry>> it = getMatchedCommands(commandText).iterator(); it.hasNext(); )
+		for (Iterator<Pair<String, CommandEntryInternal>> it = getMatchedCommands(commandText).iterator(); it.hasNext(); )
 		{
-			Pair<String, CommandEntry> e = it.next();
+			Pair<String, CommandEntryInternal> e = it.next();
  			message += getUsageMessage(player, e.getLeft(), prefix, e.getRight());
  			if (it.hasNext()) message += "\n"; 
  		}
 		return message;
 	}
 
-	private String getUsageMessage(Player player, String path, String prefix, CommandEntry entry)
+	private String getUsageMessage(Player player, String path, String prefix, CommandEntryInternal entry)
 	{
 		String command = StringUtils.isBlank(path) ? entry.getCommand() : path + entry.getCommand();
 		return usageMessageSupplier.get(player, command, prefix, entry.getParamNames());
@@ -126,9 +140,9 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 		sendUsageMessages(player, prefix, getMatchedCommands(commandText));
 	}
 	
-	private void sendUsageMessages(Player player, String prefix, List<Pair<String, CommandEntry>> commands)
+	private void sendUsageMessages(Player player, String prefix, List<Pair<String, CommandEntryInternal>> commands)
 	{
-		for (Pair<String, CommandEntry> e : commands)
+		for (Pair<String, CommandEntryInternal> e : commands)
 		{
 			player.sendMessage(Color.RED, getUsageMessage(player, e.getLeft(), prefix, e.getRight()));
 		}
