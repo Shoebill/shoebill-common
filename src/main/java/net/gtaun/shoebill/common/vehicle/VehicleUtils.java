@@ -16,12 +16,9 @@
 
 package net.gtaun.shoebill.common.vehicle;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import net.gtaun.shoebill.Shoebill;
 import net.gtaun.shoebill.constant.PlayerState;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.shoebill.object.Vehicle;
@@ -40,31 +37,16 @@ public final class VehicleUtils
 
 	public static Player getVehicleDriver(Vehicle vehicle)
 	{
-		for (Player player : Shoebill.get().getSampObjectManager().getPlayers())
-		{
-			if (player.getVehicle() == vehicle && player.getState() == PlayerState.DRIVER) return player;
-		}
-		
-		return null;
+		return Player.get().stream()
+			.filter((p) -> p.getState() == PlayerState.DRIVER && p.getVehicle() == vehicle)
+			.findFirst().orElse(null);
 	}
 	
 	public static List<Player> getVehiclePassengers(Vehicle vehicle)
 	{
-		List<Player> passengers = new ArrayList<>();
-		for (Player player : Shoebill.get().getSampObjectManager().getPlayers())
-		{
-			if (player.getVehicle() == vehicle && player.getState() == PlayerState.PASSENGER) passengers.add(player);
-		}
-		
-		Collections.sort(passengers, new Comparator<Player>()
-		{
-			@Override
-			public int compare(Player o1, Player o2)
-			{
-				return o1.getVehicleSeat() - o2.getVehicleSeat();
-			}
-		});
-		
-		return passengers;
+		return Player.get().stream()
+			.filter((p) -> p.getState() == PlayerState.PASSENGER && p.getVehicle() == vehicle)
+			.sorted((p1, p2) -> p1.getVehicleSeat() - p2.getVehicleSeat())
+			.collect(Collectors.toList());
 	}
 }
