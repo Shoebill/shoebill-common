@@ -1,9 +1,16 @@
 package net.gtaun.shoebill.common.command;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.gtaun.shoebill.object.Player;
 
 class CommandEntryInternal
 {
+	public static String completePath(String path, String child)
+	{
+		return StringUtils.isBlank(path) ? child : path + " " + child;
+	}
+	
 	@FunctionalInterface
 	public interface CommandHandlerInternal
 	{
@@ -30,6 +37,11 @@ class CommandEntryInternal
 	public String getCommand()
 	{
 		return command;
+	}
+	
+	public String completeCommand(String path)
+	{
+		return completePath(path, command);
 	}
 	
 	public Class<?>[] getParamTypes()

@@ -13,7 +13,6 @@ import net.gtaun.util.event.EventManager;
 import net.gtaun.util.event.EventManagerNode;
 import net.gtaun.util.event.HandlerPriority;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class PlayerCommandManager extends CommandGroup implements Destroyable
@@ -126,8 +125,7 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 
 	private String getUsageMessage(Player player, String path, String prefix, CommandEntryInternal entry)
 	{
-		String command = StringUtils.isBlank(path) ? entry.getCommand() : path + entry.getCommand();
-		return usageMessageSupplier.get(player, command, prefix, entry.getParamNames());
+		return usageMessageSupplier.get(player, entry.completeCommand(path), prefix, entry.getParamNames());
 	}
 	
 	public void sendUsageMessage(Player player, String commandText)

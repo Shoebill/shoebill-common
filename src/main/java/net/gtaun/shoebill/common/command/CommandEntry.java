@@ -1,7 +1,5 @@
 package net.gtaun.shoebill.common.command;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.gtaun.shoebill.common.command.CommandEntryInternal.CommandHandlerInternal;
 import net.gtaun.shoebill.object.Player;
 
@@ -23,7 +21,7 @@ public class CommandEntry
 	
 	public String getCommand()
 	{
-		return StringUtils.isBlank(path) ? entry.getCommand() : path + " " + entry.getCommand();
+		return entry.completeCommand(path);
 	}
 	
 	public Class<?>[] getParamTypes()

@@ -189,9 +189,9 @@ public class CommandGroup
 
 	public boolean containsChildGroup(CommandGroup group)
 	{
-		for (Iterator<Map.Entry<String, CommandGroup>> it = childGroups.entrySet().iterator(); it.hasNext(); )
+		for (Entry<String, CommandGroup> g : childGroups.entrySet())
 		{
-			if (it.next().getValue() == group) return true;
+			if (g == group) return true;
 		}
 
 		return false;
@@ -320,8 +320,7 @@ public class CommandGroup
 		{
 			CommandGroup child = childGroups.get(command);
 			if (child == null) return;
-			child.getMatchedCommands(path + " " + command, matchedCmds, commandText);
+			child.getMatchedCommands(CommandEntryInternal.completePath(path, command), matchedCmds, commandText);
 		}
 	}
-	
 }
