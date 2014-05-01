@@ -245,7 +245,7 @@ public class CommandGroup
 	private void getCommandEntries(String path, String command, List<Pair<String, CommandEntry>> commandEntries)
 	{
 		Collection<CommandEntry> entries = commands.get(command);
-		entries.forEach((e) -> commandEntries.add(new ImmutablePair<>(path, e)));
+		if (entries != null) entries.forEach((e) -> commandEntries.add(new ImmutablePair<>(path, e)));
 		
 		for (CommandGroup group : groups) group.getCommandEntries(path, command, commandEntries);
 	}
