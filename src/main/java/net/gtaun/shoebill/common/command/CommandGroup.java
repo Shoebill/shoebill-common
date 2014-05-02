@@ -310,7 +310,7 @@ public class CommandGroup
 		{
 			final int weights = 1000;
 			CommandEntryInternal e1 = p1.getRight(), e2 = p2.getRight();
-			return (e2.getPriority()*weights + e2.getParamTypes().length) - (e1.getPriority()*weights + e1.getParamTypes().length);
+			return (e2.getPriority() * weights + e2.getParamTypes().length) - (e1.getPriority() * weights + e1.getParamTypes().length);
 		});
 		
 		matchedCmds.addAll(commands);

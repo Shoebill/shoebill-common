@@ -28,7 +28,7 @@ public class PageListDialog extends ListDialog
 {
 	@SuppressWarnings("unchecked")
 	public static abstract class AbstractPageListDialogBuilder
-	<DialogType extends PageListDialog, DialogBuilderType extends AbstractListDialogBuilder<DialogType, DialogBuilderType>>
+	<DialogType extends PageListDialog, DialogBuilderType extends AbstractPageListDialogBuilder<DialogType, DialogBuilderType>>
 	extends AbstractListDialogBuilder<DialogType, DialogBuilderType>
 	{
 		protected AbstractPageListDialogBuilder(DialogType dialog)

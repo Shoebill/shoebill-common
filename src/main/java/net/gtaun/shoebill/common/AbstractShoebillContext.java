@@ -10,7 +10,7 @@ import net.gtaun.util.event.EventManagerNode;
 public abstract class AbstractShoebillContext implements Destroyable
 {
 	protected final EventManager rootEventManager;
-	protected final EventManagerNode eventManager;
+	protected final EventManagerNode eventManagerNode;
 
 	private List<Destroyable> destroyables;
 	
@@ -18,7 +18,7 @@ public abstract class AbstractShoebillContext implements Destroyable
 	public AbstractShoebillContext( EventManager rootEventManager)
 	{
 		this.rootEventManager = rootEventManager;
-		this.eventManager = rootEventManager.createChildNode();
+		this.eventManagerNode = rootEventManager.createChildNode();
 		this.destroyables = new LinkedList<>();
 	}
 	
@@ -56,7 +56,7 @@ public abstract class AbstractShoebillContext implements Destroyable
 		for (Destroyable destroyable : destroyables) destroyable.destroy();
 		destroyables = null;
 		
-		eventManager.destroy();
+		eventManagerNode.destroy();
 	}
 	
 	@Override
