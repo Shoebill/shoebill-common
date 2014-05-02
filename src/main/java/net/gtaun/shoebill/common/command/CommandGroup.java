@@ -249,9 +249,8 @@ public class CommandGroup
 
 		CommandGroup child = childGroups.get(command);
 		if (child == null) return false;
-
-		if (child.processCommand(path + " " + command, matchedCmds, player, paramText)) return true;
-
+		
+		if (child.processCommand(CommandEntryInternal.completePath(path, command), matchedCmds, player, paramText)) return true;
 		return false;
 	}
 	
