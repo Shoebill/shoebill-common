@@ -123,6 +123,7 @@ public abstract class AbstractDialog
 	
 	
 	protected final Player player;
+	protected final EventManager rootEventManager;
 	protected final EventManagerNode eventManagerNode;
 	private final EventManagerNode eventManagerInternal;
 	
@@ -144,6 +145,7 @@ public abstract class AbstractDialog
 	{
 		this.style = style;
 		this.player = player;
+		this.rootEventManager = rootEventManager;
 		
 		eventManagerInternal = rootEventManager.createChildNode();
 		eventManagerNode = rootEventManager.createChildNode();
