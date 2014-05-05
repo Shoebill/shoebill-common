@@ -125,6 +125,12 @@ public class ListDialog extends AbstractDialog
 			return (DialogBuilderType) this;
 		}
 		
+		public <DataType> DialogBuilderType items(Collection<ListDialogItem> items)
+		{
+			dialog.items.addAll(items);
+			return (DialogBuilderType) this;
+		}
+		
 		public DialogBuilderType onClickOk(ClickOkHandler handler)
 		{
 			dialog.setClickOkHandler(handler);

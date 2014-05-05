@@ -215,6 +215,11 @@ public class ListDialogItem
 		this.data = data;
 	}
 	
+	public Object getData()
+	{
+		return data;
+	}
+	
 	public void setItemText(String itemText)
 	{
 		itemTextSupplier = (d) -> itemText;
