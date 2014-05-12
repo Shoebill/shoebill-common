@@ -60,6 +60,12 @@ public abstract class AbstractDialog
 			return (DialogBuilderType) this;
 		}
 		
+		public DialogBuilderType caption(Supplier<String> captionSupplier)
+		{
+			dialog.setCaption(captionSupplier);
+			return (DialogBuilderType) this;
+		}
+		
 		public DialogBuilderType caption(DialogTextSupplier captionSupplier)
 		{
 			dialog.setCaption(captionSupplier);
@@ -69,6 +75,12 @@ public abstract class AbstractDialog
 		public DialogBuilderType buttonOk(String buttonOk)
 		{
 			dialog.setButtonOk(buttonOk);
+			return (DialogBuilderType) this;
+		}
+
+		public DialogBuilderType buttonOk(Supplier<String> buttonOkSupplier)
+		{
+			dialog.setButtonOk(buttonOkSupplier);
 			return (DialogBuilderType) this;
 		}
 		
@@ -81,6 +93,12 @@ public abstract class AbstractDialog
 		public DialogBuilderType buttonCancel(String buttonCancel)
 		{
 			dialog.setButtonCancel(buttonCancel);
+			return (DialogBuilderType) this;
+		}
+		
+		public DialogBuilderType buttonCancel(Supplier<String> buttonCancelSupplier)
+		{
+			dialog.setButtonCancel(buttonCancelSupplier);
 			return (DialogBuilderType) this;
 		}
 		
