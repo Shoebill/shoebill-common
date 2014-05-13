@@ -76,6 +76,7 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 		eventManagerNode.cancelAll();
 	}
 	
+	@Override
 	public boolean processCommand(Player player, String commandText)
 	{
 		return processCommand(player, commandText, "", false);

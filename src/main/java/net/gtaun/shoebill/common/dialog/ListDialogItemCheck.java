@@ -135,6 +135,7 @@ public class ListDialogItemCheck extends ListDialogItem
 		checkItemColorSupplier = (c) -> c ? checkedColor : uncheckedColor;
 	}
 	
+	@Override
 	public String getItemText()
 	{
 		String text = super.getItemText();

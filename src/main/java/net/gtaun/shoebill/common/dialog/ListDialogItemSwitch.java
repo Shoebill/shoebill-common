@@ -30,6 +30,7 @@ public class ListDialogItemSwitch extends ListDialogItem
 			super(new ListDialogItemSwitch("Unnamed"));
 		}
 		
+		@Override
 		public ItemSwitchBuilder data(Object data)
 		{
 			item.setData(data);
@@ -54,6 +55,7 @@ public class ListDialogItemSwitch extends ListDialogItem
 			return (ItemSwitchBuilder) this;
 		}
 		
+		@Override
 		public ListDialogItemSwitch build()
 		{
 			return item;
@@ -101,11 +103,13 @@ public class ListDialogItemSwitch extends ListDialogItem
 		this.statusSupplier = switchedSupplier;
 	}
 	
+	@Override
 	public String getItemText()
 	{
 		return super.getItemText() + switchColorSupplier.get(isSwitched()).toEmbeddingString() + " [" + switchTextSupplier.get(isSwitched()) + "]";
 	}
 	
+	@Override
 	public boolean isEnabled()
 	{
 		return true;

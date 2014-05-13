@@ -187,6 +187,7 @@ public class ListDialogItemRadio extends ListDialogItem
 		this.radioItemSelectHandler = itemSelectHandler;
 	}
 	
+	@Override
 	public String getItemText()
 	{
 		String text = super.getItemText();
