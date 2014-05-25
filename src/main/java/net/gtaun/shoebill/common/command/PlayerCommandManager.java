@@ -17,38 +17,52 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class PlayerCommandManager extends CommandGroup implements Destroyable
 {
-	public interface UsageMessageSupplier		{ String get(Player player, String command, String prefix, String[] params); }
-	
-	public static final UsageMessageSupplier DEFAULT_USAGE_MESSAGE_SUPPLIER = (player, cmd, prefix, params) ->
+	@FunctionalInterface
+	public interface UsageMessageSupplier
+	{
+		String get(Player player, String command, String prefix, String[] params, String help);
+	}
+
+	public static final UsageMessageSupplier DEFAULT_USAGE_MESSAGE_SUPPLIER = (player, cmd, prefix, params, help) ->
 	{
 		String message = "Usage: " + prefix + cmd;
 		for (String param : params) message += " [" + param + "]";
+		if (help != null) message += " - " + help;
 		return message;
 	};
-	
-	
+
+	@FunctionalInterface
+	public interface HelpMessageSupplier
+	{
+		String get(Player player, String command, String message);
+	}
+
+	public static final HelpMessageSupplier DEFAULT_HELP_MESSAGE_SUPPLIER = (p, c, m) -> m;
+
+
 	private EventManagerNode eventManagerNode;
 
 	private UsageMessageSupplier usageMessageSupplier = DEFAULT_USAGE_MESSAGE_SUPPLIER;
-	
-	
+	private HelpMessageSupplier helpMessageSupplier = DEFAULT_HELP_MESSAGE_SUPPLIER;
+
+
 	public PlayerCommandManager(EventManager eventManager)
 	{
 		eventManagerNode = eventManager.createChildNode();
 	}
-	
+
 	@Override
 	public void destroy()
 	{
 		eventManagerNode.destroy();
 	}
-	
+
 	@Override
 	public boolean isDestroyed()
 	{
 		return eventManagerNode.isDestroy();
 	}
-	
+
 	public void installCommandHandler(HandlerPriority priority)
 	{
 		eventManagerNode.registerHandler(PlayerCommandEvent.class, priority, (e) ->
@@ -70,24 +84,24 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 			}
 		});
 	}
-	
+
 	public void uninstallAllHandlers()
 	{
 		eventManagerNode.cancelAll();
 	}
-	
+
 	@Override
 	public boolean processCommand(Player player, String commandText)
 	{
 		return processCommand(player, commandText, "", false);
 	}
-	
+
 	public boolean processCommand(Player player, String commandText, String prefix, boolean sendUsages)
 	{
 		List<Pair<String, CommandEntryInternal>> matchedCommands = new ArrayList<>();
 		if (processCommand("", matchedCommands, player, commandText)) return true;
 		if (!sendUsages) return false;
-		
+
 		if (matchedCommands.isEmpty()) return false;
 		sendUsageMessages(player, prefix, matchedCommands);
 		return true;
@@ -99,19 +113,19 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 		getCommandEntries(entries, "");
 		return entries;
 	}
-	
+
 	public List<CommandEntry> getCommandEntries(String path)
 	{
 		List<CommandEntry> entries = new ArrayList<>();
 		getCommandEntries(entries, "", path);
 		return entries;
 	}
-	
+
 	public String getUsageMessage(Player player, String commandText)
 	{
 		return getUsageMessage(player, commandText, "/");
 	}
-	
+
 	public String getUsageMessage(Player player, String commandText, String prefix)
 	{
 		String message = "";
@@ -119,26 +133,27 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 		{
 			Pair<String, CommandEntryInternal> e = it.next();
  			message += getUsageMessage(player, e.getLeft(), prefix, e.getRight());
- 			if (it.hasNext()) message += "\n"; 
+ 			if (it.hasNext()) message += "\n";
  		}
 		return message;
 	}
 
 	private String getUsageMessage(Player player, String path, String prefix, CommandEntryInternal entry)
 	{
-		return usageMessageSupplier.get(player, entry.completeCommand(path), prefix, entry.getParamNames());
+		String completeCommand = entry.completeCommand(path);
+		return usageMessageSupplier.get(player, completeCommand, prefix, entry.getParamNames(), helpMessageSupplier.get(player, completeCommand, entry.getHelpMessage()));
 	}
-	
+
 	public void sendUsageMessage(Player player, String commandText)
 	{
 		sendUsageMessage(player, commandText, "/");
 	}
-	
+
 	public void sendUsageMessage(Player player, String commandText, String prefix)
 	{
 		sendUsageMessages(player, prefix, getMatchedCommands(commandText));
 	}
-	
+
 	private void sendUsageMessages(Player player, String prefix, List<Pair<String, CommandEntryInternal>> commands)
 	{
 		for (Pair<String, CommandEntryInternal> e : commands)
@@ -146,9 +161,14 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 			player.sendMessage(Color.RED, getUsageMessage(player, e.getLeft(), prefix, e.getRight()));
 		}
 	}
-	
+
 	public void setUsageMessageSupplier(UsageMessageSupplier usageMessageSupplier)
 	{
 		this.usageMessageSupplier = usageMessageSupplier;
+	}
+
+	public void setHelpMessageSupplier(HelpMessageSupplier helpMessageSupplier)
+	{
+		this.helpMessageSupplier = helpMessageSupplier;
 	}
 }
