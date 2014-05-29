@@ -30,13 +30,13 @@ public class ListDialogItemRadio extends ListDialogItem
 		{
 			super(new ListDialogItemRadio("Unnamed"));
 		}
-		
+
 		public ItemRadioBuilder item(RadioItem radioItem)
 		{
 			item.addItem(radioItem);
 			return (ItemRadioBuilder) this;
 		}
-		
+
 		public ItemRadioBuilder item(String itemText, Color checkedColor, RadioItemSelectHandler selectHandler)
 		{
 			item.addItem(new RadioItem(itemText, checkedColor, selectHandler));
@@ -48,44 +48,44 @@ public class ListDialogItemRadio extends ListDialogItem
 			item.addItem(new RadioItem(itemText, checkedColor));
 			return (ItemRadioBuilder) this;
 		}
-		
+
 		public ItemRadioBuilder item(String itemText, RadioItemSelectHandler selectHandler)
 		{
 			item.addItem(new RadioItem(itemText, selectHandler));
 			return (ItemRadioBuilder) this;
 		}
-		
+
 		public ItemRadioBuilder item(String itemText)
 		{
 			item.addItem(new RadioItem(itemText));
 			return (ItemRadioBuilder) this;
 		}
-		
+
 		public ItemRadioBuilder radioColor(Color checkedColor, Color uncheckedColor)
 		{
 			item.setRadioColor(checkedColor, uncheckedColor);
 			return (ItemRadioBuilder) this;
 		}
-		
+
 		public ItemRadioBuilder selectedIndex(IntSupplier indexSupplier)
 		{
 			item.setSelectedIndexSupplier(indexSupplier);
 			return (ItemRadioBuilder) this;
 		}
-		
+
 		public ItemRadioBuilder onRadioItemSelect(ItemSelectHandler selectHandler)
 		{
 			item.setRadioItemSelectHandler(selectHandler);
 			return (ItemRadioBuilder) this;
 		}
 	}
-	
+
 	public static ItemRadioBuilder create()
 	{
 		return new ItemRadioBuilder();
 	}
-	
-	
+
+
 	public static class RadioItem
 	{
 		private String itemText;
@@ -98,52 +98,52 @@ public class ListDialogItemRadio extends ListDialogItem
 			this.checkedColor = checkedColor;
 			this.selectHandler = selectHandler;
 		}
-		
+
 		public RadioItem(String itemString, Color checkedColor)
 		{
 			this.itemText = itemString;
 			this.checkedColor = checkedColor;
 		}
-		
+
 		public RadioItem(String itemString, RadioItemSelectHandler selectHandler)
 		{
 			this(itemString, null, selectHandler);
 		}
-		
+
 		public RadioItem(String itemString)
 		{
 			this(itemString, null, null);
 		}
-		
+
 		public String getItemText()
 		{
 			return itemText;
 		}
-		
+
 		public void onSelect()
 		{
 			if (selectHandler != null) selectHandler.onSelect();
 		}
 	}
-	
+
 
 	@FunctionalInterface
 	public interface ItemSelectHandler
 	{
 		void onSelect(RadioItem item, int index);
 	}
-	
+
 	@FunctionalInterface
 	public interface RadioItemSelectHandler
 	{
 		void onSelect();
 	}
-	
-	
+
+
 	private final List<RadioItem> options;
-	
+
 	private ConditionSupplier<Color> radioItemColorSupplier;
-	
+
 	private IntSupplier selectedIndexSupplier;
 	private ItemSelectHandler radioItemSelectHandler;
 
@@ -151,7 +151,7 @@ public class ListDialogItemRadio extends ListDialogItem
 	public ListDialogItemRadio(String itemText)
 	{
 		this(itemText, Color.GRAY);
-	}	
+	}
 
 	public ListDialogItemRadio(String itemText, Color uncheckedColor)
 	{
@@ -159,7 +159,7 @@ public class ListDialogItemRadio extends ListDialogItem
 		this.options = new ArrayList<>();
 		setRadioColor(Color.GREEN, uncheckedColor);
 	}
-	
+
 	public ListDialogItemRadio(String itemText, Color checkedColor, Color uncheckedColor)
 	{
 		super(itemText);
@@ -171,22 +171,22 @@ public class ListDialogItemRadio extends ListDialogItem
 	{
 		options.add(item);
 	}
-	
+
 	public void setRadioColor(Color checkedColor, Color uncheckedColor)
 	{
 		radioItemColorSupplier = (c) -> c ? checkedColor : uncheckedColor;
 	}
-	
+
 	public void setSelectedIndexSupplier(IntSupplier selectedSupplier)
 	{
 		this.selectedIndexSupplier = selectedSupplier;
 	}
-	
+
 	public void setRadioItemSelectHandler(ItemSelectHandler itemSelectHandler)
 	{
 		this.radioItemSelectHandler = itemSelectHandler;
 	}
-	
+
 	@Override
 	public String getItemText()
 	{
@@ -204,7 +204,7 @@ public class ListDialogItemRadio extends ListDialogItem
 		}
 		return text;
 	}
-	
+
 	@Override
 	public final void onItemSelect()
 	{
@@ -213,13 +213,14 @@ public class ListDialogItemRadio extends ListDialogItem
 		RadioItem item = options.get(index);
 		item.onSelect();
 		onItemSelect(item, index);
+		super.onItemSelect();
 	}
 
 	public void onItemSelect(RadioItem item, int index)
 	{
 		if (radioItemSelectHandler != null) radioItemSelectHandler.onSelect(item, index);
 	}
-	
+
 	public int getSelected()
 	{
 		if (selectedIndexSupplier == null) return -1;
