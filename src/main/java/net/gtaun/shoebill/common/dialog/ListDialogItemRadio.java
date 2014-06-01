@@ -120,9 +120,9 @@ public class ListDialogItemRadio extends ListDialogItem
 			return itemText;
 		}
 
-		public void onSelect()
+		public void onSelect(ListDialogItemRadio dialogItem)
 		{
-			if (selectHandler != null) selectHandler.onSelect();
+			if (selectHandler != null) selectHandler.onSelect(dialogItem);
 		}
 	}
 
@@ -130,13 +130,13 @@ public class ListDialogItemRadio extends ListDialogItem
 	@FunctionalInterface
 	public interface ItemSelectHandler
 	{
-		void onSelect(RadioItem item, int index);
+		void onSelect(ListDialogItemRadio dialogItem, RadioItem item, int index);
 	}
 
 	@FunctionalInterface
 	public interface RadioItemSelectHandler
 	{
-		void onSelect();
+		void onSelect(ListDialogItemRadio dialogItem);
 	}
 
 
@@ -211,14 +211,14 @@ public class ListDialogItemRadio extends ListDialogItem
 		if (options.isEmpty()) return;
 		int index = (getSelected() + 1) % options.size();
 		RadioItem item = options.get(index);
-		item.onSelect();
+		item.onSelect(this);
 		onItemSelect(item, index);
 		super.onItemSelect();
 	}
 
 	public void onItemSelect(RadioItem item, int index)
 	{
-		if (radioItemSelectHandler != null) radioItemSelectHandler.onSelect(item, index);
+		if (radioItemSelectHandler != null) radioItemSelectHandler.onSelect(this, item, index);
 	}
 
 	public int getSelected()
