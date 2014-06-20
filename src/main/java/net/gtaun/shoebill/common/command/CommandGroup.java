@@ -77,6 +77,74 @@ public class CommandGroup
 		return entries;
 	}
 
+	private static List<CustomCommandHandler> generateBeforeCheckers(Object object)
+	{
+		List<CustomCommandHandler> checkers = new ArrayList<>();
+
+		Class<?> clz = object.getClass();
+		Arrays.stream(clz.getMethods()).forEach((m) ->
+		{
+			Parameter[] methodParams = m.getParameters();
+			if (m.getReturnType() != boolean.class) return;
+			if (methodParams.length != 3) return;
+			if (methodParams[0].getType() != Player.class) return;
+			if (methodParams[1].getType() != String.class) return;
+			if (methodParams[2].getType() != String.class) return;
+
+			BeforeCheck annotation = m.getAnnotation(BeforeCheck.class);
+			if (annotation == null) return;
+
+			checkers.add((p, cmd, params) ->
+			{
+				try
+				{
+					return (boolean) m.invoke(object, p, cmd, params);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					return false;
+				}
+			});
+		});
+
+		return checkers;
+	}
+
+	private static List<CustomCommandHandler> generateCustomHandlers(Object object)
+	{
+		List<CustomCommandHandler> checkers = new ArrayList<>();
+
+		Class<?> clz = object.getClass();
+		Arrays.stream(clz.getMethods()).forEach((m) ->
+		{
+			Parameter[] methodParams = m.getParameters();
+			if (m.getReturnType() != boolean.class) return;
+			if (methodParams.length != 3) return;
+			if (methodParams[0].getType() != Player.class) return;
+			if (methodParams[1].getType() != String.class) return;
+			if (methodParams[2].getType() != String.class) return;
+
+			CustomCommand annotation = m.getAnnotation(CustomCommand.class);
+			if (annotation == null) return;
+
+			checkers.add((p, cmd, params) ->
+			{
+				try
+				{
+					return (boolean) m.invoke(object, p, cmd, params);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					return false;
+				}
+			});
+		});
+
+		return checkers;
+	}
+
 	private static Object[] parseParams(Class<?>[] types, String[] paramStrs) throws NumberFormatException
 	{
 		Object[] params = new Object[types.length];
@@ -120,6 +188,9 @@ public class CommandGroup
 
 
 	private Map<String, Collection<CommandEntryInternal>> commands;
+	private List<CustomCommandHandler> beforeCheckers;
+	private List<CustomCommandHandler> customHandlers;
+	
 	private Set<CommandGroup> groups;
 	private Map<String, CommandGroup> childGroups;
 
@@ -127,6 +198,9 @@ public class CommandGroup
 	public CommandGroup()
 	{
 		commands = new HashMap<>();
+		beforeCheckers = new ArrayList<>();
+		customHandlers = new ArrayList<>();
+		
 		groups = new HashSet<>();
 		childGroups = new HashMap<>();
 	}
@@ -134,6 +208,8 @@ public class CommandGroup
 	public void registerCommands(Object object)
 	{
 		generateCommandEntries(object).forEach((e) -> registerCommand(e));
+		beforeCheckers.addAll(generateBeforeCheckers(object));
+		customHandlers.addAll(generateCustomHandlers(object));
 	}
 
 	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, CommandHandler handler)
@@ -233,6 +309,9 @@ public class CommandGroup
 			CommandEntryInternal e1 = p1.getRight(), e2 = p2.getRight();
 			return (e2.getPriority()*weights + e2.getParamTypes().length) - (e1.getPriority()*weights + e1.getParamTypes().length);
 		});
+		
+		for (CustomCommandHandler checker : beforeCheckers) if (checker.handle(player, command, paramText) == false) return false;
+		for (CustomCommandHandler handler : customHandlers) if (handler.handle(player, command, paramText)) return true;
 
 		for (Pair<String, CommandEntryInternal> e : commands)
 		{
