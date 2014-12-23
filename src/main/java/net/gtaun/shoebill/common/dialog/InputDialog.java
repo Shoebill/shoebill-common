@@ -21,6 +21,10 @@ import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
 /**
  * 
  * @author MK124
@@ -52,6 +56,12 @@ public class InputDialog extends AbstractDialog
 		public DialogBuilderType onClickOk(ClickOkHandler handler)
 		{
 			dialog.setClickOkHandler(handler);
+			return (DialogBuilderType) this;
+		}
+
+		public DialogBuilderType line(String line)
+		{
+			dialog.addLine(line);
 			return (DialogBuilderType) this;
 		}
 	}
@@ -91,6 +101,7 @@ public class InputDialog extends AbstractDialog
 	
 	private DialogTextSupplier messageSupplier = (d) -> "None";
 	private ClickOkHandler clickOkHandler = null;
+	private Collection<String> lines;
 	
 	
 	public InputDialog(Player player, EventManager rootEventManager)
@@ -102,6 +113,7 @@ public class InputDialog extends AbstractDialog
 	{
 		super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, rootEventManager);
 		this.passwordMode = passwordMode;
+		lines = new ArrayList<>();
 	}
 
 	public InputDialog(Player player, EventManager rootEventManager, String caption, String message)
@@ -140,7 +152,19 @@ public class InputDialog extends AbstractDialog
 	{
 		return passwordMode;
 	}
-	
+
+	public void addLine(String message) {
+		lines.add(message);
+		StringBuilder stringBuilder = new StringBuilder("");
+		Iterator<String> iterator = lines.iterator();
+		while(iterator.hasNext()) {
+			String line = iterator.next();
+			stringBuilder.append(line);
+			if(iterator.hasNext()) stringBuilder.append("\n");
+		}
+		setMessage(stringBuilder.toString());
+	}
+
 	public void setMessage(String message)
 	{
 		this.messageSupplier = (d) -> message;

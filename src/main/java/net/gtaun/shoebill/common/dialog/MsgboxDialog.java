@@ -16,12 +16,15 @@
 
 package net.gtaun.shoebill.common.dialog;
 
-import java.util.function.Supplier;
-
 import net.gtaun.shoebill.constant.DialogStyle;
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.function.Supplier;
 
 /**
  * 
@@ -56,6 +59,12 @@ public class MsgboxDialog extends AbstractDialog
 			dialog.setClickOkHandler(handler);
 			return (DialogBuilderType) this;
 		}
+
+		public DialogBuilderType line(String line)
+		{
+			dialog.addLine(line);
+			return (DialogBuilderType) this;
+		}
 	}
 	
 	public static class MsgboxDialogBuilder extends AbstractMsgboxDialogBuilder<MsgboxDialog, MsgboxDialogBuilder>
@@ -80,11 +89,12 @@ public class MsgboxDialog extends AbstractDialog
 	
 	private DialogTextSupplier messageSupplier = (d) -> "-";
 	private ClickOkHandler clickOkHandler = null;
-	
+	private Collection<String> lines;
 
 	protected MsgboxDialog(Player player, EventManager rootEventManager)
 	{
 		super(DialogStyle.MSGBOX, player, rootEventManager);
+		lines = new ArrayList<>();
 	}
 	
 	public MsgboxDialog(Player player, EventManager rootEventManager, String caption, String message)
@@ -107,7 +117,19 @@ public class MsgboxDialog extends AbstractDialog
 		setCaption(captionSupplier);
 		setMessage(messageSupplier);
 	}
-	
+
+	public void addLine(String message) {
+		lines.add(message);
+		StringBuilder stringBuilder = new StringBuilder("");
+		Iterator<String> iterator = lines.iterator();
+		while(iterator.hasNext()) {
+			String line = iterator.next();
+			stringBuilder.append(line);
+			if(iterator.hasNext()) stringBuilder.append("\n");
+		}
+		setMessage(stringBuilder.toString());
+	}
+
 	public void setMessage(String message)
 	{
 		this.messageSupplier = (d) -> message;
