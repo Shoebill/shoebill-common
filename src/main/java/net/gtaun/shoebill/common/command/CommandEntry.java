@@ -12,6 +12,7 @@ public class CommandEntry
 	public CommandEntry(CommandEntryInternal entry, String path)
 	{
 		this.entry = entry;
+		this.path = path;
 	}
 	
 	public String getPath()
@@ -38,7 +39,9 @@ public class CommandEntry
 	{
 		return entry.getPriority();
 	}
-	
+
+	public String getHelpMessage() { return entry.getHelpMessage(); }
+
 	public CommandHandlerInternal getHandler()
 	{
 		return entry.getHandler();
