@@ -4,6 +4,7 @@ import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.object.Player;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Parameter;
@@ -357,8 +358,11 @@ public class CommandGroup
 
 	private void getCommandEntries(String path, String command, List<Pair<String, CommandEntryInternal>> commandEntries)
 	{
-		Collection<CommandEntryInternal> entries = new ArrayList<>();
-		entries.stream().filter(commandEntryInternal -> (commandEntryInternal.isCaseSensitive()) ? command.contentEquals(command) : command.equalsIgnoreCase(command)).forEach(entries::add);
+		commands.entrySet()
+				.stream()
+				.filter(entry -> entry.getKey().equalsIgnoreCase(command))
+				.forEach(entry -> entry.getValue().stream().filter(cmd -> (cmd.isCaseSensitive()) ? cmd.getCommand().contentEquals(command) : cmd.getCommand().equalsIgnoreCase(command))
+                											.forEach(cmd -> commandEntries.add(new ImmutablePair<>(path, cmd))));
 		for (CommandGroup group : groups) group.getCommandEntries(path, command, commandEntries);
 	}
 
