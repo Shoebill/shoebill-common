@@ -42,6 +42,8 @@ public class CommandEntry
 
 	public String getHelpMessage() { return entry.getHelpMessage(); }
 
+	public boolean isCaseSensitive() { return entry.isCaseSensitive(); }
+
 	public CommandHandlerInternal getHandler()
 	{
 		return entry.getHandler();

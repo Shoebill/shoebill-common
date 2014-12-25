@@ -1,29 +1,16 @@
 package net.gtaun.shoebill.common.command;
 
-import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.object.Player;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.lang.reflect.Parameter;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CommandGroup
 {
@@ -59,7 +46,7 @@ public class CommandGroup
 			CommandHelp help = m.getAnnotation(CommandHelp.class);
 			if (help != null) helpMessage = help.value();
 
-			entries.add(new CommandEntryInternal(name, paramTypes, paramNames, priority, helpMessage, (player, params) ->
+			entries.add(new CommandEntryInternal(name, paramTypes, paramNames, priority, helpMessage, command.caseSensitive(), (player, params) ->
 			{
 				try
 				{
@@ -214,17 +201,17 @@ public class CommandGroup
 
 	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, CommandHandler handler)
 	{
-		registerCommand(command, paramTypes, paramNames, null, (short) 0, handler);
+		registerCommand(command, paramTypes, paramNames, null, (short) 0, true, handler);
 	}
 
 	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, CommandHandler handler)
 	{
-		registerCommand(command, paramTypes, paramNames, helpMessage, (short) 0, handler);
+		registerCommand(command, paramTypes, paramNames, helpMessage, (short) 0, true, handler);
 	}
 
-	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, short priority, CommandHandler handler)
+	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, short priority, boolean caseSensitive, CommandHandler handler)
 	{
-		registerCommand(new CommandEntryInternal(command, paramTypes, paramNames, priority, helpMessage, (player, params) ->
+		registerCommand(new CommandEntryInternal(command, paramTypes, paramNames, priority, helpMessage, caseSensitive, (player, params) ->
 		{
 			Queue<Object> paramQueue = new LinkedList<>();
 			Collections.addAll(paramQueue, params);
@@ -370,9 +357,8 @@ public class CommandGroup
 
 	private void getCommandEntries(String path, String command, List<Pair<String, CommandEntryInternal>> commandEntries)
 	{
-		Collection<CommandEntryInternal> entries = commands.get(command);
-		if (entries != null) entries.forEach((e) -> commandEntries.add(new ImmutablePair<>(path, e)));
-
+		Collection<CommandEntryInternal> entries = new ArrayList<>();
+		entries.stream().filter(commandEntryInternal -> (commandEntryInternal.isCaseSensitive()) ? command.contentEquals(command) : command.equalsIgnoreCase(command)).forEach(entries::add);
 		for (CommandGroup group : groups) group.getCommandEntries(path, command, commandEntries);
 	}
 

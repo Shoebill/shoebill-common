@@ -1,8 +1,7 @@
 package net.gtaun.shoebill.common.command;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.gtaun.shoebill.object.Player;
+import org.apache.commons.lang3.StringUtils;
 
 class CommandEntryInternal
 {
@@ -24,15 +23,17 @@ class CommandEntryInternal
 	private short priority;
 	private String helpMessage;
 	private CommandHandlerInternal handler;
+	private boolean caseSensitive;
 
 
-	public CommandEntryInternal(String command, Class<?>[] paramTypes, String[] paramNames, short priority, String helpMessage, CommandHandlerInternal handler)
+	public CommandEntryInternal(String command, Class<?>[] paramTypes, String[] paramNames, short priority, String helpMessage, boolean caseSensitive, CommandHandlerInternal handler)
 	{
 		this.command = command;
 		this.paramTypes = paramTypes;
 		this.paramNames = paramNames;
 		this.priority = priority;
 		this.helpMessage = helpMessage;
+		this.caseSensitive = caseSensitive;
 		this.handler = handler;
 	}
 
@@ -64,6 +65,10 @@ class CommandEntryInternal
 	public String getHelpMessage()
 	{
 		return helpMessage;
+	}
+
+	public boolean isCaseSensitive() {
+		return caseSensitive;
 	}
 
 	public CommandHandlerInternal getHandler()
