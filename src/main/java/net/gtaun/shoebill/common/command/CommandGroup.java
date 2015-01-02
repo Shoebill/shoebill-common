@@ -31,6 +31,7 @@ public class CommandGroup
 			if (command == null) return;
 			if (methodParams[0].getType() != Player.class) return;
 
+
 			Class<?>[] paramTypes = new Class<?>[methodParams.length-1];
 			String[] paramNames = new String[paramTypes.length];
 
@@ -43,9 +44,12 @@ public class CommandGroup
 			if (!StringUtils.isBlank(command.name())) name = command.name();
 			short priority = command.priority();
 
-			String helpMessage = null;
+			String helpMessage = null, categorie = null;
 			CommandHelp help = m.getAnnotation(CommandHelp.class);
-			if (help != null) helpMessage = help.value();
+			if (help != null) {
+				helpMessage = help.value();
+				categorie = help.categorie();
+			}
 
 			entries.add(new CommandEntryInternal(name, paramTypes, paramNames, priority, helpMessage, command.caseSensitive(), (player, params) ->
 			{
@@ -59,7 +63,7 @@ public class CommandGroup
 				}
 
 				return false;
-			}));
+			}, categorie));
 		});
 
 		return entries;
@@ -202,15 +206,16 @@ public class CommandGroup
 
 	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, CommandHandler handler)
 	{
-		registerCommand(command, paramTypes, paramNames, null, (short) 0, true, handler);
+		registerCommand(command, paramTypes, paramNames, null, null, (short) 0, true, handler);
 	}
 
-	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, CommandHandler handler)
+	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, String categorie, CommandHandler handler)
 	{
-		registerCommand(command, paramTypes, paramNames, helpMessage, (short) 0, true, handler);
+		registerCommand(command, paramTypes, paramNames, helpMessage, categorie, (short) 0, true, handler);
 	}
 
-	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, short priority, boolean caseSensitive, CommandHandler handler)
+	public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, String categorie,
+								short priority, boolean caseSensitive, CommandHandler handler)
 	{
 		registerCommand(new CommandEntryInternal(command, paramTypes, paramNames, priority, helpMessage, caseSensitive, (player, params) ->
 		{
@@ -218,7 +223,7 @@ public class CommandGroup
 			Collections.addAll(paramQueue, params);
 			paramQueue.poll();
 			return handler.handle(player, paramQueue);
-		}));
+		}, categorie));
 	}
 
 	private void registerCommand(CommandEntryInternal entry)

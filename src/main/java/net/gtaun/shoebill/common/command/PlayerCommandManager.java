@@ -159,7 +159,8 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable
 		if(this.usageMessageSupplier == null) return;
 		for (Pair<String, CommandEntryInternal> e : commands)
 		{
-			player.sendMessage(Color.RED, getUsageMessage(player, e.getLeft(), prefix, e.getRight()));
+			String usageMessage = getUsageMessage(player, e.getLeft(), prefix, e.getRight());
+			if(usageMessage != null) player.sendMessage(Color.RED, usageMessage);
 		}
 	}
 

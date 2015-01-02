@@ -24,9 +24,11 @@ class CommandEntryInternal
 	private String helpMessage;
 	private CommandHandlerInternal handler;
 	private boolean caseSensitive;
+	private String categorie;
 
 
-	public CommandEntryInternal(String command, Class<?>[] paramTypes, String[] paramNames, short priority, String helpMessage, boolean caseSensitive, CommandHandlerInternal handler)
+	public CommandEntryInternal(String command, Class<?>[] paramTypes, String[] paramNames, short priority, String helpMessage, boolean caseSensitive,
+								CommandHandlerInternal handler, String categorie)
 	{
 		this.command = command;
 		this.paramTypes = paramTypes;
@@ -35,6 +37,7 @@ class CommandEntryInternal
 		this.helpMessage = helpMessage;
 		this.caseSensitive = caseSensitive;
 		this.handler = handler;
+		this.categorie = categorie;
 	}
 
 	public String getCommand()
@@ -79,5 +82,9 @@ class CommandEntryInternal
 	public boolean handle(Player player, Object[] params)
 	{
 		return handler.handle(player, params);
+	}
+
+	public String getCategorie() {
+		return categorie;
 	}
 }

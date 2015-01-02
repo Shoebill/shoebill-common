@@ -1,6 +1,7 @@
 package net.gtaun.shoebill.common.vehicle;
 
 import net.gtaun.shoebill.event.destroyable.DestroyEvent;
+import net.gtaun.shoebill.event.vehicle.VehicleCreateEvent;
 import net.gtaun.shoebill.event.vehicle.VehicleSpawnEvent;
 import net.gtaun.shoebill.object.Destroyable;
 import net.gtaun.shoebill.object.Vehicle;
@@ -35,7 +36,7 @@ public class VehicleLifecycleHolder implements Destroyable
         objectFactories = new HashMap<>();
         holder = new HashMap<>();
 
-        eventManagerNode.registerHandler(VehicleSpawnEvent.class, HandlerPriority.MONITOR, (e) ->
+        eventManagerNode.registerHandler(VehicleCreateEvent.class, HandlerPriority.MONITOR, (e) ->
         {
             Vehicle vehicle = e.getVehicle();
             Map<Class<?>, VehicleLifecycleObject> vehicleLifecycleObjects = new HashMap<>();
@@ -59,9 +60,7 @@ public class VehicleLifecycleHolder implements Destroyable
                 Map<Class<?>, VehicleLifecycleObject> vehicleLifecycleObjects = holder.get(vehicle);
                 holder.remove(vehicle);
 
-                for (VehicleLifecycleObject object : vehicleLifecycleObjects.values()) {
-                    object.destroy();
-                }
+                vehicleLifecycleObjects.values().forEach(net.gtaun.shoebill.common.vehicle.VehicleLifecycleObject::destroy);
             }
         });
     }
