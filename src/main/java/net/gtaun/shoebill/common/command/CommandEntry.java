@@ -53,4 +53,6 @@ public class CommandEntry
 	{
 		return entry.handle(player, params);
 	}
+
+	public String getCategorie() { return entry.getCategorie(); }
 }
