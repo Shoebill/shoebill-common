@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 public @interface CommandHelp
 {
-	String value();
-	String categorie();
+	String value() default "";
+	String categorie() default "";
 }
