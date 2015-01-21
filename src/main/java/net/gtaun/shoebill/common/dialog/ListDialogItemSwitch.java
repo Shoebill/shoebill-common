@@ -16,108 +16,91 @@
 
 package net.gtaun.shoebill.common.dialog;
 
+import net.gtaun.shoebill.data.Color;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import net.gtaun.shoebill.data.Color;
+public class ListDialogItemSwitch extends ListDialogItem {
+    public static class ItemSwitchBuilder extends AbstractItemBuilder<ListDialogItemSwitch, ItemSwitchBuilder> {
+        private ItemSwitchBuilder() {
+            super(new ListDialogItemSwitch("Unnamed"));
+        }
 
-public class ListDialogItemSwitch extends ListDialogItem
-{
-	public static class ItemSwitchBuilder extends AbstractItemBuilder<ListDialogItemSwitch, ItemSwitchBuilder>
-	{
-		private ItemSwitchBuilder()
-		{
-			super(new ListDialogItemSwitch("Unnamed"));
-		}
-		
-		@Override
-		public ItemSwitchBuilder data(Object data)
-		{
-			item.setData(data);
-			return (ItemSwitchBuilder) this;
-		}
-		
-		public ItemSwitchBuilder switchText(String on, String off)
-		{
-			item.setSwitchText(on, off);
-			return (ItemSwitchBuilder) this;
-		}
-		
-		public ItemSwitchBuilder switchColor(Color on, Color off)
-		{
-			item.setSwitchColor(on, off);
-			return (ItemSwitchBuilder) this;
-		}
-		
-		public ItemSwitchBuilder statusSupplier(BooleanSupplier statusSupplier)
-		{
-			item.setStatusSupplier(statusSupplier);
-			return (ItemSwitchBuilder) this;
-		}
-		
-		@Override
-		public ListDialogItemSwitch build()
-		{
-			return item;
-		}
-	}
-	
-	public static ItemSwitchBuilder create()
-	{
-		return new ItemSwitchBuilder();
-	}
-	
-	
-	private static final ConditionSupplier<String> DEFAULT_SWITCH_TEXT_SUPPLIER = (s) -> s ? "ON" : "OFF";
-	private static final ConditionSupplier<Color> DEFAULT_SWITCH_COLOR_SUPPLIER = (s) -> s ? Color.GREEN : Color.GRAY;
-	
-	
-	private ConditionSupplier<String> switchTextSupplier = DEFAULT_SWITCH_TEXT_SUPPLIER;
-	private ConditionSupplier<Color> switchColorSupplier = DEFAULT_SWITCH_COLOR_SUPPLIER;
-	
-	private BooleanSupplier statusSupplier;
-	
+        @Override
+        public ItemSwitchBuilder data(Object data) {
+            item.setData(data);
+            return this;
+        }
 
-	public ListDialogItemSwitch(String itemText)
-	{
-		super(itemText);
-	}
-	
-	public ListDialogItemSwitch(Supplier<String> textSupplier)
-	{
-		super(textSupplier);
-	}
-	
-	public void setSwitchText(String on, String off)
-	{
-		switchTextSupplier = (s) -> s ? on : off;
-	}
-	
-	public void setSwitchColor(Color on, Color off)
-	{
-		switchColorSupplier = (s) -> s ? on : off;
-	}
-	
-	public void setStatusSupplier(BooleanSupplier switchedSupplier)
-	{
-		this.statusSupplier = switchedSupplier;
-	}
-	
-	@Override
-	public String getItemText()
-	{
-		return super.getItemText() + switchColorSupplier.get(isSwitched()).toEmbeddingString() + " [" + switchTextSupplier.get(isSwitched()) + "]";
-	}
-	
-	@Override
-	public boolean isEnabled()
-	{
-		return true;
-	}
-	
-	public boolean isSwitched()
-	{
-		if (statusSupplier == null) return false;
-		return statusSupplier.getAsBoolean();
-	}
+        public ItemSwitchBuilder switchText(String on, String off) {
+            item.setSwitchText(on, off);
+            return this;
+        }
+
+        public ItemSwitchBuilder switchColor(Color on, Color off) {
+            item.setSwitchColor(on, off);
+            return this;
+        }
+
+        public ItemSwitchBuilder statusSupplier(BooleanSupplier statusSupplier) {
+            item.setStatusSupplier(statusSupplier);
+            return this;
+        }
+
+        @Override
+        public ListDialogItemSwitch build() {
+            return item;
+        }
+    }
+
+    public static ItemSwitchBuilder create() {
+        return new ItemSwitchBuilder();
+    }
+
+
+    private static final ConditionSupplier<String> DEFAULT_SWITCH_TEXT_SUPPLIER = (s) -> s ? "ON" : "OFF";
+    private static final ConditionSupplier<Color> DEFAULT_SWITCH_COLOR_SUPPLIER = (s) -> s ? Color.GREEN : Color.GRAY;
+
+
+    private ConditionSupplier<String> switchTextSupplier = DEFAULT_SWITCH_TEXT_SUPPLIER;
+    private ConditionSupplier<Color> switchColorSupplier = DEFAULT_SWITCH_COLOR_SUPPLIER;
+
+    private BooleanSupplier statusSupplier;
+
+
+    public ListDialogItemSwitch(String itemText) {
+        super(itemText);
+    }
+
+    public ListDialogItemSwitch(Supplier<String> textSupplier) {
+        super(textSupplier);
+    }
+
+    public void setSwitchText(String on, String off) {
+        switchTextSupplier = (s) -> s ? on : off;
+    }
+
+    public void setSwitchColor(Color on, Color off) {
+        switchColorSupplier = (s) -> s ? on : off;
+    }
+
+    public void setStatusSupplier(BooleanSupplier switchedSupplier) {
+        this.statusSupplier = switchedSupplier;
+    }
+
+    @Override
+    public String getItemText() {
+        return super.getItemText() + switchColorSupplier.get(isSwitched()).toEmbeddingString() + " [" + switchTextSupplier.get(isSwitched()) + "]";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public boolean isSwitched() {
+        if (statusSupplier == null) return false;
+        return statusSupplier.getAsBoolean();
+    }
 }

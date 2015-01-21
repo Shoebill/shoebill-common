@@ -1,9 +1,5 @@
 package net.gtaun.shoebill.common.command;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import net.gtaun.shoebill.data.Color;
 import net.gtaun.shoebill.event.player.PlayerCommandEvent;
 import net.gtaun.shoebill.event.player.PlayerTextEvent;
@@ -12,165 +8,144 @@ import net.gtaun.shoebill.object.Player;
 import net.gtaun.util.event.EventManager;
 import net.gtaun.util.event.EventManagerNode;
 import net.gtaun.util.event.HandlerPriority;
-
 import org.apache.commons.lang3.tuple.Pair;
 
-public class PlayerCommandManager extends CommandGroup implements Destroyable
-{
-	@FunctionalInterface
-	public interface UsageMessageSupplier
-	{
-		String get(Player player, String command, String prefix, String[] params, String help);
-	}
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-	public static final UsageMessageSupplier DEFAULT_USAGE_MESSAGE_SUPPLIER = (player, cmd, prefix, params, help) ->
-	{
-		String message = "Usage: " + prefix + cmd;
-		for (String param : params) message += " [" + param + "]";
-		if (help != null) message += " - " + help;
-		return message;
-	};
+public class PlayerCommandManager extends CommandGroup implements Destroyable {
+    @FunctionalInterface
+    public interface UsageMessageSupplier {
+        String get(Player player, String command, String prefix, String[] params, String help);
+    }
 
-	@FunctionalInterface
-	public interface HelpMessageSupplier
-	{
-		String get(Player player, String command, String message);
-	}
+    public static final UsageMessageSupplier DEFAULT_USAGE_MESSAGE_SUPPLIER = (player, cmd, prefix, params, help) ->
+    {
+        String message = "Usage: " + prefix + cmd;
+        for (String param : params) message += " [" + param + "]";
+        if (help != null) message += " - " + help;
+        return message;
+    };
 
-	public static final HelpMessageSupplier DEFAULT_HELP_MESSAGE_SUPPLIER = (p, c, m) -> m;
+    @FunctionalInterface
+    public interface HelpMessageSupplier {
+        String get(Player player, String command, String message);
+    }
 
-
-	private EventManagerNode eventManagerNode;
-
-	private UsageMessageSupplier usageMessageSupplier = DEFAULT_USAGE_MESSAGE_SUPPLIER;
-	private HelpMessageSupplier helpMessageSupplier = DEFAULT_HELP_MESSAGE_SUPPLIER;
+    public static final HelpMessageSupplier DEFAULT_HELP_MESSAGE_SUPPLIER = (p, c, m) -> m;
 
 
-	public PlayerCommandManager(EventManager eventManager)
-	{
-		eventManagerNode = eventManager.createChildNode();
-	}
+    private EventManagerNode eventManagerNode;
 
-	@Override
-	public void destroy()
-	{
-		eventManagerNode.destroy();
-	}
+    private UsageMessageSupplier usageMessageSupplier = DEFAULT_USAGE_MESSAGE_SUPPLIER;
+    private HelpMessageSupplier helpMessageSupplier = DEFAULT_HELP_MESSAGE_SUPPLIER;
 
-	@Override
-	public boolean isDestroyed()
-	{
-		return eventManagerNode.isDestroy();
-	}
 
-	public void installCommandHandler(HandlerPriority priority)
-	{
-		eventManagerNode.registerHandler(PlayerCommandEvent.class, priority, (e) ->
-		{
-			if (processCommand(e.getPlayer(), e.getCommand().substring(1), "/", true)) e.setProcessed();
-		});
-	}
+    public PlayerCommandManager(EventManager eventManager) {
+        eventManagerNode = eventManager.createChildNode();
+    }
 
-	public void installTextHandler(HandlerPriority priority, String prefix)
-	{
-		eventManagerNode.registerHandler(PlayerTextEvent.class, priority, (e) ->
-		{
-			String text = e.getText();
-			if (!text.startsWith(prefix)) return;
-			if (processCommand(e.getPlayer(), text.substring(prefix.length()), prefix, true))
-			{
-				e.disallow();
-				e.interrupt();
-			}
-		});
-	}
+    @Override
+    public void destroy() {
+        eventManagerNode.destroy();
+    }
 
-	public void uninstallAllHandlers()
-	{
-		eventManagerNode.cancelAll();
-	}
+    @Override
+    public boolean isDestroyed() {
+        return eventManagerNode.isDestroy();
+    }
 
-	@Override
-	public boolean processCommand(Player player, String commandText)
-	{
-		return processCommand(player, commandText, "", false);
-	}
+    public void installCommandHandler(HandlerPriority priority) {
+        eventManagerNode.registerHandler(PlayerCommandEvent.class, priority, (e) ->
+        {
+            if (processCommand(e.getPlayer(), e.getCommand().substring(1), "/", true)) e.setProcessed();
+        });
+    }
 
-	public boolean processCommand(Player player, String commandText, String prefix, boolean sendUsages)
-	{
-		List<Pair<String, CommandEntryInternal>> matchedCommands = new ArrayList<>();
-		if (processCommand("", matchedCommands, player, commandText)) return true;
-		if (!sendUsages) return false;
+    public void installTextHandler(HandlerPriority priority, String prefix) {
+        eventManagerNode.registerHandler(PlayerTextEvent.class, priority, (e) ->
+        {
+            String text = e.getText();
+            if (!text.startsWith(prefix)) return;
+            if (processCommand(e.getPlayer(), text.substring(prefix.length()), prefix, true)) {
+                e.disallow();
+                e.interrupt();
+            }
+        });
+    }
 
-		if (matchedCommands.isEmpty()) return false;
-		sendUsageMessages(player, prefix, matchedCommands);
-		return true;
-	}
+    public void uninstallAllHandlers() {
+        eventManagerNode.cancelAll();
+    }
 
-	public List<CommandEntry> getCommandEntries()
-	{
-		List<CommandEntry> entries = new ArrayList<>();
-		getCommandEntries(entries, "");
-		return entries;
-	}
+    @Override
+    public boolean processCommand(Player player, String commandText) {
+        return processCommand(player, commandText, "", false);
+    }
 
-	public List<CommandEntry> getCommandEntries(String path)
-	{
-		List<CommandEntry> entries = new ArrayList<>();
-		getCommandEntries(entries, "", path);
-		return entries;
-	}
+    public boolean processCommand(Player player, String commandText, String prefix, boolean sendUsages) {
+        List<Pair<String, CommandEntryInternal>> matchedCommands = new ArrayList<>();
+        if (processCommand("", matchedCommands, player, commandText)) return true;
+        if (!sendUsages) return false;
 
-	public String getUsageMessage(Player player, String commandText)
-	{
-		return getUsageMessage(player, commandText, "/");
-	}
+        if (matchedCommands.isEmpty()) return false;
+        sendUsageMessages(player, prefix, matchedCommands);
+        return true;
+    }
 
-	public String getUsageMessage(Player player, String commandText, String prefix)
-	{
-		String message = "";
-		for (Iterator<Pair<String, CommandEntryInternal>> it = getMatchedCommands(commandText).iterator(); it.hasNext(); )
-		{
-			Pair<String, CommandEntryInternal> e = it.next();
- 			message += getUsageMessage(player, e.getLeft(), prefix, e.getRight());
- 			if (it.hasNext()) message += "\n";
- 		}
-		return message;
-	}
+    public List<CommandEntry> getCommandEntries() {
+        List<CommandEntry> entries = new ArrayList<>();
+        getCommandEntries(entries, "");
+        return entries;
+    }
 
-	private String getUsageMessage(Player player, String path, String prefix, CommandEntryInternal entry)
-	{
-		String completeCommand = entry.completeCommand(path);
-		return usageMessageSupplier.get(player, completeCommand, prefix, entry.getParamNames(), helpMessageSupplier.get(player, completeCommand, entry.getHelpMessage()));
-	}
+    public List<CommandEntry> getCommandEntries(String path) {
+        List<CommandEntry> entries = new ArrayList<>();
+        getCommandEntries(entries, "", path);
+        return entries;
+    }
 
-	public void sendUsageMessage(Player player, String commandText)
-	{
-		sendUsageMessage(player, commandText, "/");
-	}
+    public String getUsageMessage(Player player, String commandText) {
+        return getUsageMessage(player, commandText, "/");
+    }
 
-	public void sendUsageMessage(Player player, String commandText, String prefix)
-	{
-		sendUsageMessages(player, prefix, getMatchedCommands(commandText));
-	}
+    public String getUsageMessage(Player player, String commandText, String prefix) {
+        String message = "";
+        for (Iterator<Pair<String, CommandEntryInternal>> it = getMatchedCommands(commandText).iterator(); it.hasNext(); ) {
+            Pair<String, CommandEntryInternal> e = it.next();
+            message += getUsageMessage(player, e.getLeft(), prefix, e.getRight());
+            if (it.hasNext()) message += "\n";
+        }
+        return message;
+    }
 
-	private void sendUsageMessages(Player player, String prefix, List<Pair<String, CommandEntryInternal>> commands)
-	{
-		if(this.usageMessageSupplier == null) return;
-		for (Pair<String, CommandEntryInternal> e : commands)
-		{
-			String usageMessage = getUsageMessage(player, e.getLeft(), prefix, e.getRight());
-			if(usageMessage != null) player.sendMessage(Color.RED, usageMessage);
-		}
-	}
+    private String getUsageMessage(Player player, String path, String prefix, CommandEntryInternal entry) {
+        String completeCommand = entry.completeCommand(path);
+        return usageMessageSupplier.get(player, completeCommand, prefix, entry.getParamNames(), helpMessageSupplier.get(player, completeCommand, entry.getHelpMessage()));
+    }
 
-	public void setUsageMessageSupplier(UsageMessageSupplier usageMessageSupplier)
-	{
-		this.usageMessageSupplier = usageMessageSupplier;
-	}
+    public void sendUsageMessage(Player player, String commandText) {
+        sendUsageMessage(player, commandText, "/");
+    }
 
-	public void setHelpMessageSupplier(HelpMessageSupplier helpMessageSupplier)
-	{
-		this.helpMessageSupplier = helpMessageSupplier;
-	}
+    public void sendUsageMessage(Player player, String commandText, String prefix) {
+        sendUsageMessages(player, prefix, getMatchedCommands(commandText));
+    }
+
+    private void sendUsageMessages(Player player, String prefix, List<Pair<String, CommandEntryInternal>> commands) {
+        if (this.usageMessageSupplier == null) return;
+        for (Pair<String, CommandEntryInternal> e : commands) {
+            String usageMessage = getUsageMessage(player, e.getLeft(), prefix, e.getRight());
+            if (usageMessage != null) player.sendMessage(Color.RED, usageMessage);
+        }
+    }
+
+    public void setUsageMessageSupplier(UsageMessageSupplier usageMessageSupplier) {
+        this.usageMessageSupplier = usageMessageSupplier;
+    }
+
+    public void setHelpMessageSupplier(HelpMessageSupplier helpMessageSupplier) {
+        this.helpMessageSupplier = helpMessageSupplier;
+    }
 }

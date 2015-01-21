@@ -16,37 +16,32 @@
 
 package net.gtaun.shoebill.common.vehicle;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import net.gtaun.shoebill.constant.PlayerState;
 import net.gtaun.shoebill.object.Player;
 import net.gtaun.shoebill.object.Vehicle;
 
-public final class VehicleUtils
-{
-	private VehicleUtils()
-	{
-		
-	}
+import java.util.List;
+import java.util.stream.Collectors;
 
-	public static boolean isVehicleDriver(Vehicle vehicle, Player player)
-	{
-		return player.getVehicle() == vehicle && player.getState() == PlayerState.DRIVER;
-	}
+public final class VehicleUtils {
+    private VehicleUtils() {
 
-	public static Player getVehicleDriver(Vehicle vehicle)
-	{
-		return Player.get().stream()
-			.filter((p) -> p.getState() == PlayerState.DRIVER && p.getVehicle() == vehicle)
-			.findFirst().orElse(null);
-	}
-	
-	public static List<Player> getVehiclePassengers(Vehicle vehicle)
-	{
-		return Player.get().stream()
-			.filter((p) -> p.getState() == PlayerState.PASSENGER && p.getVehicle() == vehicle)
-			.sorted((p1, p2) -> p1.getVehicleSeat() - p2.getVehicleSeat())
-			.collect(Collectors.toList());
-	}
+    }
+
+    public static boolean isVehicleDriver(Vehicle vehicle, Player player) {
+        return player.getVehicle() == vehicle && player.getState() == PlayerState.DRIVER;
+    }
+
+    public static Player getVehicleDriver(Vehicle vehicle) {
+        return Player.get().stream()
+                .filter((p) -> p.getState() == PlayerState.DRIVER && p.getVehicle() == vehicle)
+                .findFirst().orElse(null);
+    }
+
+    public static List<Player> getVehiclePassengers(Vehicle vehicle) {
+        return Player.get().stream()
+                .filter((p) -> p.getState() == PlayerState.PASSENGER && p.getVehicle() == vehicle)
+                .sorted((p1, p2) -> p1.getVehicleSeat() - p2.getVehicleSeat())
+                .collect(Collectors.toList());
+    }
 }

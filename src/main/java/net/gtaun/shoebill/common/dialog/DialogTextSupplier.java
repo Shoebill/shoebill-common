@@ -17,7 +17,6 @@
 package net.gtaun.shoebill.common.dialog;
 
 @FunctionalInterface
-public interface DialogTextSupplier
-{
-	String get(AbstractDialog dialog);
+public interface DialogTextSupplier {
+    String get(AbstractDialog dialog);
 }

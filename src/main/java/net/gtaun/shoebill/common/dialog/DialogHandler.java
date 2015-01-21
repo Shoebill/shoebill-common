@@ -17,7 +17,6 @@
 package net.gtaun.shoebill.common.dialog;
 
 @FunctionalInterface
-public interface DialogHandler
-{
-	void handle(AbstractDialog dialog);
+public interface DialogHandler {
+    void handle(AbstractDialog dialog);
 }

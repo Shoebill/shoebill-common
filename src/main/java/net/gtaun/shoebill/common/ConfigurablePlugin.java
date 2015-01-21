@@ -21,18 +21,15 @@ import net.gtaun.shoebill.resource.Plugin;
 
 /**
  * 可被配置的插件抽象类。
- * 
+ *
  * @author MK124
  */
-public abstract class ConfigurablePlugin extends Plugin
-{
-	protected ConfigurablePlugin()
-	{
-		
-	}
-	
-	public boolean configure(Player player)
-	{
-		return false;
-	}
+public abstract class ConfigurablePlugin extends Plugin {
+    protected ConfigurablePlugin() {
+
+    }
+
+    public boolean configure(Player player) {
+        return false;
+    }
 }

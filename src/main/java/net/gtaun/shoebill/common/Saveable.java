@@ -1,6 +1,5 @@
 package net.gtaun.shoebill.common;
 
-public interface Saveable
-{
-	void save();
+public interface Saveable {
+    void save();
 }

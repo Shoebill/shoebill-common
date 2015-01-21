@@ -16,214 +16,180 @@
 
 package net.gtaun.shoebill.common.dialog;
 
+import net.gtaun.shoebill.data.Color;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
 
-import net.gtaun.shoebill.data.Color;
+public class ListDialogItemRadio extends ListDialogItem {
+    public static class ItemRadioBuilder extends AbstractItemBuilder<ListDialogItemRadio, ItemRadioBuilder> {
+        private ItemRadioBuilder() {
+            super(new ListDialogItemRadio("Unnamed"));
+        }
 
-public class ListDialogItemRadio extends ListDialogItem
-{
-	public static class ItemRadioBuilder extends AbstractItemBuilder<ListDialogItemRadio, ItemRadioBuilder>
-	{
-		private ItemRadioBuilder()
-		{
-			super(new ListDialogItemRadio("Unnamed"));
-		}
+        public ItemRadioBuilder item(RadioItem radioItem) {
+            item.addItem(radioItem);
+            return this;
+        }
 
-		public ItemRadioBuilder item(RadioItem radioItem)
-		{
-			item.addItem(radioItem);
-			return (ItemRadioBuilder) this;
-		}
+        public ItemRadioBuilder item(String itemText, Color checkedColor, RadioItemSelectHandler selectHandler) {
+            item.addItem(new RadioItem(itemText, checkedColor, selectHandler));
+            return this;
+        }
 
-		public ItemRadioBuilder item(String itemText, Color checkedColor, RadioItemSelectHandler selectHandler)
-		{
-			item.addItem(new RadioItem(itemText, checkedColor, selectHandler));
-			return (ItemRadioBuilder) this;
-		}
+        public ItemRadioBuilder item(String itemText, Color checkedColor) {
+            item.addItem(new RadioItem(itemText, checkedColor));
+            return this;
+        }
 
-		public ItemRadioBuilder item(String itemText, Color checkedColor)
-		{
-			item.addItem(new RadioItem(itemText, checkedColor));
-			return (ItemRadioBuilder) this;
-		}
+        public ItemRadioBuilder item(String itemText, RadioItemSelectHandler selectHandler) {
+            item.addItem(new RadioItem(itemText, selectHandler));
+            return this;
+        }
 
-		public ItemRadioBuilder item(String itemText, RadioItemSelectHandler selectHandler)
-		{
-			item.addItem(new RadioItem(itemText, selectHandler));
-			return (ItemRadioBuilder) this;
-		}
+        public ItemRadioBuilder item(String itemText) {
+            item.addItem(new RadioItem(itemText));
+            return this;
+        }
 
-		public ItemRadioBuilder item(String itemText)
-		{
-			item.addItem(new RadioItem(itemText));
-			return (ItemRadioBuilder) this;
-		}
+        public ItemRadioBuilder radioColor(Color checkedColor, Color uncheckedColor) {
+            item.setRadioColor(checkedColor, uncheckedColor);
+            return this;
+        }
 
-		public ItemRadioBuilder radioColor(Color checkedColor, Color uncheckedColor)
-		{
-			item.setRadioColor(checkedColor, uncheckedColor);
-			return (ItemRadioBuilder) this;
-		}
+        public ItemRadioBuilder selectedIndex(IntSupplier indexSupplier) {
+            item.setSelectedIndexSupplier(indexSupplier);
+            return this;
+        }
 
-		public ItemRadioBuilder selectedIndex(IntSupplier indexSupplier)
-		{
-			item.setSelectedIndexSupplier(indexSupplier);
-			return (ItemRadioBuilder) this;
-		}
+        public ItemRadioBuilder onRadioItemSelect(ItemSelectHandler selectHandler) {
+            item.setRadioItemSelectHandler(selectHandler);
+            return this;
+        }
+    }
 
-		public ItemRadioBuilder onRadioItemSelect(ItemSelectHandler selectHandler)
-		{
-			item.setRadioItemSelectHandler(selectHandler);
-			return (ItemRadioBuilder) this;
-		}
-	}
-
-	public static ItemRadioBuilder create()
-	{
-		return new ItemRadioBuilder();
-	}
+    public static ItemRadioBuilder create() {
+        return new ItemRadioBuilder();
+    }
 
 
-	public static class RadioItem
-	{
-		private String itemText;
-		private Color checkedColor;
-		private RadioItemSelectHandler selectHandler;
+    public static class RadioItem {
+        private String itemText;
+        private Color checkedColor;
+        private RadioItemSelectHandler selectHandler;
 
-		public RadioItem(String itemString, Color checkedColor, RadioItemSelectHandler selectHandler)
-		{
-			this.itemText = itemString;
-			this.checkedColor = checkedColor;
-			this.selectHandler = selectHandler;
-		}
+        public RadioItem(String itemString, Color checkedColor, RadioItemSelectHandler selectHandler) {
+            this.itemText = itemString;
+            this.checkedColor = checkedColor;
+            this.selectHandler = selectHandler;
+        }
 
-		public RadioItem(String itemString, Color checkedColor)
-		{
-			this.itemText = itemString;
-			this.checkedColor = checkedColor;
-		}
+        public RadioItem(String itemString, Color checkedColor) {
+            this.itemText = itemString;
+            this.checkedColor = checkedColor;
+        }
 
-		public RadioItem(String itemString, RadioItemSelectHandler selectHandler)
-		{
-			this(itemString, null, selectHandler);
-		}
+        public RadioItem(String itemString, RadioItemSelectHandler selectHandler) {
+            this(itemString, null, selectHandler);
+        }
 
-		public RadioItem(String itemString)
-		{
-			this(itemString, null, null);
-		}
+        public RadioItem(String itemString) {
+            this(itemString, null, null);
+        }
 
-		public String getItemText()
-		{
-			return itemText;
-		}
+        public String getItemText() {
+            return itemText;
+        }
 
-		public void onSelect(ListDialogItemRadio dialogItem)
-		{
-			if (selectHandler != null) selectHandler.onSelect(dialogItem);
-		}
-	}
+        public void onSelect(ListDialogItemRadio dialogItem) {
+            if (selectHandler != null) selectHandler.onSelect(dialogItem);
+        }
+    }
 
 
-	@FunctionalInterface
-	public interface ItemSelectHandler
-	{
-		void onSelect(ListDialogItemRadio dialogItem, RadioItem item, int index);
-	}
+    @FunctionalInterface
+    public interface ItemSelectHandler {
+        void onSelect(ListDialogItemRadio dialogItem, RadioItem item, int index);
+    }
 
-	@FunctionalInterface
-	public interface RadioItemSelectHandler
-	{
-		void onSelect(ListDialogItemRadio dialogItem);
-	}
+    @FunctionalInterface
+    public interface RadioItemSelectHandler {
+        void onSelect(ListDialogItemRadio dialogItem);
+    }
 
 
-	private final List<RadioItem> options;
+    private final List<RadioItem> options;
 
-	private ConditionSupplier<Color> radioItemColorSupplier;
+    private ConditionSupplier<Color> radioItemColorSupplier;
 
-	private IntSupplier selectedIndexSupplier;
-	private ItemSelectHandler radioItemSelectHandler;
+    private IntSupplier selectedIndexSupplier;
+    private ItemSelectHandler radioItemSelectHandler;
 
 
-	public ListDialogItemRadio(String itemText)
-	{
-		this(itemText, Color.GRAY);
-	}
+    public ListDialogItemRadio(String itemText) {
+        this(itemText, Color.GRAY);
+    }
 
-	public ListDialogItemRadio(String itemText, Color uncheckedColor)
-	{
-		super(itemText);
-		this.options = new ArrayList<>();
-		setRadioColor(Color.GREEN, uncheckedColor);
-	}
+    public ListDialogItemRadio(String itemText, Color uncheckedColor) {
+        super(itemText);
+        this.options = new ArrayList<>();
+        setRadioColor(Color.GREEN, uncheckedColor);
+    }
 
-	public ListDialogItemRadio(String itemText, Color checkedColor, Color uncheckedColor)
-	{
-		super(itemText);
-		this.options = new ArrayList<>();
-		setRadioColor(checkedColor, uncheckedColor);
-	}
+    public ListDialogItemRadio(String itemText, Color checkedColor, Color uncheckedColor) {
+        super(itemText);
+        this.options = new ArrayList<>();
+        setRadioColor(checkedColor, uncheckedColor);
+    }
 
-	public void addItem(RadioItem item)
-	{
-		options.add(item);
-	}
+    public void addItem(RadioItem item) {
+        options.add(item);
+    }
 
-	public void setRadioColor(Color checkedColor, Color uncheckedColor)
-	{
-		radioItemColorSupplier = (c) -> c ? checkedColor : uncheckedColor;
-	}
+    public void setRadioColor(Color checkedColor, Color uncheckedColor) {
+        radioItemColorSupplier = (c) -> c ? checkedColor : uncheckedColor;
+    }
 
-	public void setSelectedIndexSupplier(IntSupplier selectedSupplier)
-	{
-		this.selectedIndexSupplier = selectedSupplier;
-	}
+    public void setSelectedIndexSupplier(IntSupplier selectedSupplier) {
+        this.selectedIndexSupplier = selectedSupplier;
+    }
 
-	public void setRadioItemSelectHandler(ItemSelectHandler itemSelectHandler)
-	{
-		this.radioItemSelectHandler = itemSelectHandler;
-	}
+    public void setRadioItemSelectHandler(ItemSelectHandler itemSelectHandler) {
+        this.radioItemSelectHandler = itemSelectHandler;
+    }
 
-	@Override
-	public String getItemText()
-	{
-		String text = super.getItemText();
-		for(int i=0; i<options.size(); i++)
-		{
-			int selected = getSelected();
-			RadioItem item = options.get(i);
-			if (i == selected)
-			{
-				if (item.checkedColor != null) text += item.checkedColor.toEmbeddingString() + " [" + item.getItemText() + "]";
-				else text += radioItemColorSupplier.get(true).toEmbeddingString() + " [" + item.getItemText() + "]";
-			}
-			else text += radioItemColorSupplier.get(false).toEmbeddingString() + " [" + item.getItemText() + "]";
-		}
-		return text;
-	}
+    @Override
+    public String getItemText() {
+        String text = super.getItemText();
+        for (int i = 0; i < options.size(); i++) {
+            int selected = getSelected();
+            RadioItem item = options.get(i);
+            if (i == selected) {
+                if (item.checkedColor != null)
+                    text += item.checkedColor.toEmbeddingString() + " [" + item.getItemText() + "]";
+                else text += radioItemColorSupplier.get(true).toEmbeddingString() + " [" + item.getItemText() + "]";
+            } else text += radioItemColorSupplier.get(false).toEmbeddingString() + " [" + item.getItemText() + "]";
+        }
+        return text;
+    }
 
-	@Override
-	public final void onItemSelect()
-	{
-		if (options.isEmpty()) return;
-		int index = (getSelected() + 1) % options.size();
-		RadioItem item = options.get(index);
-		item.onSelect(this);
-		onItemSelect(item, index);
-		super.onItemSelect();
-	}
+    @Override
+    public final void onItemSelect() {
+        if (options.isEmpty()) return;
+        int index = (getSelected() + 1) % options.size();
+        RadioItem item = options.get(index);
+        item.onSelect(this);
+        onItemSelect(item, index);
+        super.onItemSelect();
+    }
 
-	public void onItemSelect(RadioItem item, int index)
-	{
-		if (radioItemSelectHandler != null) radioItemSelectHandler.onSelect(this, item, index);
-	}
+    public void onItemSelect(RadioItem item, int index) {
+        if (radioItemSelectHandler != null) radioItemSelectHandler.onSelect(this, item, index);
+    }
 
-	public int getSelected()
-	{
-		if (selectedIndexSupplier == null) return -1;
-		return selectedIndexSupplier.getAsInt();
-	}
+    public int getSelected() {
+        if (selectedIndexSupplier == null) return -1;
+        return selectedIndexSupplier.getAsInt();
+    }
 }

@@ -7,9 +7,10 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface Command
-{
-	String name() default "";
-	short priority() default 0;
-	boolean caseSensitive() default false;
+public @interface Command {
+    String name() default "";
+
+    short priority() default 0;
+
+    boolean caseSensitive() default false;
 }

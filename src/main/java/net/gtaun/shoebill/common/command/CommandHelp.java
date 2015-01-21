@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface CommandHelp
-{
-	String value() default "";
-	String categorie() default "";
+public @interface CommandHelp {
+    String value() default "";
+
+    String categorie() default "";
 }

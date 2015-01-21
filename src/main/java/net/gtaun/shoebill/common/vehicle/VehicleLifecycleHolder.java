@@ -2,7 +2,6 @@ package net.gtaun.shoebill.common.vehicle;
 
 import net.gtaun.shoebill.event.destroyable.DestroyEvent;
 import net.gtaun.shoebill.event.vehicle.VehicleCreateEvent;
-import net.gtaun.shoebill.event.vehicle.VehicleSpawnEvent;
 import net.gtaun.shoebill.object.Destroyable;
 import net.gtaun.shoebill.object.Vehicle;
 import net.gtaun.util.event.EventManager;
@@ -16,10 +15,8 @@ import java.util.*;
 /**
  * Created by marvin on 01.11.14.
  */
-public class VehicleLifecycleHolder implements Destroyable
-{
-    public interface VehicleLifecycleObjectFactory<T extends VehicleLifecycleObject>
-    {
+public class VehicleLifecycleHolder implements Destroyable {
+    public interface VehicleLifecycleObjectFactory<T extends VehicleLifecycleObject> {
         T create(EventManager eventManager, Vehicle vehicle);
     }
 
@@ -30,8 +27,7 @@ public class VehicleLifecycleHolder implements Destroyable
     private final Map<Vehicle, Map<Class<?>, VehicleLifecycleObject>> holder;
 
 
-    public VehicleLifecycleHolder(EventManager eventManager)
-    {
+    public VehicleLifecycleHolder(EventManager eventManager) {
         eventManagerNode = eventManager.createChildNode();
         objectFactories = new HashMap<>();
         holder = new HashMap<>();
@@ -42,8 +38,7 @@ public class VehicleLifecycleHolder implements Destroyable
             Map<Class<?>, VehicleLifecycleObject> vehicleLifecycleObjects = new HashMap<>();
             holder.put(vehicle, vehicleLifecycleObjects);
 
-            for (Map.Entry<Class<?>, VehicleLifecycleObjectFactory<? extends VehicleLifecycleObject>> entry : objectFactories.entrySet())
-            {
+            for (Map.Entry<Class<?>, VehicleLifecycleObjectFactory<? extends VehicleLifecycleObject>> entry : objectFactories.entrySet()) {
                 Class<?> clz = entry.getKey();
                 VehicleLifecycleObjectFactory<? extends VehicleLifecycleObject> factory = entry.getValue();
 
@@ -55,7 +50,7 @@ public class VehicleLifecycleHolder implements Destroyable
 
         eventManagerNode.registerHandler(DestroyEvent.class, HandlerPriority.BOTTOM, (e) ->
         {
-            if(e.getDestroyable() instanceof Vehicle) {
+            if (e.getDestroyable() instanceof Vehicle) {
                 Vehicle vehicle = (Vehicle) e.getDestroyable();
                 Map<Class<?>, VehicleLifecycleObject> vehicleLifecycleObjects = holder.get(vehicle);
                 holder.remove(vehicle);
@@ -66,47 +61,37 @@ public class VehicleLifecycleHolder implements Destroyable
     }
 
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         if (isDestroyed()) return;
 
         eventManagerNode.destroy();
     }
 
     @Override
-    public boolean isDestroyed()
-    {
+    public boolean isDestroyed() {
         return eventManagerNode.isDestroy();
     }
 
-    public <T extends VehicleLifecycleObject> void registerClass(final Class<T> clz)
-    {
+    public <T extends VehicleLifecycleObject> void registerClass(final Class<T> clz) {
         final Constructor<T> constructor;
-        try
-        {
+        try {
             constructor = clz.getConstructor(EventManager.class, Vehicle.class);
             constructor.setAccessible(true);
-        }
-        catch (NoSuchMethodException | SecurityException e)
-        {
+        } catch (NoSuchMethodException | SecurityException e) {
             throw new UnsupportedOperationException(e);
         }
 
         registerClass(clz, (eventManager, vehicle) -> {
-            try
-            {
+            try {
                 return constructor.newInstance(eventManager, vehicle);
-            }
-            catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-            {
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 e.printStackTrace();
                 return null;
             }
         });
     }
 
-    public <T extends VehicleLifecycleObject> void registerClass(Class<T> clz, VehicleLifecycleObjectFactory<T> factory)
-    {
+    public <T extends VehicleLifecycleObject> void registerClass(Class<T> clz, VehicleLifecycleObjectFactory<T> factory) {
         if (objectFactories.containsKey(clz)) return;
 
         Vehicle.get().forEach((vehicle) ->
@@ -114,7 +99,7 @@ public class VehicleLifecycleHolder implements Destroyable
             Map<Class<?>, VehicleLifecycleObject> vehicleLifecycleObjects = holder.get(vehicle);
 
             VehicleLifecycleObject object = factory.create(eventManagerNode, vehicle);
-            if(vehicleLifecycleObjects == null) return;
+            if (vehicleLifecycleObjects == null) return;
             vehicleLifecycleObjects.put(clz, object);
             object.init();
         });
@@ -122,8 +107,7 @@ public class VehicleLifecycleHolder implements Destroyable
         objectFactories.put(clz, factory);
     }
 
-    public <T extends VehicleLifecycleObject> void unregisterClass(Class<T> clz)
-    {
+    public <T extends VehicleLifecycleObject> void unregisterClass(Class<T> clz) {
         if (objectFactories.containsKey(clz) == false) return;
 
         Vehicle.get().forEach((vehicle) ->
@@ -137,8 +121,7 @@ public class VehicleLifecycleHolder implements Destroyable
         objectFactories.remove(clz);
     }
 
-    public <T extends VehicleLifecycleObject> T getObject(Vehicle vehicle, Class<T> clz)
-    {
+    public <T extends VehicleLifecycleObject> T getObject(Vehicle vehicle, Class<T> clz) {
         if (objectFactories.containsKey(clz) == false) return null;
 
         Map<Class<?>, VehicleLifecycleObject> vehicleLifecycleObjects = holder.get(vehicle);
@@ -147,8 +130,7 @@ public class VehicleLifecycleHolder implements Destroyable
         return clz.cast(vehicleLifecycleObjects.get(clz));
     }
 
-    public <T extends VehicleLifecycleObject> Collection<T> getObjects(Class<T> clz)
-    {
+    public <T extends VehicleLifecycleObject> Collection<T> getObjects(Class<T> clz) {
         if (objectFactories.containsKey(clz) == false) return Collections.emptyList();
 
         Collection<T> objects = new LinkedList<>();
