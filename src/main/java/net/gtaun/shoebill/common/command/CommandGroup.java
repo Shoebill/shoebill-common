@@ -53,7 +53,7 @@ public class CommandGroup {
             entries.add(new CommandEntryInternal(name, paramTypes, paramNames, priority, helpMessage, command.caseSensitive(), (player, params) ->
             {
                 try {
-                    return m.invoke(object, params);
+                    return (boolean) m.invoke(object, params);
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
@@ -84,7 +84,7 @@ public class CommandGroup {
             checkers.add((p, cmd, params) ->
             {
                 try {
-                    return m.invoke(object, p, cmd, params);
+                    return (boolean) m.invoke(object, p, cmd, params);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return false;
@@ -114,7 +114,7 @@ public class CommandGroup {
             checkers.add((p, cmd, params) ->
             {
                 try {
-                    return m.invoke(object, p, cmd, params);
+                    return (boolean) m.invoke(object, p, cmd, params);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return false;
