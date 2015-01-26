@@ -11,6 +11,8 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CommandGroup {
@@ -51,7 +53,7 @@ public class CommandGroup {
             entries.add(new CommandEntryInternal(name, paramTypes, paramNames, priority, helpMessage, command.caseSensitive(), (player, params) ->
             {
                 try {
-                    return (boolean) m.invoke(object, params);
+                    return m.invoke(object, params);
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
@@ -82,7 +84,7 @@ public class CommandGroup {
             checkers.add((p, cmd, params) ->
             {
                 try {
-                    return (boolean) m.invoke(object, p, cmd, params);
+                    return m.invoke(object, p, cmd, params);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return false;
@@ -112,7 +114,7 @@ public class CommandGroup {
             checkers.add((p, cmd, params) ->
             {
                 try {
-                    return (boolean) m.invoke(object, p, cmd, params);
+                    return m.invoke(object, p, cmd, params);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return false;
@@ -269,16 +271,18 @@ public class CommandGroup {
         });
 
         for (CustomCommandHandler checker : beforeCheckers)
-            if (checker.handle(player, command, paramText) == false) return false;
+            if (!checker.handle(player, command, paramText)) return false;
         for (CustomCommandHandler handler : customHandlers) if (handler.handle(player, command, paramText)) return true;
 
         for (Pair<String, CommandEntryInternal> e : commands) {
             CommandEntryInternal entry = e.getRight();
             Class<?>[] types = entry.getParamTypes();
-            String[] paramStrs = StringUtils.split(paramText, " ", types.length);
-            if (types.length == paramStrs.length) {
+            List<String> matches = new ArrayList<>();
+            Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(paramText); // strings with spaces can be made like this: "my string"
+            while (m.find()) matches.add(m.group(1).replace("\"", ""));
+            if (types.length == matches.size()) {
                 try {
-                    Object[] params = parseParams(types, paramStrs);
+                    Object[] params = parseParams(types, matches.toArray(new String[matches.size()]));
                     params = ArrayUtils.add(params, 0, player);
                     if (entry.handle(player, params)) return true;
                 } catch (Throwable ex) {
