@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("RedundantCast")
 public class CommandGroup {
     private static Collection<CommandEntryInternal> generateCommandEntries(Object object) {
         List<CommandEntryInternal> entries = new ArrayList<>();
@@ -296,9 +297,7 @@ public class CommandGroup {
         CommandGroup child = childGroups.get(command);
         if (child == null) return false;
 
-        if (child.processCommand(CommandEntryInternal.completePath(path, command), matchedCmds, player, paramText))
-            return true;
-        return false;
+        return child.processCommand(CommandEntryInternal.completePath(path, command), matchedCmds, player, paramText);
     }
 
     protected void getCommandEntries(List<CommandEntry> entries, String curPath) {
@@ -365,5 +364,9 @@ public class CommandGroup {
             if (child == null) return;
             child.getMatchedCommands(CommandEntryInternal.completePath(path, command), matchedCmds, commandText);
         }
+    }
+
+    public void replaceTypeParser(Class<?> type, Function<String, Object> function) {
+        TYPE_PARSER.put(type, function);
     }
 }
