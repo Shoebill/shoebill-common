@@ -183,10 +183,12 @@ public class CommandGroup {
         childGroups = new HashMap<>();
     }
 
-    public void registerCommands(Object object) {
-        generateCommandEntries(object).forEach((e) -> registerCommand(e));
-        beforeCheckers.addAll(generateBeforeCheckers(object));
-        customHandlers.addAll(generateCustomHandlers(object));
+    public void registerCommands(Object... objects) {
+        for(Object object : objects) {
+            generateCommandEntries(object).forEach(this::registerCommand);
+            beforeCheckers.addAll(generateBeforeCheckers(object));
+            customHandlers.addAll(generateCustomHandlers(object));
+        }
     }
 
     public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, CommandHandler handler) {
