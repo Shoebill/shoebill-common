@@ -130,6 +130,10 @@ public class PageListDialog extends ListDialog {
 
     @Override
     public void show() {
+        show(getListString());
+    }
+
+    protected String getListString() {
         String listStr = "";
         displayedItems.clear();
 
@@ -164,7 +168,7 @@ public class PageListDialog extends ListDialog {
         for (ListDialogItem item : displayedItems) {
             listStr += item.getItemText() + "\n";
         }
-        show(listStr);
+        return listStr;
     }
 
     protected void show(int page) {

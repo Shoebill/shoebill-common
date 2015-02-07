@@ -156,6 +156,10 @@ public class InputDialog extends AbstractDialog {
         clickOkHandler = handler;
     }
 
+    public String getMessage() {
+        return messageSupplier.get(this);
+    }
+
     @Override
     public void show() {
         show(messageSupplier.get(this));

@@ -238,6 +238,10 @@ public class ListDialog extends AbstractDialog {
 
     @Override
     public void show() {
+        show(getItemString());
+    }
+
+    public String getItemString() {
         String listStr = "";
         displayedItems.clear();
 
@@ -250,8 +254,7 @@ public class ListDialog extends AbstractDialog {
             listStr += text + "\n";
             displayedItems.add(item);
         }
-
-        show(listStr);
+        return listStr;
     }
 
     @Override

@@ -223,6 +223,18 @@ public abstract class AbstractDialog {
         this.buttonCancelSupplier = buttonCancelSupplier;
     }
 
+    public String getButtonOk() {
+        return buttonOkSupplier.get(this);
+    }
+
+    public String getButtonCancel() {
+        return buttonCancelSupplier.get(this);
+    }
+
+    public DialogId getDialogId() {
+        return dialogId;
+    }
+
     public void setClickCancelHandler(DialogHandler onClickCancelHandler) {
         this.clickCancelHandler = onClickCancelHandler;
     }
