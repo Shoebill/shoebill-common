@@ -137,14 +137,16 @@ public class PageListDialog extends ListDialog {
         String listStr = "";
         displayedItems.clear();
 
-        displayedItems.add(new ListDialogItem(Color.GRAY.toEmbeddingString() + prevPageItemText) {
-            @Override
-            public void onItemSelect() {
-                int page = currentPage - 1;
-                if (page < 0) page = getMaxPage();
-                show(page);
-            }
-        });
+        if (items.size() >= itemsPerPage + 1) {
+            displayedItems.add(new ListDialogItem(Color.GRAY.toEmbeddingString() + prevPageItemText) {
+                @Override
+                public void onItemSelect() {
+                    int page = currentPage - 1;
+                    if (page < 0) page = getMaxPage();
+                    show(page);
+                }
+            });
+        }
 
         int offset = itemsPerPage * currentPage;
         for (int i = 0; i < itemsPerPage; i++) {

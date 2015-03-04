@@ -84,7 +84,6 @@ public class TimedListDialog extends ListDialog {
         eventManagerNode.cancelAll();
         eventManagerNode.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(getDialogId()), (e) ->
         {
-
             if (currentTime <= 0) {
                 eventManagerNode.cancelAll();
                 if (e.getDialogResponse() == 1) {

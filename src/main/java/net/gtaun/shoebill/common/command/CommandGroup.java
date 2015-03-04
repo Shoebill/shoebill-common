@@ -161,6 +161,8 @@ public class CommandGroup {
         TYPE_PARSER.put(double.class, (s) -> Double.parseDouble(s));
         TYPE_PARSER.put(Double.class, (s) -> Double.parseDouble(s));
 
+        TYPE_PARSER.put(Boolean.class, (s) -> Boolean.parseBoolean(s));
+
         TYPE_PARSER.put(Player.class, (s) -> Player.getByNameOrId(s));
         TYPE_PARSER.put(Color.class, (s) -> new Color(Integer.parseUnsignedInt(s, 16)));
     }
@@ -274,7 +276,7 @@ public class CommandGroup {
         });
 
         for (CustomCommandHandler checker : beforeCheckers)
-            if (!checker.handle(player, command, paramText)) return false;
+            if (!checker.handle(player, command, paramText)) return true;
         for (CustomCommandHandler handler : customHandlers) if (handler.handle(player, command, paramText)) return true;
 
         for (Pair<String, CommandEntryInternal> e : commands) {
