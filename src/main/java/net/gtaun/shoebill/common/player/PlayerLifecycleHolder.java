@@ -106,7 +106,7 @@ public class PlayerLifecycleHolder implements Destroyable {
     }
 
     public <T extends PlayerLifecycleObject> void unregisterClass(Class<T> clz) {
-        if (objectFactories.containsKey(clz) == false) return;
+        if (!objectFactories.containsKey(clz)) return;
 
         Player.get().forEach((player) ->
         {
@@ -120,7 +120,7 @@ public class PlayerLifecycleHolder implements Destroyable {
     }
 
     public <T extends PlayerLifecycleObject> T getObject(Player player, Class<T> clz) {
-        if (objectFactories.containsKey(clz) == false) return null;
+        if (!objectFactories.containsKey(clz)) return null;
 
         Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
         if (playerLifecycleObjects == null) return null;
@@ -129,7 +129,7 @@ public class PlayerLifecycleHolder implements Destroyable {
     }
 
     public <T extends PlayerLifecycleObject> Collection<T> getObjects(Class<T> clz) {
-        if (objectFactories.containsKey(clz) == false) return Collections.emptyList();
+        if (!objectFactories.containsKey(clz)) return Collections.emptyList();
 
         Collection<T> objects = new LinkedList<>();
         holder.values().forEach((m) -> objects.add(clz.cast(m.get(clz))));

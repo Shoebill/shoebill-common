@@ -108,7 +108,7 @@ public class VehicleLifecycleHolder implements Destroyable {
     }
 
     public <T extends VehicleLifecycleObject> void unregisterClass(Class<T> clz) {
-        if (objectFactories.containsKey(clz) == false) return;
+        if (!objectFactories.containsKey(clz)) return;
 
         Vehicle.get().forEach((vehicle) ->
         {
@@ -122,7 +122,7 @@ public class VehicleLifecycleHolder implements Destroyable {
     }
 
     public <T extends VehicleLifecycleObject> T getObject(Vehicle vehicle, Class<T> clz) {
-        if (objectFactories.containsKey(clz) == false) return null;
+        if (!objectFactories.containsKey(clz)) return null;
 
         Map<Class<?>, VehicleLifecycleObject> vehicleLifecycleObjects = holder.get(vehicle);
         if (vehicleLifecycleObjects == null) return null;
@@ -131,7 +131,7 @@ public class VehicleLifecycleHolder implements Destroyable {
     }
 
     public <T extends VehicleLifecycleObject> Collection<T> getObjects(Class<T> clz) {
-        if (objectFactories.containsKey(clz) == false) return Collections.emptyList();
+        if (!objectFactories.containsKey(clz)) return Collections.emptyList();
 
         Collection<T> objects = new LinkedList<>();
         holder.values().forEach((m) -> objects.add(clz.cast(m.get(clz))));

@@ -246,7 +246,7 @@ public class ListDialog extends AbstractDialog {
         displayedItems.clear();
 
         for (ListDialogItem item : items) {
-            if (item.isEnabled() == false) continue;
+            if (!item.isEnabled()) continue;
 
             String text = item.getItemText();
             if (StringUtils.isEmpty(text)) text = "-";
