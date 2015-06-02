@@ -14,20 +14,31 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class PlayerLifecycleHolder implements Destroyable {
+    @FunctionalInterface
     public interface PlayerLifecycleObjectFactory<T extends PlayerLifecycleObject> {
         T create(EventManager eventManager, Player player);
+    }
+
+    @FunctionalInterface
+    public interface EventHandlerRegisterer {
+        void register(EventManager eventManager);
+    }
+
+    class PlayerLifecycleObjectStuff {
+        PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject> factory;
+        EventManagerNode eventManagerNode;
     }
 
 
     private final EventManagerNode eventManagerNode;
 
-    private final Map<Class<?>, PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject>> objectFactories;
+    private final Map<Class<?>, PlayerLifecycleObjectStuff> objectStuffs;
     private final Map<Player, Map<Class<?>, PlayerLifecycleObject>> holder;
 
 
     public PlayerLifecycleHolder(EventManager eventManager) {
         eventManagerNode = eventManager.createChildNode();
-        objectFactories = new HashMap<>();
+        objectStuffs = new HashMap<>();
         holder = new HashMap<>();
 
         eventManagerNode.registerHandler(PlayerConnectEvent.class, HandlerPriority.MONITOR, (PlayerConnectEvent e) ->
@@ -36,11 +47,11 @@ public class PlayerLifecycleHolder implements Destroyable {
             Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = new HashMap<>();
             holder.put(player, playerLifecycleObjects);
 
-            for (Entry<Class<?>, PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject>> entry : objectFactories.entrySet()) {
+            for (Entry<Class<?>, PlayerLifecycleObjectStuff> entry : objectStuffs.entrySet()) {
                 Class<?> clz = entry.getKey();
-                PlayerLifecycleObjectFactory<? extends PlayerLifecycleObject> factory = entry.getValue();
-
-                PlayerLifecycleObject object = factory.create(eventManagerNode, player);
+                PlayerLifecycleObjectStuff stuff = entry.getValue();
+                
+                PlayerLifecycleObject object = stuff.factory.create(eventManagerNode, player);
                 playerLifecycleObjects.put(clz, object);
                 object.init();
             }
@@ -69,44 +80,60 @@ public class PlayerLifecycleHolder implements Destroyable {
     }
 
     public <T extends PlayerLifecycleObject> void registerClass(final Class<T> clz) {
-        final Constructor<T> constructor;
-        try {
-            constructor = clz.getConstructor(EventManager.class, Player.class);
-            constructor.setAccessible(true);
-        } catch (NoSuchMethodException | SecurityException e) {
-            throw new UnsupportedOperationException(e);
-        }
+        registerClass(clz, null, null);
+    }
 
-        registerClass(clz, new PlayerLifecycleObjectFactory<T>() {
-            @Override
-            public T create(EventManager eventManager, Player player) {
+
+    public <T extends PlayerLifecycleObject> void registerClass(Class<T> clz, PlayerLifecycleObjectFactory<T> factory) {
+        registerClass(clz, factory, null);
+    }
+
+    public <T extends PlayerLifecycleObject> void registerClass(Class<T> clz, PlayerLifecycleObjectFactory<T> factory, EventHandlerRegisterer handlerRegisterer) {
+        if (objectStuffs.containsKey(clz)) return;
+        if (factory == null)
+        {
+            final Constructor<T> constructor;
+            try {
+                constructor = clz.getConstructor(EventManager.class, Player.class);
+                constructor.setAccessible(true);
+            } catch (NoSuchMethodException | SecurityException e) {
+                throw new UnsupportedOperationException(e);
+            }
+
+            factory = (eventManager, player) -> {
                 try {
                     return constructor.newInstance(eventManager, player);
                 } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     e.printStackTrace();
                     return null;
                 }
-            }
-        });
-    }
+            };
+        }
 
-    public <T extends PlayerLifecycleObject> void registerClass(Class<T> clz, PlayerLifecycleObjectFactory<T> factory) {
-        if (objectFactories.containsKey(clz)) return;
+        PlayerLifecycleObjectStuff stuff = new PlayerLifecycleObjectStuff();
+        stuff.factory = factory;
+        objectStuffs.put(clz, stuff);
+
+        if (handlerRegisterer != null) {
+            stuff.eventManagerNode = eventManagerNode.createChildNode();
+            handlerRegisterer.register(stuff.eventManagerNode);
+        }
 
         Player.get().forEach((player) ->
         {
             Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
 
-            PlayerLifecycleObject object = factory.create(eventManagerNode, player);
+            PlayerLifecycleObject object = stuff.factory.create(eventManagerNode, player);
             playerLifecycleObjects.put(clz, object);
             object.init();
         });
-
-        objectFactories.put(clz, factory);
     }
-
+    
     public <T extends PlayerLifecycleObject> void unregisterClass(Class<T> clz) {
-        if (!objectFactories.containsKey(clz)) return;
+        PlayerLifecycleObjectStuff stuff = objectStuffs.get(clz);
+        if (stuff == null) return;
+
+        stuff.eventManagerNode.destroy();
 
         Player.get().forEach((player) ->
         {
@@ -116,11 +143,11 @@ public class PlayerLifecycleHolder implements Destroyable {
             object.destroy();
         });
 
-        objectFactories.remove(clz);
+        objectStuffs.remove(clz);
     }
 
     public <T extends PlayerLifecycleObject> T getObject(Player player, Class<T> clz) {
-        if (!objectFactories.containsKey(clz)) return null;
+        if (!objectStuffs.containsKey(clz)) return null;
 
         Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
         if (playerLifecycleObjects == null) return null;
@@ -129,7 +156,7 @@ public class PlayerLifecycleHolder implements Destroyable {
     }
 
     public <T extends PlayerLifecycleObject> Collection<T> getObjects(Class<T> clz) {
-        if (!objectFactories.containsKey(clz)) return Collections.emptyList();
+        if (!objectStuffs.containsKey(clz)) return Collections.emptyList();
 
         Collection<T> objects = new LinkedList<>();
         holder.values().forEach((m) -> objects.add(clz.cast(m.get(clz))));
