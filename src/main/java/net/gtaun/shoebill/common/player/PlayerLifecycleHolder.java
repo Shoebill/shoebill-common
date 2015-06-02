@@ -128,12 +128,12 @@ public class PlayerLifecycleHolder implements Destroyable {
             object.init();
         });
     }
-    
+
     public <T extends PlayerLifecycleObject> void unregisterClass(Class<T> clz) {
         PlayerLifecycleObjectStuff stuff = objectStuffs.get(clz);
         if (stuff == null) return;
 
-        stuff.eventManagerNode.destroy();
+        if (stuff.eventManagerNode != null) stuff.eventManagerNode.destroy();
 
         Player.get().forEach((player) ->
         {
