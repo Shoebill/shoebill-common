@@ -32,13 +32,13 @@ public class TimedPageListDialog extends PageListDialog {
     }
 
     public static class TimedListDialogBuilder extends AbstractTimedPageListDialogBuilder<TimedPageListDialog, TimedListDialogBuilder> {
-        private TimedListDialogBuilder(Player player, EventManager rootEventManager) {
-            super(new TimedPageListDialog(player, rootEventManager));
+        private TimedListDialogBuilder(Player player, EventManager parentEventManager) {
+            super(new TimedPageListDialog(player, parentEventManager));
         }
     }
 
-    public static AbstractTimedPageListDialogBuilder<?, ?> create(Player player, EventManager rootEventManager) {
-        return new TimedListDialogBuilder(player, rootEventManager);
+    public static AbstractTimedPageListDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
+        return new TimedListDialogBuilder(player, parentEventManager);
     }
 
     private int blockedTime;

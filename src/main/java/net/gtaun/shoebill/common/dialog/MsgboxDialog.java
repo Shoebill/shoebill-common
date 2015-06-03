@@ -60,13 +60,13 @@ public class MsgboxDialog extends AbstractDialog {
     }
 
     public static class MsgboxDialogBuilder extends AbstractMsgboxDialogBuilder<MsgboxDialog, MsgboxDialogBuilder> {
-        private MsgboxDialogBuilder(Player player, EventManager rootEventManager) {
-            super(new MsgboxDialog(player, rootEventManager));
+        private MsgboxDialogBuilder(Player player, EventManager parentEventManager) {
+            super(new MsgboxDialog(player, parentEventManager));
         }
     }
 
-    public static AbstractMsgboxDialogBuilder<?, ?> create(Player player, EventManager rootEventManager) {
-        return new MsgboxDialogBuilder(player, rootEventManager);
+    public static AbstractMsgboxDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
+        return new MsgboxDialogBuilder(player, parentEventManager);
     }
 
     @FunctionalInterface
@@ -79,25 +79,25 @@ public class MsgboxDialog extends AbstractDialog {
     private ClickOkHandler clickOkHandler = null;
     private Collection<String> lines;
 
-    protected MsgboxDialog(Player player, EventManager rootEventManager) {
-        super(DialogStyle.MSGBOX, player, rootEventManager);
+    protected MsgboxDialog(Player player, EventManager parentEventManager) {
+        super(DialogStyle.MSGBOX, player, parentEventManager);
         lines = new ArrayList<>();
     }
 
-    public MsgboxDialog(Player player, EventManager rootEventManager, String caption, String message) {
-        super(DialogStyle.MSGBOX, player, rootEventManager);
+    public MsgboxDialog(Player player, EventManager parentEventManager, String caption, String message) {
+        super(DialogStyle.MSGBOX, player, parentEventManager);
         setCaption(caption);
         setMessage(message);
     }
 
-    public MsgboxDialog(Player player, EventManager rootEventManager, Supplier<String> captionSupplier, Supplier<String> messageSupplier) {
-        super(DialogStyle.MSGBOX, player, rootEventManager);
+    public MsgboxDialog(Player player, EventManager parentEventManager, Supplier<String> captionSupplier, Supplier<String> messageSupplier) {
+        super(DialogStyle.MSGBOX, player, parentEventManager);
         setCaption(captionSupplier);
         setMessage(messageSupplier);
     }
 
-    public MsgboxDialog(Player player, EventManager rootEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
-        super(DialogStyle.MSGBOX, player, rootEventManager);
+    public MsgboxDialog(Player player, EventManager parentEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
+        super(DialogStyle.MSGBOX, player, parentEventManager);
         setCaption(captionSupplier);
         setMessage(messageSupplier);
     }

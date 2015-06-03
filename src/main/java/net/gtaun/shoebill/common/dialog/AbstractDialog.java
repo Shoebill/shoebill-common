@@ -122,7 +122,7 @@ public abstract class AbstractDialog {
 
 
     protected final Player player;
-    protected final EventManager rootEventManager;
+    protected final EventManager parentEventManager;
     protected final EventManagerNode eventManagerNode;
     private final EventManagerNode eventManagerInternal;
 
@@ -140,13 +140,13 @@ public abstract class AbstractDialog {
     private DialogHandler clickCancelHandler = null;
 
 
-    AbstractDialog(DialogStyle style, Player player, EventManager rootEventManager) {
+    AbstractDialog(DialogStyle style, Player player, EventManager parentEventManager) {
         this.style = style;
         this.player = player;
-        this.rootEventManager = rootEventManager;
+        this.parentEventManager = parentEventManager;
 
-        eventManagerInternal = rootEventManager.createChildNode();
-        eventManagerNode = rootEventManager.createChildNode();
+        eventManagerInternal = parentEventManager.createChildNode();
+        eventManagerNode = parentEventManager.createChildNode();
 
         dialogId = SampObjectManager.get().createDialogId();
     }

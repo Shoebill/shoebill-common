@@ -28,13 +28,13 @@ public class TimedListDialog extends ListDialog {
     }
 
     public static class TimedListDialogBuilder extends AbstractTimedListDialogBuilder<TimedListDialog, TimedListDialogBuilder> {
-        private TimedListDialogBuilder(Player player, EventManager rootEventManager) {
-            super(new TimedListDialog(player, rootEventManager));
+        private TimedListDialogBuilder(Player player, EventManager parentEventManager) {
+            super(new TimedListDialog(player, parentEventManager));
         }
     }
 
-    public static AbstractTimedListDialogBuilder<?, ?> create(Player player, EventManager rootEventManager) {
-        return new TimedListDialogBuilder(player, rootEventManager);
+    public static AbstractTimedListDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
+        return new TimedListDialogBuilder(player, parentEventManager);
     }
 
     protected TimedListDialog(Player player, EventManager eventManager) {

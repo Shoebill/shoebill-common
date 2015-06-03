@@ -121,13 +121,13 @@ public class ListDialog extends AbstractDialog {
     }
 
     public static class ListDialogBuilder extends AbstractListDialogBuilder<ListDialog, ListDialogBuilder> {
-        private ListDialogBuilder(Player player, EventManager rootEventManager) {
-            super(new ListDialog(player, rootEventManager));
+        private ListDialogBuilder(Player player, EventManager parentEventManager) {
+            super(new ListDialog(player, parentEventManager));
         }
     }
 
-    public static AbstractListDialogBuilder<?, ?> create(Player player, EventManager rootEventManager) {
-        return new ListDialogBuilder(player, rootEventManager);
+    public static AbstractListDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
+        return new ListDialogBuilder(player, parentEventManager);
     }
 
     @FunctionalInterface

@@ -30,13 +30,13 @@ public class TimedMsgboxDialog extends MsgboxDialog {
     }
 
     public static class TimedMsgboxDialogBuilder extends AbstractTimedMsgboxDialogBuilder<TimedMsgboxDialog, TimedMsgboxDialogBuilder> {
-        private TimedMsgboxDialogBuilder(Player player, EventManager rootEventManager) {
-            super(new TimedMsgboxDialog(player, rootEventManager));
+        private TimedMsgboxDialogBuilder(Player player, EventManager parentEventManager) {
+            super(new TimedMsgboxDialog(player, parentEventManager));
         }
     }
 
-    public static AbstractTimedMsgboxDialogBuilder<?, ?> create(Player player, EventManager rootEventManager) {
-        return new TimedMsgboxDialogBuilder(player, rootEventManager);
+    public static AbstractTimedMsgboxDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
+        return new TimedMsgboxDialogBuilder(player, parentEventManager);
     }
 
     private int blockedTime;
@@ -44,20 +44,20 @@ public class TimedMsgboxDialog extends MsgboxDialog {
     private int currentTime;
     private String originalAccept = "";
 
-    protected TimedMsgboxDialog(Player player, EventManager rootEventManager) {
-        super(player, rootEventManager);
+    protected TimedMsgboxDialog(Player player, EventManager parentEventManager) {
+        super(player, parentEventManager);
     }
 
-    public TimedMsgboxDialog(Player player, EventManager rootEventManager, String caption, String message) {
-        super(player, rootEventManager, caption, message);
+    public TimedMsgboxDialog(Player player, EventManager parentEventManager, String caption, String message) {
+        super(player, parentEventManager, caption, message);
     }
 
-    public TimedMsgboxDialog(Player player, EventManager rootEventManager, Supplier<String> captionSupplier, Supplier<String> messageSupplier) {
-        super(player, rootEventManager, captionSupplier, messageSupplier);
+    public TimedMsgboxDialog(Player player, EventManager parentEventManager, Supplier<String> captionSupplier, Supplier<String> messageSupplier) {
+        super(player, parentEventManager, captionSupplier, messageSupplier);
     }
 
-    public TimedMsgboxDialog(Player player, EventManager rootEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
-        super(player, rootEventManager, captionSupplier, messageSupplier);
+    public TimedMsgboxDialog(Player player, EventManager parentEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
+        super(player, parentEventManager, captionSupplier, messageSupplier);
     }
 
     public int getBlockedTime() {

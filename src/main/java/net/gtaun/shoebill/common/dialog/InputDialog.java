@@ -59,21 +59,21 @@ public class InputDialog extends AbstractDialog {
     }
 
     public static class InputDialogBuilder extends AbstractInputDialogBuilder<InputDialog, InputDialogBuilder> {
-        private InputDialogBuilder(Player player, EventManager rootEventManager) {
-            super(new InputDialog(player, rootEventManager));
+        private InputDialogBuilder(Player player, EventManager parentEventManager) {
+            super(new InputDialog(player, parentEventManager));
         }
 
-        private InputDialogBuilder(Player player, EventManager rootEventManager, boolean passwordMode) {
-            super(new InputDialog(player, rootEventManager, passwordMode));
+        private InputDialogBuilder(Player player, EventManager parentEventManager, boolean passwordMode) {
+            super(new InputDialog(player, parentEventManager, passwordMode));
         }
     }
 
-    public static AbstractInputDialogBuilder<?, ?> create(Player player, EventManager rootEventManager) {
-        return new InputDialogBuilder(player, rootEventManager);
+    public static AbstractInputDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
+        return new InputDialogBuilder(player, parentEventManager);
     }
 
-    public static AbstractInputDialogBuilder<?, ?> create(Player player, EventManager rootEventManager, boolean passwordMode) {
-        return new InputDialogBuilder(player, rootEventManager, passwordMode);
+    public static AbstractInputDialogBuilder<?, ?> create(Player player, EventManager parentEventManager, boolean passwordMode) {
+        return new InputDialogBuilder(player, parentEventManager, passwordMode);
     }
 
     @FunctionalInterface
@@ -90,39 +90,39 @@ public class InputDialog extends AbstractDialog {
     private Collection<String> lines;
 
 
-    public InputDialog(Player player, EventManager rootEventManager) {
-        this(player, rootEventManager, false);
+    public InputDialog(Player player, EventManager parentEventManager) {
+        this(player, parentEventManager, false);
     }
 
-    public InputDialog(Player player, EventManager rootEventManager, boolean passwordMode) {
-        super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, rootEventManager);
+    public InputDialog(Player player, EventManager parentEventManager, boolean passwordMode) {
+        super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, parentEventManager);
         this.passwordMode = passwordMode;
         lines = new ArrayList<>();
     }
 
-    public InputDialog(Player player, EventManager rootEventManager, String caption, String message) {
-        super(DialogStyle.INPUT, player, rootEventManager);
+    public InputDialog(Player player, EventManager parentEventManager, String caption, String message) {
+        super(DialogStyle.INPUT, player, parentEventManager);
         this.passwordMode = false;
         setCaption(caption);
         setMessage(message);
     }
 
-    public InputDialog(Player player, EventManager rootEventManager, String caption, String message, boolean passwordMode) {
-        super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, rootEventManager);
+    public InputDialog(Player player, EventManager parentEventManager, String caption, String message, boolean passwordMode) {
+        super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, parentEventManager);
         this.passwordMode = passwordMode;
         setCaption(caption);
         setMessage(message);
     }
 
-    public InputDialog(Player player, EventManager rootEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
-        super(DialogStyle.INPUT, player, rootEventManager);
+    public InputDialog(Player player, EventManager parentEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
+        super(DialogStyle.INPUT, player, parentEventManager);
         this.passwordMode = false;
         setCaption(captionSupplier);
         setMessage(messageSupplier);
     }
 
-    public InputDialog(Player player, EventManager rootEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier, boolean passwordMode) {
-        super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, rootEventManager);
+    public InputDialog(Player player, EventManager parentEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier, boolean passwordMode) {
+        super(passwordMode ? DialogStyle.PASSWORD : DialogStyle.INPUT, player, parentEventManager);
         this.passwordMode = passwordMode;
         setCaption(captionSupplier);
         setMessage(messageSupplier);

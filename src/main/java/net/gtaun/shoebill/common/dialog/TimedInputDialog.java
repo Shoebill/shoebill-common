@@ -28,21 +28,21 @@ public class TimedInputDialog extends InputDialog {
     }
 
     public static class TimedInputDialogBuilder extends AbstractTimedInputDialogBuilder<TimedInputDialog, TimedInputDialogBuilder> {
-        private TimedInputDialogBuilder(Player player, EventManager rootEventManager) {
-            super(new TimedInputDialog(player, rootEventManager));
+        private TimedInputDialogBuilder(Player player, EventManager parentEventManager) {
+            super(new TimedInputDialog(player, parentEventManager));
         }
 
-        private TimedInputDialogBuilder(Player player, EventManager rootEventManager, boolean passwordMode) {
-            super(new TimedInputDialog(player, rootEventManager, passwordMode));
+        private TimedInputDialogBuilder(Player player, EventManager parentEventManager, boolean passwordMode) {
+            super(new TimedInputDialog(player, parentEventManager, passwordMode));
         }
     }
 
-    public static AbstractTimedInputDialogBuilder<?, ?> create(Player player, EventManager rootEventManager) {
-        return new TimedInputDialogBuilder(player, rootEventManager);
+    public static AbstractTimedInputDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
+        return new TimedInputDialogBuilder(player, parentEventManager);
     }
 
-    public static AbstractTimedInputDialogBuilder<?, ?> create(Player player, EventManager rootEventManager, boolean passwordMode) {
-        return new TimedInputDialogBuilder(player, rootEventManager, passwordMode);
+    public static AbstractTimedInputDialogBuilder<?, ?> create(Player player, EventManager parentEventManager, boolean passwordMode) {
+        return new TimedInputDialogBuilder(player, parentEventManager, passwordMode);
     }
 
     private int blockedTime;
@@ -50,28 +50,28 @@ public class TimedInputDialog extends InputDialog {
     private int currentTime;
     private String originalAccept = "";
 
-    public TimedInputDialog(Player player, EventManager rootEventManager) {
-        super(player, rootEventManager);
+    public TimedInputDialog(Player player, EventManager parentEventManager) {
+        super(player, parentEventManager);
     }
 
-    public TimedInputDialog(Player player, EventManager rootEventManager, boolean passwordMode) {
-        super(player, rootEventManager, passwordMode);
+    public TimedInputDialog(Player player, EventManager parentEventManager, boolean passwordMode) {
+        super(player, parentEventManager, passwordMode);
     }
 
-    public TimedInputDialog(Player player, EventManager rootEventManager, String caption, String message) {
-        super(player, rootEventManager, caption, message);
+    public TimedInputDialog(Player player, EventManager parentEventManager, String caption, String message) {
+        super(player, parentEventManager, caption, message);
     }
 
-    public TimedInputDialog(Player player, EventManager rootEventManager, String caption, String message, boolean passwordMode) {
-        super(player, rootEventManager, caption, message, passwordMode);
+    public TimedInputDialog(Player player, EventManager parentEventManager, String caption, String message, boolean passwordMode) {
+        super(player, parentEventManager, caption, message, passwordMode);
     }
 
-    public TimedInputDialog(Player player, EventManager rootEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
-        super(player, rootEventManager, captionSupplier, messageSupplier);
+    public TimedInputDialog(Player player, EventManager parentEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
+        super(player, parentEventManager, captionSupplier, messageSupplier);
     }
 
-    public TimedInputDialog(Player player, EventManager rootEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier, boolean passwordMode) {
-        super(player, rootEventManager, captionSupplier, messageSupplier, passwordMode);
+    public TimedInputDialog(Player player, EventManager parentEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier, boolean passwordMode) {
+        super(player, parentEventManager, captionSupplier, messageSupplier, passwordMode);
     }
 
     public void setBlockedTime(int blockedTime) {
