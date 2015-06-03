@@ -2,9 +2,9 @@ package net.gtaun.shoebill.common;
 
 import net.gtaun.util.event.EventManager;
 
-public class ShoebillContentManager extends AbstractShoebillContext
+public class ShoebillContextManager extends AbstractShoebillContext
 {
-	public ShoebillContentManager(EventManager parentEventManager)
+	public ShoebillContextManager(EventManager parentEventManager)
 	{
 		super(parentEventManager);
 	}
