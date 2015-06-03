@@ -5,20 +5,18 @@ import net.gtaun.util.event.EventManager;
 import net.gtaun.util.event.EventManagerNode;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractShoebillContext implements Destroyable {
-    protected final EventManager rootEventManager;
+    protected final EventManager parentEventManager;
 
     private boolean isInited = false;
     protected EventManagerNode eventManagerNode;
     private Set<Destroyable> destroyables = new HashSet<>();
 
 
-    public AbstractShoebillContext(EventManager rootEventManager) {
-        this.rootEventManager = rootEventManager;
+    public AbstractShoebillContext(EventManager parentEventManager) {
+        this.parentEventManager = parentEventManager;
     }
 
     @Override
@@ -40,7 +38,7 @@ public abstract class AbstractShoebillContext implements Destroyable {
         try {
             if (isInited) return;
 
-            eventManagerNode = rootEventManager.createChildNode();
+            eventManagerNode = parentEventManager.createChildNode();
             onInit();
             isInited = true;
         } catch (Throwable e) {
