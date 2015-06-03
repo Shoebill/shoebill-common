@@ -38,6 +38,8 @@ public abstract class AbstractShoebillContext implements Destroyable {
 
     public final void init() {
         try {
+            if (isInited) return;
+
             eventManagerNode = rootEventManager.createChildNode();
             onInit();
             isInited = true;
