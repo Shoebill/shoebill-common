@@ -21,10 +21,12 @@ public class ShoebillContextManager extends AbstractShoebillContext
 
 	}
 
-	public void manage(AbstractShoebillContext context)
+	public <ContextType extends AbstractShoebillContext>
+	ContextType manage(ContextType context)
 	{
 		addDestroyable(context);
 		context.init();
+		return context;
 	}
 
 	public void destroy(AbstractShoebillContext context)
