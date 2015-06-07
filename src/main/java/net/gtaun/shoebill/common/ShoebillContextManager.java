@@ -57,7 +57,7 @@ public class ShoebillContextManager extends AbstractShoebillContext
 	}
 
 	public <ContextType extends AbstractShoebillContext>
-	ContextType get(Class<ContextType> clazz)
+	ContextType getContext(Class<ContextType> clazz)
 	{
 		Set<AbstractShoebillContext> contextCotainer = contextContainers.get(clazz);
 		if (contextCotainer == null || contextCotainer.isEmpty()) return null;
