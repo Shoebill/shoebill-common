@@ -1,5 +1,6 @@
 package net.gtaun.shoebill.common.player;
 
+import net.gtaun.shoebill.common.AbstractShoebillContext;
 import net.gtaun.shoebill.event.player.PlayerConnectEvent;
 import net.gtaun.shoebill.event.player.PlayerDisconnectEvent;
 import net.gtaun.shoebill.object.Destroyable;
@@ -41,12 +42,11 @@ public class PlayerLifecycleHolder implements Destroyable {
         objectStuffs = new HashMap<>();
         holder = new HashMap<>();
 
-        eventManagerNode.registerHandler(PlayerConnectEvent.class, HandlerPriority.MONITOR, (PlayerConnectEvent e) ->
+        eventManagerNode.registerHandler(PlayerConnectEvent.class, HandlerPriority.NORMAL, (PlayerConnectEvent e) ->
         {
             Player player = e.getPlayer();
             Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = new HashMap<>();
             holder.put(player, playerLifecycleObjects);
-
             for (Entry<Class<?>, PlayerLifecycleObjectStuff> entry : objectStuffs.entrySet()) {
                 Class<?> clz = entry.getKey();
                 PlayerLifecycleObjectStuff stuff = entry.getValue();
@@ -63,7 +63,7 @@ public class PlayerLifecycleHolder implements Destroyable {
             Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = holder.get(player);
             holder.remove(player);
 
-            for (PlayerLifecycleObject object : playerLifecycleObjects.values()) object.destroy();
+            playerLifecycleObjects.values().forEach(AbstractShoebillContext::destroy);
         });
     }
 
