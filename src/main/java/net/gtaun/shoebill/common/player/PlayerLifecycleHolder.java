@@ -42,7 +42,7 @@ public class PlayerLifecycleHolder implements Destroyable {
         objectStuffs = new HashMap<>();
         holder = new HashMap<>();
 
-        eventManagerNode.registerHandler(PlayerConnectEvent.class, HandlerPriority.NORMAL, (PlayerConnectEvent e) ->
+        eventManagerNode.registerHandler(PlayerConnectEvent.class, HandlerPriority.MONITOR, (PlayerConnectEvent e) ->
         {
             Player player = e.getPlayer();
             Map<Class<?>, PlayerLifecycleObject> playerLifecycleObjects = new HashMap<>();
