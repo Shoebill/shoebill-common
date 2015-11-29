@@ -52,7 +52,7 @@ public abstract class AbstractShoebillContext implements Destroyable {
         if (isDestroyed()) return;
 
         onDestroy();
-        for (Destroyable destroyable : destroyables) destroyable.destroy();
+        destroyables.forEach(net.gtaun.shoebill.object.Destroyable::destroy);
         destroyables.clear();
 
         eventManagerNode.destroy();
@@ -63,7 +63,7 @@ public abstract class AbstractShoebillContext implements Destroyable {
 
     @Override
     public boolean isDestroyed() {
-        return isInited();
+        return !isInited();
     }
 
     public boolean isInited()

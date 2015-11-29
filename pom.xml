@@ -30,6 +30,7 @@
 
     <repositories>
         <repository>
+<<<<<<< HEAD
             <id>gtaun-repo-snapshots</id>
             <name>GTAUN Repo Snapshots</name>
             <url>http://repo.gtaun.net/content/repositories/snapshots</url>
@@ -40,6 +41,11 @@
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
+=======
+            <id>gtaun-public-repo</id>
+            <name>GTAUN Public Repository</name>
+            <url>http://repo.gtaun.net/content/groups/public</url>
+>>>>>>> 362b4cb0316bae38cdee7fb87879c7a20445a0b9
         </repository>
     </repositories>
 

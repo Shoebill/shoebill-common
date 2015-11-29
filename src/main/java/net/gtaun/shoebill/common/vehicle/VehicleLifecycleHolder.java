@@ -19,8 +19,7 @@ public class VehicleLifecycleHolder implements Destroyable {
     public interface VehicleLifecycleObjectFactory<T extends VehicleLifecycleObject> {
         T create(EventManager eventManager, Vehicle vehicle);
     }
-
-
+    
     private final EventManagerNode eventManagerNode;
 
     private final Map<Class<?>, VehicleLifecycleObjectFactory<? extends VehicleLifecycleObject>> objectFactories;
