@@ -115,15 +115,15 @@ public class ListDialogItem {
     protected ItemSelectHandler<Object> selectHandler;
 
 
-    public <DataType> ListDialogItem() {
+    public ListDialogItem() {
         setItemText("-");
     }
 
-    public <DataType> ListDialogItem(String itemText) {
+    public ListDialogItem(String itemText) {
         setItemText(itemText);
     }
 
-    public <DataType> ListDialogItem(Supplier<String> textSupplier) {
+    public ListDialogItem(Supplier<String> textSupplier) {
         setItemText(textSupplier);
     }
 

@@ -141,7 +141,6 @@ public class ListDialog extends AbstractDialog {
 
     private ClickOkHandler clickOkHandler = null;
 
-
     protected ListDialog(Player player, EventManager eventManager) {
         super(DialogStyle.LIST, player, eventManager);
         items = new ArrayList<ListDialogItem>() {

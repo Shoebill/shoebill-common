@@ -2,12 +2,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
-
     <groupId>net.gtaun</groupId>
     <artifactId>shoebill-common</artifactId>
     <version>1.2-SNAPSHOT</version>
@@ -72,6 +66,15 @@
             <organizationUrl>http://www.gtaun.net</organizationUrl>
             <timezone>+8</timezone>
         </developer>
+
+        <developer>
+            <name>123marvin123</name>
+            <id>123marvin123</id>
+            <url>https://github.com/123marvin123</url>
+            <email>catboy560@gmail.com</email>
+            <organization>GTAUN</organization>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
     <ciManagement>
@@ -90,9 +93,40 @@
     </dependencies>
 
     <build>
-        <defaultGoal>clean install</defaultGoal>
+        <defaultGoal>clean install javadoc:javadoc</defaultGoal>
 
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <docletArtifact>
+                        <groupId>com.google.doclava</groupId>
+                        <artifactId>doclava</artifactId>
+                        <version>1.0.5</version>
+                    </docletArtifact>
+                    <doclet>com.google.doclava.Doclava</doclet>
+                    <!--
+                      | bootclasspath required by Sun's JVM
+                    -->
+                    <bootclasspath>${sun.boot.class.path}</bootclasspath>
+                    <additionalparam>
+                        -quiet
+                        -federate JDK http://download.oracle.com/javase/6/docs/api/index.html?
+                        -federationxml JDK http://doclava.googlecode.com/svn/static/api/openjdk-6.xml
+                        -hdf project.name "${project.name}"
+                        -d ${project.build.directory}/apidocs
+                    </additionalparam>
+                    <useStandardDocletOptions>false</useStandardDocletOptions>
+                    <!--
+                      | Apple's JVM sometimes requires more memory
+                    -->
+                    <additionalJOption>-J-Xmx1024m</additionalJOption>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -101,23 +135,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <locale>en_US</locale>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>

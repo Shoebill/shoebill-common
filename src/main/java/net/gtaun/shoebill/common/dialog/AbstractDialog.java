@@ -127,7 +127,7 @@ public abstract class AbstractDialog {
     private final EventManagerNode eventManagerInternal;
 
     private final DialogId dialogId;
-    private final DialogStyle style;
+    protected DialogStyle style;
 
     private AbstractDialog parentDialog;
 
