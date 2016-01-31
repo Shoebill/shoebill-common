@@ -25,9 +25,7 @@ import net.gtaun.shoebill.resource.Plugin;
  * @author MK124
  */
 public abstract class ConfigurablePlugin extends Plugin {
-    protected ConfigurablePlugin() {
-
-    }
+    protected ConfigurablePlugin() {}
 
     public boolean configure(Player player) {
         return false;

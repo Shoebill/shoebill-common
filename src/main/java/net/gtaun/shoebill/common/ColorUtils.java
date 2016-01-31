@@ -24,7 +24,5 @@ public class ColorUtils {
         return new Color((java.awt.Color.HSBtoRGB(hue, saturation, brightness) << 8) | (alpha & 0xFF));
     }
 
-    private ColorUtils() {
-
-    }
+    private ColorUtils() {}
 }

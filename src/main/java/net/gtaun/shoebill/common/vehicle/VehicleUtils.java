@@ -24,9 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class VehicleUtils {
-    private VehicleUtils() {
-
-    }
+    private VehicleUtils() {}
 
     public static boolean isVehicleDriver(Vehicle vehicle, Player player) {
         return player.getVehicle() == vehicle && player.getState() == PlayerState.DRIVER;

@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 public @interface CommandHelp {
     String value() default "";
 
-    String categorie() default "";
+    String category() default "";
 }

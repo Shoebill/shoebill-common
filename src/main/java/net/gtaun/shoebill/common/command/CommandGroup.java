@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.Map.Entry;
@@ -44,11 +45,11 @@ public class CommandGroup {
             if (!StringUtils.isBlank(command.name())) name = command.name();
             short priority = command.priority();
 
-            String helpMessage = null, categorie = null;
+            String helpMessage = null, category = null;
             CommandHelp help = m.getAnnotation(CommandHelp.class);
             if (help != null) {
                 helpMessage = help.value();
-                categorie = help.categorie();
+                category = help.category();
             }
 
             entries.add(new CommandEntryInternal(name, paramTypes, paramNames, priority, helpMessage, command.caseSensitive(), (player, params) ->
@@ -60,7 +61,7 @@ public class CommandGroup {
                 }
 
                 return false;
-            }, categorie));
+            }, category));
         });
 
         return entries;
@@ -82,15 +83,7 @@ public class CommandGroup {
             BeforeCheck annotation = m.getAnnotation(BeforeCheck.class);
             if (annotation == null) return;
 
-            checkers.add((p, cmd, params) ->
-            {
-                try {
-                    return (boolean) m.invoke(object, p, cmd, params);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return false;
-                }
-            });
+            checkers.add(makeCustomCommandHandler(object, m));
         });
 
         return checkers;
@@ -112,18 +105,22 @@ public class CommandGroup {
             CustomCommand annotation = m.getAnnotation(CustomCommand.class);
             if (annotation == null) return;
 
-            checkers.add((p, cmd, params) ->
-            {
-                try {
-                    return (boolean) m.invoke(object, p, cmd, params);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return false;
-                }
-            });
+            checkers.add(makeCustomCommandHandler(object, m));
         });
 
         return checkers;
+    }
+
+    private static CustomCommandHandler makeCustomCommandHandler(Object object, Method m) {
+        return (p, cmd, params) ->
+        {
+            try {
+                return (boolean) m.invoke(object, p, cmd, params);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        };
     }
 
     private static Object[] parseParams(Class<?>[] types, String[] paramStrs) throws NumberFormatException {
@@ -141,10 +138,11 @@ public class CommandGroup {
     private static final Map<Class<?>, Function<String, Object>> TYPE_PARSER = new HashMap<>();
 
     static {
-        TYPE_PARSER.put(String.class, (s) -> s);
 
         TYPE_PARSER.put(int.class, (s) -> Integer.parseInt(s));
         TYPE_PARSER.put(Integer.class, (s) -> Integer.parseInt(s));
+
+        TYPE_PARSER.put(String.class, (s) -> s);
 
         TYPE_PARSER.put(short.class, (s) -> Short.parseShort(s));
         TYPE_PARSER.put(Short.class, (s) -> Short.parseShort(s));
