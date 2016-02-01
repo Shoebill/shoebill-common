@@ -21,18 +21,24 @@ public class CommandGroup {
     private static Collection<CommandEntryInternal> generateCommandEntries(Object object) {
         List<CommandEntryInternal> entries = new ArrayList<>();
 
+        List<CustomCommandHandler> beforeCheckers = new ArrayList<>();
+        List<CustomCommandHandler> customHandlers = new ArrayList<>();
+
+        beforeCheckers.addAll(generateBeforeCheckers(object));
+        customHandlers.addAll(generateCustomHandlers(object));
+
         Class<?> clz = object.getClass();
         Arrays.stream(clz.getMethods()).forEach((m) ->
         {
-            String name = m.getName();
-            Parameter[] methodParams = m.getParameters();
-            if (m.getReturnType() != boolean.class) return;
-            if (methodParams.length < 1) return;
-
             Command command = m.getAnnotation(Command.class);
             if (command == null) return;
+            if (m.getReturnType() != boolean.class) return;
+
+            Parameter[] methodParams = m.getParameters();
+            if (methodParams.length < 1) return;
             if (methodParams[0].getType() != Player.class) return;
 
+            String name = m.getName();
 
             Class<?>[] paramTypes = new Class<?>[methodParams.length - 1];
             String[] paramNames = new String[paramTypes.length];
@@ -52,6 +58,7 @@ public class CommandGroup {
                 category = help.category();
             }
 
+
             entries.add(new CommandEntryInternal(name, paramTypes, paramNames, priority, helpMessage, command.caseSensitive(), (player, params) ->
             {
                 try {
@@ -61,7 +68,7 @@ public class CommandGroup {
                 }
 
                 return false;
-            }, category));
+            }, category, beforeCheckers, customHandlers));
         });
 
         return entries;
@@ -167,8 +174,6 @@ public class CommandGroup {
 
 
     private Map<String, Collection<CommandEntryInternal>> commands;
-    private List<CustomCommandHandler> beforeCheckers;
-    private List<CustomCommandHandler> customHandlers;
 
     private Set<CommandGroup> groups;
     private Map<String, CommandGroup> childGroups;
@@ -176,8 +181,6 @@ public class CommandGroup {
 
     public CommandGroup() {
         commands = new HashMap<>();
-        beforeCheckers = new ArrayList<>();
-        customHandlers = new ArrayList<>();
 
         groups = new HashSet<>();
         childGroups = new HashMap<>();
@@ -186,28 +189,29 @@ public class CommandGroup {
     public void registerCommands(Object... objects) {
         for(Object object : objects) {
             generateCommandEntries(object).forEach(this::registerCommand);
-            beforeCheckers.addAll(generateBeforeCheckers(object));
-            customHandlers.addAll(generateCustomHandlers(object));
         }
     }
 
-    public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, CommandHandler handler) {
-        registerCommand(command, paramTypes, paramNames, null, null, (short) 0, true, handler);
+    public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, CommandHandler handler,
+                                List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers) {
+        registerCommand(command, paramTypes, paramNames, null, null, (short) 0, true, handler, beforeCheckers, customHandlers);
     }
 
-    public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, String categorie, CommandHandler handler) {
-        registerCommand(command, paramTypes, paramNames, helpMessage, categorie, (short) 0, true, handler);
+    public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, String categorie, CommandHandler handler,
+                                List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers) {
+        registerCommand(command, paramTypes, paramNames, helpMessage, categorie, (short) 0, true, handler, beforeCheckers, customHandlers);
     }
 
     public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, String categorie,
-                                short priority, boolean caseSensitive, CommandHandler handler) {
+                                short priority, boolean caseSensitive, CommandHandler handler,
+                                List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers) {
         registerCommand(new CommandEntryInternal(command, paramTypes, paramNames, priority, helpMessage, caseSensitive, (player, params) ->
         {
             Queue<Object> paramQueue = new LinkedList<>();
             Collections.addAll(paramQueue, params);
             paramQueue.poll();
             return handler.handle(player, paramQueue);
-        }, categorie));
+        }, categorie, beforeCheckers, customHandlers));
     }
 
     private void registerCommand(CommandEntryInternal entry) {
@@ -273,37 +277,52 @@ public class CommandGroup {
             return (e2.getPriority() * weights + e2.getParamTypes().length) - (e1.getPriority() * weights + e1.getParamTypes().length);
         });
 
-        for (CustomCommandHandler checker : beforeCheckers)
-            if (!checker.handle(player, command, paramText)) return true;
-        for (CustomCommandHandler handler : customHandlers) if (handler.handle(player, command, paramText)) return true;
-
+        Pattern pattern = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
         for (Pair<String, CommandEntryInternal> e : commands) {
             CommandEntryInternal entry = e.getRight();
+
+            for (CustomCommandHandler checker : entry.getBeforeCheckers())
+                if (!checker.handle(player, command, paramText)) return true;
+            for (CustomCommandHandler handler : entry.getCustomHandlers())
+                if (handler.handle(player, command, paramText)) return true;
+
             Class<?>[] types = entry.getParamTypes();
             List<String> matches = new ArrayList<>();
-            Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(paramText); // strings with spaces can be made like this: "my string"
+            Matcher m = pattern.matcher(paramText); // strings with spaces can be made like this: "my string"
             while (m.find()) matches.add(m.group(1).replace("\"", ""));
-            if (types.length == matches.size()) {
+            if (types.length == matches.size() || types[types.length-1] == String.class) {
+                if(types.length > 0 && types[types.length-1] == String.class) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    Function<String, Object> stringParser = TYPE_PARSER.get(String.class);
+                    for (int i = matches.size() - 1; i >= 0; i--) {
+                        if (i < types.length - 1) break;
+                        else {
+                            Object result = stringParser.apply(matches.get(i));
+                            if (result != null) {
+                                matches.remove(i);
+                                stringBuilder.insert(0, " " + (String) result);
+                            } else break;
+                        }
+                    }
+                    matches.add(stringBuilder.toString().trim());
+                }
                 try {
                     Object[] params = parseParams(types, matches.toArray(new String[matches.size()]));
                     params = ArrayUtils.add(params, 0, player);
                     if (entry.handle(player, params)) return true;
-                } catch (Throwable ex) {
-
-                }
+                } catch (Throwable ignored) {}
             }
         }
 
         matchedCmds.addAll(commands);
 
         CommandGroup child = childGroups.get(command);
-        if (child == null) return false;
+        return child != null && child.processCommand(CommandEntryInternal.completePath(path, command), matchedCmds, player, paramText);
 
-        return child.processCommand(CommandEntryInternal.completePath(path, command), matchedCmds, player, paramText);
     }
 
     protected void getCommandEntries(List<CommandEntry> entries, String curPath) {
-        commands.entrySet().stream().map((e) -> e.getValue()).forEach((commands) ->
+        commands.entrySet().stream().map(Entry::getValue).forEach((commands) ->
         {
             entries.addAll(commands.stream().map((e) -> new CommandEntry(e, curPath)).collect(Collectors.toList()));
         });
@@ -315,7 +334,7 @@ public class CommandGroup {
 
     protected void getCommandEntries(List<CommandEntry> entries, String curPath, String path) {
         if (curPath.startsWith(path)) {
-            commands.entrySet().stream().map((e) -> e.getValue()).forEach((commands) ->
+            commands.entrySet().stream().map(Entry::getValue).forEach((commands) ->
             {
                 entries.addAll(commands.stream().map((e) -> new CommandEntry(e, curPath)).collect(Collectors.toList()));
             });

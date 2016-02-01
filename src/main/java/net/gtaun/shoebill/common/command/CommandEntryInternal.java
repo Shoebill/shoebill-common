@@ -3,6 +3,8 @@ package net.gtaun.shoebill.common.command;
 import net.gtaun.shoebill.object.Player;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+
 class CommandEntryInternal {
     public static String completePath(String path, String child) {
         return StringUtils.isBlank(path) ? child : path + " " + child;
@@ -22,10 +24,11 @@ class CommandEntryInternal {
     private CommandHandlerInternal handler;
     private boolean caseSensitive;
     private String categorie;
-
+    private List<CustomCommandHandler> beforeCheckers;
+    private List<CustomCommandHandler> customHandlers;
 
     public CommandEntryInternal(String command, Class<?>[] paramTypes, String[] paramNames, short priority, String helpMessage, boolean caseSensitive,
-                                CommandHandlerInternal handler, String categorie) {
+                                CommandHandlerInternal handler, String categorie, List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers) {
         this.command = command;
         this.paramTypes = paramTypes;
         this.paramNames = paramNames;
@@ -34,6 +37,8 @@ class CommandEntryInternal {
         this.caseSensitive = caseSensitive;
         this.handler = handler;
         this.categorie = categorie;
+        this.beforeCheckers = beforeCheckers;
+        this.customHandlers = customHandlers;
     }
 
     public String getCommand() {
@@ -74,5 +79,13 @@ class CommandEntryInternal {
 
     public String getCategorie() {
         return categorie;
+    }
+
+    public List<CustomCommandHandler> getBeforeCheckers() {
+        return beforeCheckers;
+    }
+
+    public List<CustomCommandHandler> getCustomHandlers() {
+        return customHandlers;
     }
 }
