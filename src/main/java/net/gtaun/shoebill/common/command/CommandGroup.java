@@ -290,7 +290,7 @@ public class CommandGroup {
             List<String> matches = new ArrayList<>();
             Matcher m = pattern.matcher(paramText); // strings with spaces can be made like this: "my string"
             while (m.find()) matches.add(m.group(1).replace("\"", ""));
-            if (types.length == matches.size() || types[types.length-1] == String.class) {
+            if ((types.length == matches.size() || types[types.length-1] == String.class) && matches.size() > 0) {
                 if(types.length > 0 && types[types.length-1] == String.class) {
                     StringBuilder stringBuilder = new StringBuilder();
                     Function<String, Object> stringParser = TYPE_PARSER.get(String.class);
@@ -304,7 +304,9 @@ public class CommandGroup {
                             } else break;
                         }
                     }
-                    matches.add(stringBuilder.toString().trim());
+                    final String finalString = stringBuilder.toString().trim();
+                    if(finalString.length() > 0) //Don't allow empty strings
+                        matches.add(finalString);
                 }
                 try {
                     Object[] params = parseParams(types, matches.toArray(new String[matches.size()]));
