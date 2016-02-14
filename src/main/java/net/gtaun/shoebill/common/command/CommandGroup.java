@@ -281,16 +281,20 @@ public class CommandGroup {
         for (Pair<String, CommandEntryInternal> e : commands) {
             CommandEntryInternal entry = e.getRight();
 
-            for (CustomCommandHandler checker : entry.getBeforeCheckers())
-                if (!checker.handle(player, command, paramText)) return true;
-            for (CustomCommandHandler handler : entry.getCustomHandlers())
-                if (handler.handle(player, command, paramText)) return true;
+            if(entry.getBeforeCheckers() != null) {
+                for (CustomCommandHandler checker : entry.getBeforeCheckers())
+                    if (!checker.handle(player, command, paramText)) return true;
+            }
+            if(entry.getCustomHandlers() != null) {
+                for (CustomCommandHandler handler : entry.getCustomHandlers())
+                    if (handler.handle(player, command, paramText)) return true;
+            }
 
             Class<?>[] types = entry.getParamTypes();
             List<String> matches = new ArrayList<>();
             Matcher m = pattern.matcher(paramText); // strings with spaces can be made like this: "my string"
             while (m.find()) matches.add(m.group(1).replace("\"", ""));
-            if (types.length == matches.size() || types[types.length-1] == String.class) {
+            if (types.length == matches.size() || ((types.length > 0) && types[types.length - 1] == String.class)) {
                 if(types.length > 0 && types[types.length-1] == String.class) {
                     StringBuilder stringBuilder = new StringBuilder();
                     Function<String, Object> stringParser = TYPE_PARSER.get(String.class);
