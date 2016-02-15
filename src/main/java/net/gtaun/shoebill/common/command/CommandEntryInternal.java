@@ -18,7 +18,6 @@ class CommandEntryInternal {
 
     private String command;
     private Class<?>[] paramTypes;
-    private String[] paramNames;
     private short priority;
     private String helpMessage;
     private CommandHandlerInternal handler;
@@ -26,12 +25,14 @@ class CommandEntryInternal {
     private String categorie;
     private List<CustomCommandHandler> beforeCheckers;
     private List<CustomCommandHandler> customHandlers;
+    private CommandParameter[] parameterAnnotations;
 
-    public CommandEntryInternal(String command, Class<?>[] paramTypes, String[] paramNames, short priority, String helpMessage, boolean caseSensitive,
-                                CommandHandlerInternal handler, String categorie, List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers) {
+    public CommandEntryInternal(String command, Class<?>[] paramTypes, short priority, String helpMessage, boolean caseSensitive,
+                                CommandHandlerInternal handler, String categorie, List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers,
+                                CommandParameter[] parameterAnnotations) {
+        if(parameterAnnotations == null) parameterAnnotations = new CommandParameter[0];
         this.command = command;
         this.paramTypes = paramTypes;
-        this.paramNames = paramNames;
         this.priority = priority;
         this.helpMessage = helpMessage;
         this.caseSensitive = caseSensitive;
@@ -39,6 +40,7 @@ class CommandEntryInternal {
         this.categorie = categorie;
         this.beforeCheckers = beforeCheckers;
         this.customHandlers = customHandlers;
+        this.parameterAnnotations = parameterAnnotations;
     }
 
     public String getCommand() {
@@ -51,10 +53,6 @@ class CommandEntryInternal {
 
     public Class<?>[] getParamTypes() {
         return paramTypes.clone();
-    }
-
-    public String[] getParamNames() {
-        return paramNames.clone();
     }
 
     public short getPriority() {
@@ -87,5 +85,9 @@ class CommandEntryInternal {
 
     public List<CustomCommandHandler> getCustomHandlers() {
         return customHandlers;
+    }
+
+    public CommandParameter[] getParameterAnnotations() {
+        return parameterAnnotations;
     }
 }

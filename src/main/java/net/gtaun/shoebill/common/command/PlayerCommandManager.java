@@ -17,15 +17,20 @@ import java.util.List;
 public class PlayerCommandManager extends CommandGroup implements Destroyable {
     @FunctionalInterface
     public interface UsageMessageSupplier {
-        String get(Player player, String command, String prefix, String[] params, String help);
+        String get(Player player, String prefix, CommandEntry command);
     }
 
-    public static final UsageMessageSupplier DEFAULT_USAGE_MESSAGE_SUPPLIER = (player, cmd, prefix, params, help) ->
+    public static final UsageMessageSupplier DEFAULT_USAGE_MESSAGE_SUPPLIER = (player, prefix, command) ->
     {
-        String message = "Usage: " + prefix + cmd;
-        for (String param : params) message += " [" + param + "]";
-        if (help != null) message += " - " + help;
-        return message;
+        StringBuilder stringBuilder = new StringBuilder("Usage: " + prefix + command.getCommand());
+        if(command.getParameters().length > 0) {
+            for(int i = 0; i < command.getParameters().length; i++) {
+                stringBuilder.append(" [").append(command.getParameters()[i].name()).append("]");
+            }
+        }
+        if(command.getHelpMessage() != null)
+            stringBuilder.append(" - ").append(command.getHelpMessage());
+        return stringBuilder.toString();
     };
 
     @FunctionalInterface
@@ -121,8 +126,7 @@ public class PlayerCommandManager extends CommandGroup implements Destroyable {
     }
 
     private String getUsageMessage(Player player, String path, String prefix, CommandEntryInternal entry) {
-        String completeCommand = entry.completeCommand(path);
-        return usageMessageSupplier.get(player, completeCommand, prefix, entry.getParamNames(), helpMessageSupplier.get(player, completeCommand, entry.getHelpMessage()));
+        return usageMessageSupplier.get(player, prefix, new CommandEntry(entry, path));
     }
 
     public void sendUsageMessage(Player player, String commandText) {

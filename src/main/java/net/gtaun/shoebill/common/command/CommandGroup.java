@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -41,11 +42,21 @@ public class CommandGroup {
             String name = m.getName();
 
             Class<?>[] paramTypes = new Class<?>[methodParams.length - 1];
-            String[] paramNames = new String[paramTypes.length];
+            CommandParameter[] commandParameters = new CommandParameter[methodParams.length - 1];
 
             for (int i = 1; i < methodParams.length; i++) {
                 paramTypes[i - 1] = methodParams[i].getType();
-                paramNames[i - 1] = methodParams[i].getName();
+                if(methodParams[i].getAnnotations() != null) {
+                    Annotation[] annotations = methodParams[i].getAnnotations();
+                    for(Annotation annotation : annotations) {
+                        if(annotation.annotationType() == CommandParameter.class) {
+                            commandParameters[i - 1] = (CommandParameter) annotation;
+                            break;
+                        }
+                    }
+                }
+                if(commandParameters[i - 1] == null)
+                    commandParameters[i - 1] = makeCommandParameterAnnotation(methodParams[i].getName());
             }
 
             if (!StringUtils.isBlank(command.name())) name = command.name();
@@ -58,8 +69,7 @@ public class CommandGroup {
                 category = help.category();
             }
 
-
-            entries.add(new CommandEntryInternal(name, paramTypes, paramNames, priority, helpMessage, command.caseSensitive(), (player, params) ->
+            entries.add(new CommandEntryInternal(name, paramTypes, priority, helpMessage, command.caseSensitive(), (player, params) ->
             {
                 try {
                     return (boolean) m.invoke(object, params);
@@ -68,7 +78,7 @@ public class CommandGroup {
                 }
 
                 return false;
-            }, category, beforeCheckers, customHandlers));
+            }, category, beforeCheckers, customHandlers, commandParameters));
         });
 
         return entries;
@@ -192,26 +202,29 @@ public class CommandGroup {
         }
     }
 
-    public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, CommandHandler handler,
-                                List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers) {
-        registerCommand(command, paramTypes, paramNames, null, null, (short) 0, true, handler, beforeCheckers, customHandlers);
+    public void registerCommand(String command, Class<?>[] paramTypes, CommandHandler handler,
+                                List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers,
+                                CommandParameter[] commandParameters) {
+        registerCommand(command, paramTypes, null, null, (short) 0, true, handler, beforeCheckers, customHandlers, commandParameters);
     }
 
-    public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, String categorie, CommandHandler handler,
-                                List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers) {
-        registerCommand(command, paramTypes, paramNames, helpMessage, categorie, (short) 0, true, handler, beforeCheckers, customHandlers);
+    public void registerCommand(String command, Class<?>[] paramTypes, String helpMessage, String categorie, CommandHandler handler,
+                                List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers,
+                                CommandParameter[] commandParameters) {
+        registerCommand(command, paramTypes, helpMessage, categorie, (short) 0, true, handler, beforeCheckers, customHandlers, commandParameters);
     }
 
-    public void registerCommand(String command, Class<?>[] paramTypes, String[] paramNames, String helpMessage, String categorie,
+    public void registerCommand(String command, Class<?>[] paramTypes, String helpMessage, String categorie,
                                 short priority, boolean caseSensitive, CommandHandler handler,
-                                List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers) {
-        registerCommand(new CommandEntryInternal(command, paramTypes, paramNames, priority, helpMessage, caseSensitive, (player, params) ->
+                                List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers,
+                                CommandParameter[] commandParameters) {
+        registerCommand(new CommandEntryInternal(command, paramTypes, priority, helpMessage, caseSensitive, (player, params) ->
         {
             Queue<Object> paramQueue = new LinkedList<>();
             Collections.addAll(paramQueue, params);
             paramQueue.poll();
             return handler.handle(player, paramQueue);
-        }, categorie, beforeCheckers, customHandlers));
+        }, categorie, beforeCheckers, customHandlers, commandParameters));
     }
 
     private void registerCommand(CommandEntryInternal entry) {
@@ -395,5 +408,29 @@ public class CommandGroup {
 
     public void replaceTypeParser(Class<?> type, Function<String, Object> function) {
         TYPE_PARSER.put(type, function);
+    }
+
+    private static CommandParameter makeCommandParameterAnnotation(String name) {
+        return makeCommandParameterAnnotation(name, null);
+    }
+
+    private static CommandParameter makeCommandParameterAnnotation(String name, String description) {
+        return new CommandParameter() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return CommandParameter.class;
+            }
+
+            @Override
+            public String name() {
+                return name;
+            }
+
+            @Override
+            public String description() {
+                return description;
+            }
+        };
     }
 }

@@ -7,7 +7,6 @@ public class CommandEntry {
     private CommandEntryInternal entry;
     private String path;
 
-
     public CommandEntry(CommandEntryInternal entry, String path) {
         this.entry = entry;
         this.path = path;
@@ -21,12 +20,8 @@ public class CommandEntry {
         return entry.completeCommand(path);
     }
 
-    public Class<?>[] getParamTypes() {
+    public Class<?>[] getParameterTypes() {
         return entry.getParamTypes();
-    }
-
-    public String[] getParamNames() {
-        return entry.getParamNames();
     }
 
     public short getPriority() {
@@ -51,5 +46,9 @@ public class CommandEntry {
 
     public String getCategorie() {
         return entry.getCategorie();
+    }
+
+    public CommandParameter[] getParameters() {
+        return entry.getParameterAnnotations();
     }
 }
