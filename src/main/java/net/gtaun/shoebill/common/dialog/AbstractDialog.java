@@ -140,7 +140,7 @@ public abstract class AbstractDialog {
     private DialogHandler clickCancelHandler = null;
 
 
-    AbstractDialog(DialogStyle style, Player player, EventManager parentEventManager) {
+    public AbstractDialog(DialogStyle style, Player player, EventManager parentEventManager) {
         this.style = style;
         this.player = player;
         this.parentEventManager = parentEventManager;
