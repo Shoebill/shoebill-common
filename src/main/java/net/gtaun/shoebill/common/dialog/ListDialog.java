@@ -36,9 +36,150 @@ import java.util.function.Supplier;
  * @author MK124
  */
 public class ListDialog extends AbstractDialog {
+    protected final List<ListDialogItem> items;
+    protected final List<ListDialogItem> displayedItems;
+    private ClickOkHandler clickOkHandler = null;
+
+    protected ListDialog(Player player, EventManager eventManager) {
+        super(DialogStyle.LIST, player, eventManager);
+        items = new ArrayList<ListDialogItem>() {
+            private static final long serialVersionUID = 2260194681967627384L;
+
+            @Override
+            public void add(int index, ListDialogItem e) {
+                e.currentDialog = ListDialog.this;
+                super.add(index, e);
+            }
+
+            @Override
+            public boolean add(ListDialogItem e) {
+                e.currentDialog = ListDialog.this;
+                return super.add(e);
+            }
+
+            @Override
+            public ListDialogItem set(int index, ListDialogItem e) {
+                e.currentDialog = ListDialog.this;
+                return super.set(index, e);
+            }
+
+            @Override
+            public boolean addAll(Collection<? extends ListDialogItem> c) {
+                c.forEach((e) -> e.currentDialog = ListDialog.this);
+                return super.addAll(c);
+            }
+
+            @Override
+            public boolean addAll(int index, Collection<? extends ListDialogItem> c) {
+                c.forEach((e) -> e.currentDialog = ListDialog.this);
+                return super.addAll(index, c);
+            }
+        };
+        displayedItems = new ArrayList<>();
+    }
+
+    public static AbstractListDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
+        return new ListDialogBuilder(player, parentEventManager);
+    }
+
+    public void addItem(ListDialogItem item) {
+        items.add(item);
+    }
+
+    public void addItem(String itemText) {
+        items.add(new ListDialogItem(itemText));
+    }
+
+    public void addItem(Supplier<String> textSupplier) {
+        items.add(new ListDialogItem(textSupplier));
+    }
+
+    public void addItem(String itemText, ItemSelectSimpleHandler handler) {
+        items.add(new ListDialogItem(itemText, handler));
+    }
+
+    public void addItem(Supplier<String> textSupplier, ItemSelectSimpleHandler handler) {
+        items.add(new ListDialogItem(textSupplier, handler));
+    }
+
+    public void addItem(String itemText, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler) {
+        items.add(new ListDialogItem(itemText, enabledSupplier, handler));
+    }
+
+    public void addItem(Supplier<String> textSupplier, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler) {
+        items.add(new ListDialogItem(textSupplier, enabledSupplier, handler));
+    }
+
+    public <DataType> void addItem(DataType data, String itemText, ItemSelectHandler<DataType> handler) {
+        items.add(new ListDialogItem(data, itemText, handler));
+    }
+
+    public <DataType> void addItem(DataType data, ItemTextSupplier<DataType> textSupplier, ItemSelectHandler<DataType> handler) {
+        items.add(new ListDialogItem(data, textSupplier, handler));
+    }
+
+    public <DataType> void addItem(DataType data, String itemText, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler) {
+        items.add(new ListDialogItem(data, itemText, enabledSupplier, handler));
+    }
+
+    public <DataType> void addItem(DataType data, ItemTextSupplier<DataType> textSupplier, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler) {
+        items.add(new ListDialogItem(data, textSupplier, enabledSupplier, handler));
+    }
+
+    public void setClickOkHandler(ClickOkHandler handler) {
+        clickOkHandler = handler;
+    }
+
+    public List<ListDialogItem> getItems() {
+        return items;
+    }
+
+    public List<ListDialogItem> getDisplayedItems() {
+        return displayedItems;
+    }
+
+    @Override
+    public void show() {
+        show(getItemString());
+    }
+
+    public String getItemString() {
+        String listStr = "";
+        displayedItems.clear();
+
+        for (ListDialogItem item : items) {
+            if (!item.isEnabled()) continue;
+
+            String text = item.getItemText();
+            if (StringUtils.isEmpty(text)) text = "-";
+
+            listStr += text + "\n";
+            displayedItems.add(item);
+        }
+        return listStr;
+    }
+
+    @Override
+    public void onClickOk(DialogResponseEvent event) {
+        int itemId = event.getListitem();
+        ListDialogItem item = displayedItems.get(itemId);
+
+        item.onItemSelect();
+        onClickOk(item);
+    }
+
+    protected void onClickOk(ListDialogItem item) {
+        if (clickOkHandler != null) clickOkHandler.onClickOk(this, item);
+    }
+
     @FunctionalInterface
     public interface BuilderFunction<Builder> {
         void call(Builder builder);
+    }
+
+    @FunctionalInterface
+    public interface ClickOkHandler {
+        void onClickOk(ListDialog dialog, ListDialogItem item);
     }
 
     @SuppressWarnings("unchecked")
@@ -124,148 +265,5 @@ public class ListDialog extends AbstractDialog {
         private ListDialogBuilder(Player player, EventManager parentEventManager) {
             super(new ListDialog(player, parentEventManager));
         }
-    }
-
-    public static AbstractListDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
-        return new ListDialogBuilder(player, parentEventManager);
-    }
-
-    @FunctionalInterface
-    public interface ClickOkHandler {
-        void onClickOk(ListDialog dialog, ListDialogItem item);
-    }
-
-
-    protected final List<ListDialogItem> items;
-    protected final List<ListDialogItem> displayedItems;
-
-    private ClickOkHandler clickOkHandler = null;
-
-    protected ListDialog(Player player, EventManager eventManager) {
-        super(DialogStyle.LIST, player, eventManager);
-        items = new ArrayList<ListDialogItem>() {
-            private static final long serialVersionUID = 2260194681967627384L;
-
-            @Override
-            public void add(int index, ListDialogItem e) {
-                e.currentDialog = ListDialog.this;
-                super.add(index, e);
-            }
-
-            @Override
-            public boolean add(ListDialogItem e) {
-                e.currentDialog = ListDialog.this;
-                return super.add(e);
-            }
-
-            @Override
-            public ListDialogItem set(int index, ListDialogItem e) {
-                e.currentDialog = ListDialog.this;
-                return super.set(index, e);
-            }
-
-            @Override
-            public boolean addAll(Collection<? extends ListDialogItem> c) {
-                c.forEach((e) -> e.currentDialog = ListDialog.this);
-                return super.addAll(c);
-            }
-
-            @Override
-            public boolean addAll(int index, Collection<? extends ListDialogItem> c) {
-                c.forEach((e) -> e.currentDialog = ListDialog.this);
-                return super.addAll(index, c);
-            }
-        };
-        displayedItems = new ArrayList<>();
-    }
-
-    public void addItem(ListDialogItem item) {
-        items.add(item);
-    }
-
-    public void addItem(String itemText) {
-        items.add(new ListDialogItem(itemText));
-    }
-
-    public void addItem(Supplier<String> textSupplier) {
-        items.add(new ListDialogItem(textSupplier));
-    }
-
-    public void addItem(String itemText, ItemSelectSimpleHandler handler) {
-        items.add(new ListDialogItem(itemText, handler));
-    }
-
-    public void addItem(Supplier<String> textSupplier, ItemSelectSimpleHandler handler) {
-        items.add(new ListDialogItem(textSupplier, handler));
-    }
-
-    public void addItem(String itemText, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler) {
-        items.add(new ListDialogItem(itemText, enabledSupplier, handler));
-    }
-
-    public void addItem(Supplier<String> textSupplier, BooleanSupplier enabledSupplier, ItemSelectSimpleHandler handler) {
-        items.add(new ListDialogItem(textSupplier, enabledSupplier, handler));
-    }
-
-    public <DataType> void addItem(DataType data, String itemText, ItemSelectHandler<DataType> handler) {
-        items.add(new ListDialogItem(data, itemText, handler));
-    }
-
-    public <DataType> void addItem(DataType data, ItemTextSupplier<DataType> textSupplier, ItemSelectHandler<DataType> handler) {
-        items.add(new ListDialogItem(data, textSupplier, handler));
-    }
-
-    public <DataType> void addItem(DataType data, String itemText, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler) {
-        items.add(new ListDialogItem(data, itemText, enabledSupplier, handler));
-    }
-
-    public <DataType> void addItem(DataType data, ItemTextSupplier<DataType> textSupplier, ItemBooleanSupplier<DataType> enabledSupplier, ItemSelectHandler<DataType> handler) {
-        items.add(new ListDialogItem(data, textSupplier, enabledSupplier, handler));
-    }
-
-    public void setClickOkHandler(ClickOkHandler handler) {
-        clickOkHandler = handler;
-    }
-
-    public List<ListDialogItem> getItems() {
-        return items;
-    }
-
-    public List<ListDialogItem> getDisplayedItems() {
-        return displayedItems;
-    }
-
-    @Override
-    public void show() {
-        show(getItemString());
-    }
-
-    public String getItemString() {
-        String listStr = "";
-        displayedItems.clear();
-
-        for (ListDialogItem item : items) {
-            if (!item.isEnabled()) continue;
-
-            String text = item.getItemText();
-            if (StringUtils.isEmpty(text)) text = "-";
-
-            listStr += text + "\n";
-            displayedItems.add(item);
-        }
-        return listStr;
-    }
-
-    @Override
-    final void onClickOk(DialogResponseEvent event) {
-        int itemId = event.getListitem();
-        ListDialogItem item = displayedItems.get(itemId);
-
-        item.onItemSelect();
-        onClickOk(item);
-    }
-
-    protected void onClickOk(ListDialogItem item) {
-        if (clickOkHandler != null) clickOkHandler.onClickOk(this, item);
     }
 }

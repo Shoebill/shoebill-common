@@ -30,6 +30,89 @@ import java.util.function.Supplier;
  * @author MK124
  */
 public class MsgboxDialog extends AbstractDialog {
+    private DialogTextSupplier messageSupplier = (d) -> "-";
+    private ClickOkHandler clickOkHandler = null;
+    private Collection<String> lines;
+
+    protected MsgboxDialog(Player player, EventManager parentEventManager) {
+        super(DialogStyle.MSGBOX, player, parentEventManager);
+        lines = new ArrayList<>();
+    }
+
+
+    public MsgboxDialog(Player player, EventManager parentEventManager, String caption, String message) {
+        super(DialogStyle.MSGBOX, player, parentEventManager);
+        setCaption(caption);
+        setMessage(message);
+    }
+
+    public MsgboxDialog(Player player, EventManager parentEventManager, Supplier<String> captionSupplier, Supplier<String> messageSupplier) {
+        super(DialogStyle.MSGBOX, player, parentEventManager);
+        setCaption(captionSupplier);
+        setMessage(messageSupplier);
+    }
+
+    public MsgboxDialog(Player player, EventManager parentEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
+        super(DialogStyle.MSGBOX, player, parentEventManager);
+        setCaption(captionSupplier);
+        setMessage(messageSupplier);
+    }
+
+    public static AbstractMsgboxDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
+        return new MsgboxDialogBuilder(player, parentEventManager);
+    }
+
+    public void addLine(String message) {
+        lines.add(message);
+        StringBuilder stringBuilder = new StringBuilder("");
+        Iterator<String> iterator = lines.iterator();
+        while (iterator.hasNext()) {
+            String line = iterator.next();
+            stringBuilder.append(line);
+            if (iterator.hasNext()) stringBuilder.append("\n");
+        }
+        setMessage(stringBuilder.toString());
+    }
+
+    public void setMessage(String message) {
+        this.messageSupplier = (d) -> message;
+    }
+
+    public void setMessage(Supplier<String> messageSupplier) {
+        this.messageSupplier = (d) -> messageSupplier.get();
+    }
+
+    public String getMessage() {
+        return this.messageSupplier.get(this);
+    }
+
+    public void setMessage(DialogTextSupplier messageSupplier) {
+        this.messageSupplier = messageSupplier;
+    }
+
+    public void setClickOkHandler(ClickOkHandler onClickOkHandler) {
+        this.clickOkHandler = onClickOkHandler;
+    }
+
+    @Override
+    public void show() {
+        show(messageSupplier.get(this));
+    }
+
+    @Override
+    public void onClickOk(DialogResponseEvent event) {
+        onClickOk();
+    }
+
+    protected void onClickOk() {
+        if (clickOkHandler != null) clickOkHandler.onClickOk(this);
+    }
+
+    @FunctionalInterface
+    public interface ClickOkHandler {
+        void onClickOk(MsgboxDialog dialog);
+    }
+
     @SuppressWarnings("unchecked")
     public static abstract class AbstractMsgboxDialogBuilder
             <DialogType extends MsgboxDialog, DialogBuilderType extends AbstractMsgboxDialogBuilder<DialogType, DialogBuilderType>>
@@ -63,88 +146,5 @@ public class MsgboxDialog extends AbstractDialog {
         private MsgboxDialogBuilder(Player player, EventManager parentEventManager) {
             super(new MsgboxDialog(player, parentEventManager));
         }
-    }
-
-    public static AbstractMsgboxDialogBuilder<?, ?> create(Player player, EventManager parentEventManager) {
-        return new MsgboxDialogBuilder(player, parentEventManager);
-    }
-
-    @FunctionalInterface
-    public interface ClickOkHandler {
-        void onClickOk(MsgboxDialog dialog);
-    }
-
-
-    private DialogTextSupplier messageSupplier = (d) -> "-";
-    private ClickOkHandler clickOkHandler = null;
-    private Collection<String> lines;
-
-    protected MsgboxDialog(Player player, EventManager parentEventManager) {
-        super(DialogStyle.MSGBOX, player, parentEventManager);
-        lines = new ArrayList<>();
-    }
-
-    public MsgboxDialog(Player player, EventManager parentEventManager, String caption, String message) {
-        super(DialogStyle.MSGBOX, player, parentEventManager);
-        setCaption(caption);
-        setMessage(message);
-    }
-
-    public MsgboxDialog(Player player, EventManager parentEventManager, Supplier<String> captionSupplier, Supplier<String> messageSupplier) {
-        super(DialogStyle.MSGBOX, player, parentEventManager);
-        setCaption(captionSupplier);
-        setMessage(messageSupplier);
-    }
-
-    public MsgboxDialog(Player player, EventManager parentEventManager, DialogTextSupplier captionSupplier, DialogTextSupplier messageSupplier) {
-        super(DialogStyle.MSGBOX, player, parentEventManager);
-        setCaption(captionSupplier);
-        setMessage(messageSupplier);
-    }
-
-    public void addLine(String message) {
-        lines.add(message);
-        StringBuilder stringBuilder = new StringBuilder("");
-        Iterator<String> iterator = lines.iterator();
-        while (iterator.hasNext()) {
-            String line = iterator.next();
-            stringBuilder.append(line);
-            if (iterator.hasNext()) stringBuilder.append("\n");
-        }
-        setMessage(stringBuilder.toString());
-    }
-
-    public void setMessage(String message) {
-        this.messageSupplier = (d) -> message;
-    }
-
-    public void setMessage(Supplier<String> messageSupplier) {
-        this.messageSupplier = (d) -> messageSupplier.get();
-    }
-
-    public void setMessage(DialogTextSupplier messageSupplier) {
-        this.messageSupplier = messageSupplier;
-    }
-
-    public String getMessage() {
-        return this.messageSupplier.get(this);
-    }
-
-    public void setClickOkHandler(ClickOkHandler onClickOkHandler) {
-        this.clickOkHandler = onClickOkHandler;
-    }
-
-    @Override
-    public void show() {
-        show(messageSupplier.get(this));
-    }
-
-    @Override
-    final void onClickOk(DialogResponseEvent event) {
-        onClickOk();
-    }
-
-    protected void onClickOk() {
-        if (clickOkHandler != null) clickOkHandler.onClickOk(this);
     }
 }

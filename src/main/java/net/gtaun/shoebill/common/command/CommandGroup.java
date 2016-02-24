@@ -19,6 +19,47 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("RedundantCast")
 public class CommandGroup {
+    private static final Map<Class<?>, Function<String, Object>> TYPE_PARSER = new HashMap<>();
+
+    static {
+
+        TYPE_PARSER.put(int.class, (s) -> Integer.parseInt(s));
+        TYPE_PARSER.put(Integer.class, (s) -> Integer.parseInt(s));
+
+        TYPE_PARSER.put(String.class, (s) -> s);
+
+        TYPE_PARSER.put(short.class, (s) -> Short.parseShort(s));
+        TYPE_PARSER.put(Short.class, (s) -> Short.parseShort(s));
+
+        TYPE_PARSER.put(byte.class, (s) -> Byte.parseByte(s));
+        TYPE_PARSER.put(Byte.class, (s) -> Byte.parseByte(s));
+
+        TYPE_PARSER.put(char.class, (s) -> s.length() > 0 ? s.charAt(0) : 0);
+        TYPE_PARSER.put(Character.class, (s) -> s.length() > 0 ? s.charAt(0) : 0);
+
+        TYPE_PARSER.put(float.class, (s) -> Float.parseFloat(s));
+        TYPE_PARSER.put(Float.class, (s) -> Float.parseFloat(s));
+
+        TYPE_PARSER.put(double.class, (s) -> Double.parseDouble(s));
+        TYPE_PARSER.put(Double.class, (s) -> Double.parseDouble(s));
+
+        TYPE_PARSER.put(Boolean.class, (s) -> Boolean.parseBoolean(s));
+
+        TYPE_PARSER.put(Player.class, (s) -> Player.getByNameOrId(s));
+        TYPE_PARSER.put(Color.class, (s) -> new Color(Integer.parseUnsignedInt(s, 16)));
+    }
+
+    private Map<String, Collection<CommandEntryInternal>> commands;
+    private Set<CommandGroup> groups;
+    private Map<String, CommandGroup> childGroups;
+
+    public CommandGroup() {
+        commands = new HashMap<>();
+
+        groups = new HashSet<>();
+        childGroups = new HashMap<>();
+    }
+
     private static Collection<CommandEntryInternal> generateCommandEntries(Object object) {
         List<CommandEntryInternal> entries = new ArrayList<>();
 
@@ -46,16 +87,16 @@ public class CommandGroup {
 
             for (int i = 1; i < methodParams.length; i++) {
                 paramTypes[i - 1] = methodParams[i].getType();
-                if(methodParams[i].getAnnotations() != null) {
+                if (methodParams[i].getAnnotations() != null) {
                     Annotation[] annotations = methodParams[i].getAnnotations();
-                    for(Annotation annotation : annotations) {
-                        if(annotation.annotationType() == CommandParameter.class) {
+                    for (Annotation annotation : annotations) {
+                        if (annotation.annotationType() == CommandParameter.class) {
                             commandParameters[i - 1] = (CommandParameter) annotation;
                             break;
                         }
                     }
                 }
-                if(commandParameters[i - 1] == null)
+                if (commandParameters[i - 1] == null)
                     commandParameters[i - 1] = makeCommandParameterAnnotation(methodParams[i].getName());
             }
 
@@ -152,48 +193,32 @@ public class CommandGroup {
         return func.apply(param);
     }
 
-    private static final Map<Class<?>, Function<String, Object>> TYPE_PARSER = new HashMap<>();
-
-    static {
-
-        TYPE_PARSER.put(int.class, (s) -> Integer.parseInt(s));
-        TYPE_PARSER.put(Integer.class, (s) -> Integer.parseInt(s));
-
-        TYPE_PARSER.put(String.class, (s) -> s);
-
-        TYPE_PARSER.put(short.class, (s) -> Short.parseShort(s));
-        TYPE_PARSER.put(Short.class, (s) -> Short.parseShort(s));
-
-        TYPE_PARSER.put(byte.class, (s) -> Byte.parseByte(s));
-        TYPE_PARSER.put(Byte.class, (s) -> Byte.parseByte(s));
-
-        TYPE_PARSER.put(char.class, (s) -> s.length() > 0 ? s.charAt(0) : 0);
-        TYPE_PARSER.put(Character.class, (s) -> s.length() > 0 ? s.charAt(0) : 0);
-
-        TYPE_PARSER.put(float.class, (s) -> Float.parseFloat(s));
-        TYPE_PARSER.put(Float.class, (s) -> Float.parseFloat(s));
-
-        TYPE_PARSER.put(double.class, (s) -> Double.parseDouble(s));
-        TYPE_PARSER.put(Double.class, (s) -> Double.parseDouble(s));
-
-        TYPE_PARSER.put(Boolean.class, (s) -> Boolean.parseBoolean(s));
-
-        TYPE_PARSER.put(Player.class, (s) -> Player.getByNameOrId(s));
-        TYPE_PARSER.put(Color.class, (s) -> new Color(Integer.parseUnsignedInt(s, 16)));
+    public static void replaceTypeParser(Class<?> type, Function<String, Object> function) {
+        TYPE_PARSER.put(type, function);
     }
 
+    private static CommandParameter makeCommandParameterAnnotation(String name) {
+        return makeCommandParameterAnnotation(name, null);
+    }
 
-    private Map<String, Collection<CommandEntryInternal>> commands;
+    private static CommandParameter makeCommandParameterAnnotation(String name, String description) {
+        return new CommandParameter() {
 
-    private Set<CommandGroup> groups;
-    private Map<String, CommandGroup> childGroups;
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return CommandParameter.class;
+            }
 
+            @Override
+            public String name() {
+                return name;
+            }
 
-    public CommandGroup() {
-        commands = new HashMap<>();
-
-        groups = new HashSet<>();
-        childGroups = new HashMap<>();
+            @Override
+            public String description() {
+                return description;
+            }
+        };
     }
 
     public void registerCommands(Object... objects) {
@@ -404,33 +429,5 @@ public class CommandGroup {
             if (child == null) return;
             child.getMatchedCommands(CommandEntryInternal.completePath(path, command), matchedCmds, commandText);
         }
-    }
-
-    public void replaceTypeParser(Class<?> type, Function<String, Object> function) {
-        TYPE_PARSER.put(type, function);
-    }
-
-    private static CommandParameter makeCommandParameterAnnotation(String name) {
-        return makeCommandParameterAnnotation(name, null);
-    }
-
-    private static CommandParameter makeCommandParameterAnnotation(String name, String description) {
-        return new CommandParameter() {
-
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return CommandParameter.class;
-            }
-
-            @Override
-            public String name() {
-                return name;
-            }
-
-            @Override
-            public String description() {
-                return description;
-            }
-        };
     }
 }
