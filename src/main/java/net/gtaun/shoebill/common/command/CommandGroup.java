@@ -197,6 +197,13 @@ public class CommandGroup {
         TYPE_PARSER.put(type, function);
     }
 
+    public static Function<String, Object> getTypeParser(Class<?> type) {
+        if (TYPE_PARSER.containsKey(type))
+            return TYPE_PARSER.get(type);
+        else
+            return null;
+    }
+
     private static CommandParameter makeCommandParameterAnnotation(String name) {
         return makeCommandParameterAnnotation(name, null);
     }
