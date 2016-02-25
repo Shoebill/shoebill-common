@@ -204,6 +204,10 @@ public class CommandGroup {
             return null;
     }
 
+    public static Map<Class<?>, Function<String, Object>> getTypeParsers() {
+        return new HashMap<>(TYPE_PARSER);
+    }
+
     private static CommandParameter makeCommandParameterAnnotation(String name) {
         return makeCommandParameterAnnotation(name, null);
     }
