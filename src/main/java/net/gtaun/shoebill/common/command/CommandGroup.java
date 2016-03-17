@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +53,7 @@ public class CommandGroup {
     private Map<String, Collection<CommandEntryInternal>> commands;
     private Set<CommandGroup> groups;
     private Map<String, CommandGroup> childGroups;
+    private BiFunction<Player, CommandGroup, Boolean> onEmptyCommand;
 
     public CommandGroup() {
         commands = new HashMap<>();
@@ -317,6 +319,23 @@ public class CommandGroup {
     }
 
     protected boolean processCommand(String path, List<Pair<String, CommandEntryInternal>> matchedCmds, Player player, String command, String paramText) {
+        if (paramText.trim().length() == 0) {
+            for (Map.Entry<String, CommandGroup> childGroup : childGroups.entrySet()) {
+                if (childGroup.getKey().equalsIgnoreCase(command)) {
+                    BiFunction<Player, CommandGroup, Boolean> onEmptyConsumer = childGroup.getValue().getEmptyCommandHandler();
+                    if (onEmptyConsumer != null) {
+                        try {
+                            boolean shouldReturn = onEmptyConsumer.apply(player, this);
+                            if (shouldReturn) return true;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
         List<Pair<String, CommandEntryInternal>> commands = new ArrayList<>();
         getCommandEntries(path, command, commands);
         Collections.sort(commands, (p1, p2) ->
@@ -440,5 +459,13 @@ public class CommandGroup {
             if (child == null) return;
             child.getMatchedCommands(CommandEntryInternal.completePath(path, command), matchedCmds, commandText);
         }
+    }
+
+    public BiFunction<Player, CommandGroup, Boolean> getEmptyCommandHandler() {
+        return onEmptyCommand;
+    }
+
+    public void setEmptyCommandHandler(BiFunction<Player, CommandGroup, Boolean> onEmptyCommand) {
+        this.onEmptyCommand = onEmptyCommand;
     }
 }
