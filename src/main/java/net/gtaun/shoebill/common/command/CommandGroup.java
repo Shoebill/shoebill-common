@@ -12,11 +12,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static net.gtaun.shoebill.common.command.PlayerCommandManager.DEFAULT_USAGE_MESSAGE_SUPPLIER;
 
 @SuppressWarnings("RedundantCast")
 public class CommandGroup {
@@ -53,7 +54,9 @@ public class CommandGroup {
     private Map<String, Collection<CommandEntryInternal>> commands;
     private Set<CommandGroup> groups;
     private Map<String, CommandGroup> childGroups;
-    private BiFunction<Player, CommandGroup, Boolean> onEmptyCommand;
+
+    private CommandNotFoundHandler notFoundHandler;
+    private PlayerCommandManager.UsageMessageSupplier usageMessageSupplier = DEFAULT_USAGE_MESSAGE_SUPPLIER;
 
     public CommandGroup() {
         commands = new HashMap<>();
@@ -234,6 +237,19 @@ public class CommandGroup {
         };
     }
 
+    private static CommandGroup getChildGroup(CommandGroup commandGroup, String name) {
+        for (Map.Entry<String, CommandGroup> children : commandGroup.childGroups.entrySet()) {
+            if (children.getKey().equalsIgnoreCase(name)) {
+                return children.getValue();
+            } else {
+                CommandGroup other = getChildGroup(children.getValue(), name);
+                if (other != null)
+                    return other;
+            }
+        }
+        return null;
+    }
+
     public void registerCommands(Object... objects) {
         for(Object object : objects) {
             generateCommandEntries(object).forEach(this::registerCommand);
@@ -320,23 +336,15 @@ public class CommandGroup {
 
     protected boolean processCommand(String path, List<Pair<String, CommandEntryInternal>> matchedCmds, Player player, String command, String paramText) {
         if (paramText.trim().length() == 0) {
-            for (Map.Entry<String, CommandGroup> childGroup : childGroups.entrySet()) {
-                if (childGroup.getKey().equalsIgnoreCase(command)) {
-                    BiFunction<Player, CommandGroup, Boolean> onEmptyConsumer = childGroup.getValue().getEmptyCommandHandler();
-                    if (onEmptyConsumer != null) {
-                        try {
-                            boolean shouldReturn = onEmptyConsumer.apply(player, this);
-                            if (shouldReturn) return true;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return false;
-                        }
-                    }
-                }
+            CommandGroup childGroup = getChildGroup(this, command);
+            if (childGroup != null && childGroup.getNotFoundHandler() != null) {
+                if (childGroup.getNotFoundHandler().handle(player, this, createEmptyCommand()))
+                    return true;
             }
         }
 
         List<Pair<String, CommandEntryInternal>> commands = new ArrayList<>();
+        matchedCmds = new ArrayList<>();
         getCommandEntries(path, command, commands);
         Collections.sort(commands, (p1, p2) ->
         {
@@ -349,11 +357,11 @@ public class CommandGroup {
         for (Pair<String, CommandEntryInternal> e : commands) {
             CommandEntryInternal entry = e.getRight();
 
-            if(entry.getBeforeCheckers() != null) {
+            if (entry.getBeforeCheckers() != null) {
                 for (CustomCommandHandler checker : entry.getBeforeCheckers())
                     if (!checker.handle(player, command, paramText)) return true;
             }
-            if(entry.getCustomHandlers() != null) {
+            if (entry.getCustomHandlers() != null) {
                 for (CustomCommandHandler handler : entry.getCustomHandlers())
                     if (handler.handle(player, command, paramText)) return true;
             }
@@ -363,7 +371,7 @@ public class CommandGroup {
             Matcher m = pattern.matcher(paramText); // strings with spaces can be made like this: "my string"
             while (m.find()) matches.add(m.group(1).replace("\"", ""));
             if (types.length == matches.size() || ((types.length > 0) && types[types.length - 1] == String.class)) {
-                if(types.length > 0 && types[types.length-1] == String.class) {
+                if (types.length > 0 && types[types.length - 1] == String.class) {
                     StringBuilder stringBuilder = new StringBuilder();
                     Function<String, Object> stringParser = TYPE_PARSER.get(String.class);
                     for (int i = matches.size() - 1; i >= 0; i--) {
@@ -377,13 +385,15 @@ public class CommandGroup {
                         }
                     }
                     final String finalString = stringBuilder.toString().trim();
-                    if(finalString.length() > 0) //Don't allow empty strings
+                    if (finalString.length() > 0) //Don't allow empty strings
                         matches.add(finalString);
                 }
+                matchedCmds.add(e);
                 try {
                     Object[] params = parseParams(types, matches.toArray(new String[matches.size()]));
                     params = ArrayUtils.add(params, 0, player);
-                    if (entry.handle(player, params)) return true;
+                    if (entry.handle(player, params))
+                        return true;
                 } catch (Throwable ignored) {}
             }
         }
@@ -391,8 +401,39 @@ public class CommandGroup {
         matchedCmds.addAll(commands);
 
         CommandGroup child = childGroups.get(command);
-        return child != null && child.processCommand(CommandEntryInternal.completePath(path, command), matchedCmds, player, paramText);
+        if (child != null) {
+            boolean result = child.processCommand(CommandEntryInternal.completePath(path, command), matchedCmds, player, paramText);
+            if (result) return true;
+        }
+        if (!matchedCmds.isEmpty()) {
+            sendUsageMessages(player, "/", commands);
+            return true;
+        }
+        return false;
+    }
 
+    private Command createEmptyCommand() {
+        return new Command() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Command.class;
+            }
+
+            @Override
+            public String name() {
+                return null;
+            }
+
+            @Override
+            public short priority() {
+                return 0;
+            }
+
+            @Override
+            public boolean caseSensitive() {
+                return false;
+            }
+        };
     }
 
     protected void getCommandEntries(List<CommandEntry> entries, String curPath) {
@@ -461,11 +502,50 @@ public class CommandGroup {
         }
     }
 
-    public BiFunction<Player, CommandGroup, Boolean> getEmptyCommandHandler() {
-        return onEmptyCommand;
+    public CommandNotFoundHandler getNotFoundHandler() {
+        return notFoundHandler;
     }
 
-    public void setEmptyCommandHandler(BiFunction<Player, CommandGroup, Boolean> onEmptyCommand) {
-        this.onEmptyCommand = onEmptyCommand;
+    public void setNotFoundHandler(CommandNotFoundHandler notFoundHandler) {
+        this.notFoundHandler = notFoundHandler;
     }
+
+    public String getUsageMessage(Player player, String commandText) {
+        return getUsageMessage(player, commandText, "/");
+    }
+
+    public String getUsageMessage(Player player, String commandText, String prefix) {
+        String message = "";
+        for (Iterator<Pair<String, CommandEntryInternal>> it = getMatchedCommands(commandText).iterator(); it.hasNext(); ) {
+            Pair<String, CommandEntryInternal> e = it.next();
+            message += getUsageMessage(player, e.getLeft(), prefix, e.getRight());
+            if (it.hasNext()) message += "\n";
+        }
+        return message;
+    }
+
+    private String getUsageMessage(Player player, String path, String prefix, CommandEntryInternal entry) {
+        return usageMessageSupplier.get(player, prefix, new CommandEntry(entry, path));
+    }
+
+    public void sendUsageMessage(Player player, String commandText) {
+        sendUsageMessage(player, commandText, "/");
+    }
+
+    public void sendUsageMessage(Player player, String commandText, String prefix) {
+        sendUsageMessages(player, prefix, getMatchedCommands(commandText));
+    }
+
+    private void sendUsageMessages(Player player, String prefix, List<Pair<String, CommandEntryInternal>> commands) {
+        if (this.usageMessageSupplier == null) return;
+        for (Pair<String, CommandEntryInternal> e : commands) {
+            String usageMessage = getUsageMessage(player, e.getLeft(), prefix, e.getRight());
+            if (usageMessage != null) player.sendMessage(Color.RED, usageMessage);
+        }
+    }
+
+    public void setUsageMessageSupplier(PlayerCommandManager.UsageMessageSupplier usageMessageSupplier) {
+        this.usageMessageSupplier = usageMessageSupplier;
+    }
+
 }
