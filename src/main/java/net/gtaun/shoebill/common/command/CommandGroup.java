@@ -124,7 +124,7 @@ public class CommandGroup {
                 }
 
                 return false;
-            }, category, beforeCheckers, customHandlers, commandParameters));
+            }, category, beforeCheckers, customHandlers, commandParameters, clz));
         });
 
         return entries;
@@ -258,27 +258,27 @@ public class CommandGroup {
 
     public void registerCommand(String command, Class<?>[] paramTypes, CommandHandler handler,
                                 List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers,
-                                CommandParameter[] commandParameters) {
-        registerCommand(command, paramTypes, null, null, (short) 0, true, handler, beforeCheckers, customHandlers, commandParameters);
+                                CommandParameter[] commandParameters, Class<?> origin) {
+        registerCommand(command, paramTypes, null, null, (short) 0, true, handler, beforeCheckers, customHandlers, commandParameters, origin);
     }
 
     public void registerCommand(String command, Class<?>[] paramTypes, String helpMessage, String categorie, CommandHandler handler,
                                 List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers,
-                                CommandParameter[] commandParameters) {
-        registerCommand(command, paramTypes, helpMessage, categorie, (short) 0, true, handler, beforeCheckers, customHandlers, commandParameters);
+                                CommandParameter[] commandParameters, Class<?> origin) {
+        registerCommand(command, paramTypes, helpMessage, categorie, (short) 0, true, handler, beforeCheckers, customHandlers, commandParameters, origin);
     }
 
     public void registerCommand(String command, Class<?>[] paramTypes, String helpMessage, String categorie,
                                 short priority, boolean caseSensitive, CommandHandler handler,
                                 List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers,
-                                CommandParameter[] commandParameters) {
+                                CommandParameter[] commandParameters, Class<?> origin) {
         registerCommand(new CommandEntryInternal(command, paramTypes, priority, helpMessage, caseSensitive, (player, params) ->
         {
             Queue<Object> paramQueue = new LinkedList<>();
             Collections.addAll(paramQueue, params);
             paramQueue.poll();
             return handler.handle(player, paramQueue);
-        }, categorie, beforeCheckers, customHandlers, commandParameters));
+        }, categorie, beforeCheckers, customHandlers, commandParameters, origin));
     }
 
     private void registerCommand(CommandEntryInternal entry) {

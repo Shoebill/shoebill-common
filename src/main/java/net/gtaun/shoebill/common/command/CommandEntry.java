@@ -51,4 +51,6 @@ public class CommandEntry {
     public CommandParameter[] getParameters() {
         return entry.getParameterAnnotations();
     }
+
+    public Class<?> getOrigin() { return entry.getOrigin(); }
 }

@@ -26,10 +26,11 @@ class CommandEntryInternal {
     private List<CustomCommandHandler> beforeCheckers;
     private List<CustomCommandHandler> customHandlers;
     private CommandParameter[] parameterAnnotations;
+    private Class<?> origin;
 
     public CommandEntryInternal(String command, Class<?>[] paramTypes, short priority, String helpMessage, boolean caseSensitive,
                                 CommandHandlerInternal handler, String categorie, List<CustomCommandHandler> beforeCheckers, List<CustomCommandHandler> customHandlers,
-                                CommandParameter[] parameterAnnotations) {
+                                CommandParameter[] parameterAnnotations, Class<?> origin) {
         if(parameterAnnotations == null) parameterAnnotations = new CommandParameter[0];
         this.command = command;
         this.paramTypes = paramTypes;
@@ -41,6 +42,11 @@ class CommandEntryInternal {
         this.beforeCheckers = beforeCheckers;
         this.customHandlers = customHandlers;
         this.parameterAnnotations = parameterAnnotations;
+        this.origin = origin;
+    }
+
+    public Class<?> getOrigin() {
+        return origin;
     }
 
     public String getCommand() {
