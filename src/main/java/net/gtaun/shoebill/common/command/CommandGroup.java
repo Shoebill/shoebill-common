@@ -56,10 +56,11 @@ public class CommandGroup {
     private Map<String, CommandGroup> childGroups;
 
     private CommandNotFoundHandler notFoundHandler;
-    private PlayerCommandManager.UsageMessageSupplier usageMessageSupplier = DEFAULT_USAGE_MESSAGE_SUPPLIER;
+    private PlayerCommandManager.UsageMessageSupplier usageMessageSupplier;
 
     public CommandGroup() {
         commands = new HashMap<>();
+        usageMessageSupplier = DEFAULT_USAGE_MESSAGE_SUPPLIER;
 
         groups = new HashSet<>();
         childGroups = new HashMap<>();
@@ -203,10 +204,7 @@ public class CommandGroup {
     }
 
     public static Function<String, Object> getTypeParser(Class<?> type) {
-        if (TYPE_PARSER.containsKey(type))
-            return TYPE_PARSER.get(type);
-        else
-            return null;
+        return TYPE_PARSER.getOrDefault(type, null);
     }
 
     public static Map<Class<?>, Function<String, Object>> getTypeParsers() {
@@ -321,20 +319,20 @@ public class CommandGroup {
     }
 
     public boolean processCommand(Player player, String commandText) {
-        return processCommand("", null, player, commandText);
+        return processCommand("", player, commandText);
     }
 
     public boolean processCommand(Player player, String command, String paramText) {
-        return processCommand("", null, player, command.trim(), paramText);
+        return processCommand("", player, command.trim(), paramText);
     }
 
-    protected boolean processCommand(String path, List<Pair<String, CommandEntryInternal>> matchedCmds, Player player, String commandText) {
+    protected boolean processCommand(String path, Player player, String commandText) {
         String[] splits = StringUtils.split(commandText, " ", 2);
         if (splits.length < 1) return false;
-        return processCommand(path, matchedCmds, player, splits[0], splits.length == 2 ? splits[1] : "");
+        return processCommand(path, player, splits[0], splits.length == 2 ? splits[1] : "");
     }
 
-    protected boolean processCommand(String path, List<Pair<String, CommandEntryInternal>> matchedCmds, Player player, String command, String paramText) {
+    protected boolean processCommand(String path, Player player, String command, String paramText) {
         if (paramText.trim().length() == 0) {
             CommandGroup childGroup = getChildGroup(this, command);
             if (childGroup != null && childGroup.getNotFoundHandler() != null) {
@@ -344,7 +342,7 @@ public class CommandGroup {
         }
 
         List<Pair<String, CommandEntryInternal>> commands = new ArrayList<>();
-        matchedCmds = new ArrayList<>();
+        List<Pair<String, CommandEntryInternal>> matchedCmds = new ArrayList<>();
         getCommandEntries(path, command, commands);
         Collections.sort(commands, (p1, p2) ->
         {
@@ -388,7 +386,6 @@ public class CommandGroup {
                     if (finalString.length() > 0) //Don't allow empty strings
                         matches.add(finalString);
                 }
-                matchedCmds.add(e);
                 try {
                     Object[] params = parseParams(types, matches.toArray(new String[matches.size()]));
                     params = ArrayUtils.add(params, 0, player);
@@ -402,9 +399,15 @@ public class CommandGroup {
 
         CommandGroup child = childGroups.get(command);
         if (child != null) {
-            boolean result = child.processCommand(CommandEntryInternal.completePath(path, command), matchedCmds, player, paramText);
+            boolean result = child.processCommand(CommandEntryInternal.completePath(path, command), player, paramText);
             if (result) return true;
         }
+
+        for (CommandGroup childGroup : groups) {
+            boolean result = childGroup.processCommand(path, player, command, paramText);
+            if (result) return true;
+        }
+
         if (!matchedCmds.isEmpty()) {
             sendUsageMessages(player, "/", commands);
             return true;
@@ -442,7 +445,6 @@ public class CommandGroup {
             entries.addAll(commands.stream().map((e) -> new CommandEntry(e, curPath)).collect(Collectors.toList()));
         });
 
-        for (CommandGroup group : groups) group.getCommandEntries(entries, curPath);
         for (Entry<String, CommandGroup> e : childGroups.entrySet())
             e.getValue().getCommandEntries(entries, (curPath + " " + e.getKey()).trim());
     }
@@ -453,8 +455,6 @@ public class CommandGroup {
             {
                 entries.addAll(commands.stream().map((e) -> new CommandEntry(e, curPath)).collect(Collectors.toList()));
             });
-
-            for (CommandGroup group : groups) group.getCommandEntries(entries, curPath);
         }
 
         for (Entry<String, CommandGroup> e : childGroups.entrySet())
@@ -467,7 +467,6 @@ public class CommandGroup {
                 .filter(entry -> entry.getKey().equalsIgnoreCase(command))
                 .forEach(entry -> entry.getValue().stream().filter(cmd -> (cmd.isCaseSensitive()) ? cmd.getCommand().contentEquals(command) : cmd.getCommand().equalsIgnoreCase(command))
                         .forEach(cmd -> commandEntries.add(new ImmutablePair<>(path, cmd))));
-        for (CommandGroup group : groups) group.getCommandEntries(path, command, commandEntries);
     }
 
     protected List<Pair<String, CommandEntryInternal>> getMatchedCommands(String commandText) {
