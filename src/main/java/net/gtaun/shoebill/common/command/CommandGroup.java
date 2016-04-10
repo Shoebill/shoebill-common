@@ -472,8 +472,6 @@ public class CommandGroup {
     protected Collection<CommandEntry> getCommands() {
         Collection<CommandEntry> commands = new ArrayList<>();
         getAllCommands(this, commands, "");
-        groups.stream().forEach(commandGroup -> getAllCommands(commandGroup, commands, ""));
-        childGroups.entrySet().stream().forEach(stringCommandGroupEntry -> getAllCommands(stringCommandGroupEntry.getValue(), commands, stringCommandGroupEntry.getKey()));
         return commands;
     }
 
@@ -483,6 +481,9 @@ public class CommandGroup {
                 commands.add(new CommandEntry(commandEntryInternal, ((path.length() == 0) ? ("") : (path + " ")) + stringCollectionEntry.getKey()));
             });
         });
+        commandGroup.groups.stream().forEach(commandGroup1 -> getAllCommands(commandGroup1, commands, ""));
+        commandGroup.childGroups.entrySet().stream()
+                .forEach(stringCommandGroupEntry -> getAllCommands(stringCommandGroupEntry.getValue(), commands, stringCommandGroupEntry.getKey()));
     }
 
     protected List<Pair<String, CommandEntryInternal>> getMatchedCommands(String commandText) {
