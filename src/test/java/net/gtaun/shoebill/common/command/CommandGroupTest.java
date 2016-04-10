@@ -5,6 +5,8 @@ import net.gtaun.shoebill.test.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collection;
+
 import static org.junit.Assert.*;
 
 /**
@@ -51,6 +53,14 @@ public class CommandGroupTest {
         assertEquals("Usage Message Supplier for FirstGroup!", firstGroup.getUsageMessage(player, "say"));
         assertEquals("Usage Message Supplier for SecondGroup!", secondGroup.getUsageMessage(player, "kick"));
         assertEquals("Usage: /exit", firstChildGroup.getUsageMessage(player, "exit"));
+    }
+
+    @Test
+    public void getCommands() throws Exception {
+        assertEquals(2, firstGroup.getCommands().size());
+        assertEquals(2, secondGroup.getCommands().size());
+        assertEquals(1, firstChildGroup.getCommands().size());
+        assertEquals(5, playerCommandManager.getCommands().size());
     }
 
 }
