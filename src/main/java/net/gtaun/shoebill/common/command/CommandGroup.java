@@ -469,7 +469,7 @@ public class CommandGroup {
                         .forEach(cmd -> commandEntries.add(new ImmutablePair<>(path, cmd))));
     }
 
-    protected Collection<CommandEntry> getCommands() {
+    public Collection<CommandEntry> getCommands() {
         Collection<CommandEntry> commands = new ArrayList<>();
         getAllCommands(this, commands, "");
         return commands;
