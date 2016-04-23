@@ -254,6 +254,7 @@ public abstract class AbstractDialog {
         eventManagerInternal.registerHandler(DialogResponseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
         {
             eventManagerInternal.cancelAll();
+            onClose(DialogCloseType.RESPOND);
 
             if (e.getDialogResponse() == 1) {
                 onClickOk(e);
@@ -261,7 +262,6 @@ public abstract class AbstractDialog {
                 onClickCancel();
             }
 
-            onClose(DialogCloseType.RESPOND);
         });
 
         eventManagerInternal.registerHandler(DialogCloseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
