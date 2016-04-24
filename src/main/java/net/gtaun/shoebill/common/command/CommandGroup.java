@@ -478,7 +478,7 @@ public class CommandGroup {
     private static void getAllCommands(CommandGroup commandGroup, Collection<CommandEntry> commands, String path) {
         commandGroup.commands.entrySet().stream().forEach(stringCollectionEntry -> {
             stringCollectionEntry.getValue().stream().forEach(commandEntryInternal -> {
-                commands.add(new CommandEntry(commandEntryInternal, ((path.length() == 0) ? ("") : (path + " ")) + stringCollectionEntry.getKey()));
+                commands.add(new CommandEntry(commandEntryInternal, path));
             });
         });
         commandGroup.groups.stream().forEach(commandGroup1 -> getAllCommands(commandGroup1, commands, ""));
