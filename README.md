@@ -1,6 +1,8 @@
-Shoebill common tool library
-=================
+# Shoebill Common Tool Library
 
+[![Build Status](http://ci.gtaun.net/app/rest/builds/buildType:(id:Shoebill_Common_Deploy)/statusIcon)](http://ci.gtaun.net/project.html?projectId=Shoebill_Common)
+
+This project contains commonly needed tools, such as an CommandManager and a Vehicle- and PlayerLifecycleHolder.
 
 Warnings
 -----------------
