@@ -266,8 +266,10 @@ public abstract class AbstractDialog {
 
         eventManagerInternal.registerHandler(DialogCloseEvent.class, HandlerPriority.NORMAL, Attentions.create().object(dialogId), (e) ->
         {
-            if (e.getType() != DialogCloseType.RESPOND) eventManagerInternal.cancelAll();
-            onClose(e.getType());
+            if (e.getType() != DialogCloseType.RESPOND) {
+                eventManagerInternal.cancelAll();
+                onClose(e.getType());
+            }
         });
 
         player.showDialog(dialogId, style, captionSupplier.get(this), text, buttonOkSupplier.get(this), buttonCancelSupplier.get(this));
