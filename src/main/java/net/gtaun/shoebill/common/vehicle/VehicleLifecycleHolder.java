@@ -2,8 +2,8 @@ package net.gtaun.shoebill.common.vehicle;
 
 import net.gtaun.shoebill.event.destroyable.DestroyEvent;
 import net.gtaun.shoebill.event.vehicle.VehicleCreateEvent;
-import net.gtaun.shoebill.object.Destroyable;
-import net.gtaun.shoebill.object.Vehicle;
+import net.gtaun.shoebill.entities.Destroyable;
+import net.gtaun.shoebill.entities.Vehicle;
 import net.gtaun.util.event.EventManager;
 import net.gtaun.util.event.EventManagerNode;
 import net.gtaun.util.event.HandlerPriority;
@@ -12,9 +12,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-/**
- * Created by marvin on 01.11.14.
- */
 public class VehicleLifecycleHolder implements Destroyable {
     public interface VehicleLifecycleObjectFactory<T extends VehicleLifecycleObject> {
         T create(EventManager eventManager, Vehicle vehicle);

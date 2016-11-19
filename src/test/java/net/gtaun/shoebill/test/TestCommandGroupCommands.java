@@ -1,7 +1,7 @@
 package net.gtaun.shoebill.test;
 
 import net.gtaun.shoebill.common.command.Command;
-import net.gtaun.shoebill.object.Player;
+import net.gtaun.shoebill.entities.Player;
 
 /**
  * Created by marvin on 07.04.16.

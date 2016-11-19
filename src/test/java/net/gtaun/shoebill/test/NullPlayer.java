@@ -4,7 +4,8 @@ import net.gtaun.shoebill.constant.*;
 import net.gtaun.shoebill.data.*;
 import net.gtaun.shoebill.exception.AlreadyExistException;
 import net.gtaun.shoebill.exception.IllegalLengthException;
-import net.gtaun.shoebill.object.*;
+import net.gtaun.shoebill.entities.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * Created by marvin on 07.04.16.
  * Copyright (c) Marvin Haschker 2016.
  */
-public class NullPlayer implements Player {
+public class NullPlayer extends Player {
     @Override
     public boolean isOnline() {
         return true;
@@ -23,16 +24,19 @@ public class NullPlayer implements Player {
         return 0;
     }
 
+    @NotNull
     @Override
     public PlayerKeyState getKeyState() {
         return null;
     }
 
+    @NotNull
     @Override
     public PlayerAttach getAttach() {
         return null;
     }
 
+    @NotNull
     @Override
     public PlayerWeaponSkill getWeaponSkill() {
         return null;
@@ -63,16 +67,19 @@ public class NullPlayer implements Player {
         return 1252;
     }
 
+    @NotNull
     @Override
     public String getIp() {
         return "127.0.0.1";
     }
 
+    @NotNull
     @Override
     public String getName() {
         return "TestPlayer";
     }
 
+    @NotNull
     @Override
     public Color getColor() {
         return Color.WHITE;
@@ -93,6 +100,7 @@ public class NullPlayer implements Player {
         return 0;
     }
 
+    @NotNull
     @Override
     public WeaponModel getArmedWeapon() {
         return WeaponModel.BRASSKNUCKLE;
@@ -119,11 +127,6 @@ public class NullPlayer implements Player {
     }
 
     @Override
-    public int getWeather() {
-        return 0;
-    }
-
-    @Override
     public int getCameraMode() {
         return 0;
     }
@@ -138,6 +141,7 @@ public class NullPlayer implements Player {
         return 0;
     }
 
+    @NotNull
     @Override
     public FightStyle getFightStyle() {
         return FightStyle.NORMAL;
@@ -153,6 +157,7 @@ public class NullPlayer implements Player {
         return 0;
     }
 
+    @NotNull
     @Override
     public SpecialAction getSpecialAction() {
         return null;
@@ -173,21 +178,25 @@ public class NullPlayer implements Player {
         return 0;
     }
 
+    @NotNull
     @Override
     public AngledLocation getLocation() {
         return new AngledLocation(0f, 0f, 0f, 0f);
     }
 
+    @NotNull
     @Override
     public Area getWorldBound() {
         return new Area(-3000, -3000, 3000, 3000);
     }
 
+    @NotNull
     @Override
     public Velocity getVelocity() {
         return new Velocity(0f, 0f, 0f);
     }
 
+    @NotNull
     @Override
     public PlayerState getState() {
         return PlayerState.ONFOOT;
@@ -239,31 +248,6 @@ public class NullPlayer implements Player {
     }
 
     @Override
-    public void setSpawnInfo(float v, float v1, float v2, int i, int i1, float v3, int i2, int i3, WeaponModel weaponModel, int i4, WeaponModel weaponModel1, int i5, WeaponModel weaponModel2, int i6) {
-
-    }
-
-    @Override
-    public void setSpawnInfo(Vector3D vector3D, int i, int i1, float v, int i2, int i3, WeaponData weaponData, WeaponData weaponData1, WeaponData weaponData2) {
-
-    }
-
-    @Override
-    public void setSpawnInfo(Location location, float v, int i, int i1, WeaponData weaponData, WeaponData weaponData1, WeaponData weaponData2) {
-
-    }
-
-    @Override
-    public void setSpawnInfo(AngledLocation angledLocation, int i, int i1, WeaponData weaponData, WeaponData weaponData1, WeaponData weaponData2) {
-
-    }
-
-    @Override
-    public void setSpawnInfo(SpawnInfo spawnInfo) {
-
-    }
-
-    @Override
     public void setColor(Color color) {
 
     }
@@ -295,11 +279,6 @@ public class NullPlayer implements Player {
 
     @Override
     public void setScore(int i) {
-
-    }
-
-    @Override
-    public void setWeather(int i) {
 
     }
 
@@ -375,16 +354,6 @@ public class NullPlayer implements Player {
 
     @Override
     public void setWorldBound(Area area) {
-
-    }
-
-    @Override
-    public void setVelocity(Vector3D vector3D) {
-
-    }
-
-    @Override
-    public void sendMessage(String s) {
 
     }
 
@@ -533,11 +502,13 @@ public class NullPlayer implements Player {
 
     }
 
+    @NotNull
     @Override
     public Vector3D getCameraPosition() {
         return null;
     }
 
+    @NotNull
     @Override
     public Vector3D getCameraFrontVector() {
         return null;
@@ -598,6 +569,7 @@ public class NullPlayer implements Player {
 
     }
 
+    @NotNull
     @Override
     public WeaponState getWeaponState() {
         return null;
@@ -623,14 +595,10 @@ public class NullPlayer implements Player {
 
     }
 
+    @NotNull
     @Override
     public Time getTime() {
         return null;
-    }
-
-    @Override
-    public void setTime(int i, int i1) {
-
     }
 
     @Override
@@ -683,6 +651,7 @@ public class NullPlayer implements Player {
 
     }
 
+    @NotNull
     @Override
     public PlayerMapIcon getMapIcon() {
         return null;
@@ -723,6 +692,7 @@ public class NullPlayer implements Player {
         return null;
     }
 
+    @NotNull
     @Override
     public String getNetworkStats() {
         return null;
@@ -763,11 +733,13 @@ public class NullPlayer implements Player {
 
     }
 
+    @NotNull
     @Override
     public Vector3D getLastShotOrigin() {
         return null;
     }
 
+    @NotNull
     @Override
     public Vector3D getLastShotHitPosition() {
         return null;
@@ -858,6 +830,7 @@ public class NullPlayer implements Player {
 
     }
 
+    @NotNull
     @Override
     public String getVersion() {
         return null;
@@ -913,6 +886,7 @@ public class NullPlayer implements Player {
         return 0;
     }
 
+    @NotNull
     @Override
     public String getIpPort() {
         return null;
@@ -938,6 +912,7 @@ public class NullPlayer implements Player {
 
     }
 
+    @NotNull
     @Override
     public String getVarString(String s) {
         return null;
@@ -958,6 +933,7 @@ public class NullPlayer implements Player {
         return false;
     }
 
+    @NotNull
     @Override
     public List<String> getVarNames() {
         return null;
@@ -1000,6 +976,67 @@ public class NullPlayer implements Player {
 
     @Override
     public Actor getTargetActor() {
+        return null;
+    }
+
+    @Override
+    public void setWeather(Weather weather) {
+
+    }
+
+    @Override
+    public int getInterior() {
+        return 0;
+    }
+
+    @Override
+    public int getWorld() {
+        return 0;
+    }
+
+    @Override
+    public float getFacingAngle() {
+        return 0;
+    }
+
+    @Override
+    public void setFacingAngle(float v) {
+
+    }
+
+    @Override
+    public void setVelocity(Velocity velocity) {
+
+    }
+
+    @Override
+    public void setStuntBonusEnabled(boolean b) {
+
+    }
+
+    @Override
+    public void setSpectating(boolean b) {
+
+    }
+
+    @Override
+    public void setRecording(boolean b) {
+
+    }
+
+    @Override
+    public void setControllable(boolean b) {
+
+    }
+
+    @Override
+    public void setSpawnInfo(float v, float v1, float v2, int i, int i1, float v3, int i2, int i3, WeaponData weaponData, WeaponData weaponData1, WeaponData weaponData2) {
+
+    }
+
+    @NotNull
+    @Override
+    public Weather getWeather() {
         return null;
     }
 }

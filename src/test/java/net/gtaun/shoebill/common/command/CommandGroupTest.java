@@ -1,13 +1,11 @@
 package net.gtaun.shoebill.common.command;
 
-import net.gtaun.shoebill.object.Player;
+import net.gtaun.shoebill.entities.Player;
 import net.gtaun.shoebill.test.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collection;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by marvin on 07.04.16.
