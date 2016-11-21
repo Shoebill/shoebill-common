@@ -162,10 +162,13 @@ public class ListDialog extends AbstractDialog {
     @Override
     public void onClickOk(DialogResponseEvent event) {
         int itemId = event.getListitem();
-        ListDialogItem item = displayedItems.get(itemId);
+        try {
+            ListDialogItem item = displayedItems.get(itemId);
 
-        item.onItemSelect();
-        onClickOk(item);
+            item.onItemSelect();
+            onClickOk(item);
+        } catch (IndexOutOfBoundsException ignored) {
+        }
     }
 
     protected void onClickOk(ListDialogItem item) {
