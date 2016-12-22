@@ -22,23 +22,23 @@ class PlayerCommandManager(eventManager: EventManager) : CommandGroup(), Destroy
     override fun destroy() = eventManagerNode.destroy()
 
     override val isDestroyed: Boolean
-        get() = eventManagerNode.isDestroy
+        get() = eventManagerNode.isDestroyed
 
     fun installCommandHandler(priority: HandlerPriority): HandlerEntry? =
-            eventManagerNode.registerHandler(PlayerCommandEvent::class.java, priority) { e ->
+            eventManagerNode.registerHandler(PlayerCommandEvent::class, { e ->
                 if (processCommand(e.player, e.command.substring(1)))
                     e.setProcessed()
-            }
+            }, priority)
 
     fun installTextHandler(priority: HandlerPriority, prefix: String): HandlerEntry? =
-            eventManagerNode.registerHandler(PlayerTextEvent::class.java, priority) { e ->
+            eventManagerNode.registerHandler(PlayerTextEvent::class, { e ->
                 val text = e.text
                 if (!text.startsWith(prefix)) return@registerHandler
                 if (processCommand(e.player, text.substring(prefix.length), prefix)) {
                     e.disallow()
                     e.interrupt()
                 }
-            }
+            }, priority)
 
 
     fun uninstallAllHandlers() = eventManagerNode.cancelAll()

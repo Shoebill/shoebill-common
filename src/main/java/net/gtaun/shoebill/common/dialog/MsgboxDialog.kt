@@ -29,11 +29,8 @@ class MsgboxDialog(player: Player, parentEventManager: EventManager) :
         AbstractDialog(DialogStyle.MSGBOX, player, parentEventManager) {
 
     @Suppress("unused")
-    class MsgboxDialogBuilder : AbstractDialog.Builder<MsgboxDialog, MsgboxDialogBuilder> {
-
-        constructor(player: Player, parentEventManager: EventManager) : super() {
-            dialog = MsgboxDialog(player, parentEventManager)
-        }
+    class MsgboxDialogBuilder(player: Player, parentEventManager: EventManager) :
+            AbstractDialog.Builder<MsgboxDialog, MsgboxDialogBuilder>() {
 
         fun message(message: String) = message { message }
         fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
@@ -46,6 +43,10 @@ class MsgboxDialog(player: Player, parentEventManager: EventManager) :
         fun messageSupplier(init: MsgboxDialogBuilder.() -> DialogTextSupplier): MsgboxDialogBuilder {
             dialog.messageSupplier = init(this)
             return this
+        }
+
+        init {
+            dialog = MsgboxDialog(player, parentEventManager)
         }
     }
 

@@ -73,7 +73,7 @@ constructor(eventManager: EventManager = Shoebill.get().eventManager) : Destroya
     }
 
     override val isDestroyed: Boolean
-        get() = eventManagerNode.isDestroy
+        get() = eventManagerNode.isDestroyed
 
     override fun destroy() = eventManagerNode.destroy()
 

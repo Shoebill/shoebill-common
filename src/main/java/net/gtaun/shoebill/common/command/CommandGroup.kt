@@ -74,12 +74,12 @@ open class CommandGroup {
 
     protected fun processCommand(path: String, player: Player, commandText: String): Boolean {
         val splits = StringUtils.split(commandText, " ", 2)
-        if (splits.size < 1) return false
+        if (splits.isEmpty()) return false
         return processCommand(path, player, splits[0], if (splits.size == 2) splits[1] else "")
     }
 
     protected fun processCommand(path: String, player: Player, command: String, paramText: String): Boolean {
-        if (paramText.trim { it <= ' ' }.length == 0) {
+        if (paramText.trim { it <= ' ' }.isEmpty()) {
             val childGroup = getChildGroup(this, command)
             if (childGroup != null && childGroup.notFoundHandler != null) {
                 if (childGroup.notFoundHandler!!.handle(player, this, command))
@@ -202,7 +202,7 @@ open class CommandGroup {
         var modifiedCommandText = commandText
         val splits = StringUtils.split(modifiedCommandText, " ", 2)
 
-        if (splits.size == 0) return
+        if (splits.isEmpty()) return
 
         val command = splits[0]
         modifiedCommandText = if (splits.size > 1) splits[1] else null
@@ -298,7 +298,7 @@ open class CommandGroup {
                 if (it.returnType != Boolean::class.java) return@forEach
 
                 val methodParams = it.parameters
-                if (methodParams.size < 1) return@forEach
+                if (methodParams.isEmpty()) return@forEach
                 if (methodParams[0].type != Player::class.java) return@forEach
 
                 var name = it.name
