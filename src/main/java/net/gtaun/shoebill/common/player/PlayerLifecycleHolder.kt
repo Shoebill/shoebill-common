@@ -18,13 +18,13 @@ class PlayerLifecycleHolder @JvmOverloads constructor(eventManager: EventManager
         LifecycleHolder<Player>(eventManager) {
 
     init {
-        eventManagerNode.registerHandler(PlayerConnectEvent::class.java, HandlerPriority.MONITOR, {
+        eventManagerNode.registerHandler(PlayerConnectEvent::class, {
             buildObjects(it.player)
-        })
+        }, HandlerPriority.MONITOR)
 
-        eventManagerNode.registerHandler(PlayerDisconnectEvent::class.java, HandlerPriority.BOTTOM, {
+        eventManagerNode.registerHandler(PlayerDisconnectEvent::class, {
             destroyObjects(it.player)
-        })
+        }, HandlerPriority.BOTTOM)
     }
 
     inline fun <reified B : PlayerLifecycleObject> registerClass(lifecycleObject: Class<B>) =

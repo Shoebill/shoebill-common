@@ -177,7 +177,7 @@ abstract class AbstractDialog(protected var style: DialogStyle, val player: Play
         onShow()
 
         eventManagerInternal.cancelAll()
-        eventManagerInternal.registerHandler(DialogResponseEvent::class.java, HandlerPriority.NORMAL, Attentions.create().`object`(dialogId)) { e ->
+        eventManagerInternal.registerHandler(DialogResponseEvent::class, { e ->
             eventManagerInternal.cancelAll()
             onClose(DialogCloseType.RESPOND)
 
@@ -187,14 +187,14 @@ abstract class AbstractDialog(protected var style: DialogStyle, val player: Play
                 onClickCancel()
             }
 
-        }
+        }, HandlerPriority.NORMAL, Attentions.create().`object`(dialogId))
 
-        eventManagerInternal.registerHandler(DialogCloseEvent::class.java, HandlerPriority.NORMAL, Attentions.create().`object`(dialogId)) { e ->
+        eventManagerInternal.registerHandler(DialogCloseEvent::class, { e ->
             if (e.type != DialogCloseType.RESPOND) {
                 eventManagerInternal.cancelAll()
                 onClose(e.type)
             }
-        }
+        }, HandlerPriority.NORMAL, Attentions.create().`object`(dialogId))
 
         player.showDialog(dialogId, style, captionSupplier[this], text,
                 buttonOkSupplier[this], buttonCancelSupplier[this])

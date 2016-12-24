@@ -1,6 +1,10 @@
 package net.gtaun.shoebill.test;
 
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import kotlin.reflect.KClass;
 import net.gtaun.util.event.*;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by marvin on 07.04.16.
@@ -8,12 +12,6 @@ import net.gtaun.util.event.*;
  */
 public class NullEventManagerNode implements EventManagerNode {
 
-    private EventManager parent;
-    private boolean destroyed = false;
-
-    public NullEventManagerNode(EventManager parent) {
-        this.parent = parent;
-    }
 
     @Override
     public void cancelAll() {
@@ -22,33 +20,80 @@ public class NullEventManagerNode implements EventManagerNode {
 
     @Override
     public void destroy() {
-        if (isDestroy()) return;
 
-        destroyed = true;
     }
 
     @Override
-    public boolean isDestroy() {
-        return destroyed;
+    public boolean isDestroyed() {
+        return false;
     }
 
+    @NotNull
     @Override
     public EventManager getParent() {
-        return parent;
+        return null;
     }
 
+    @NotNull
     @Override
-    public <E extends Event> HandlerEntry registerHandler(Class<E> type, short priority, Attentions concerns, EventHandler<E> handler) {
+    public <E extends Event> HandlerEntry registerHandler(KClass<E> kClass, Function1<? super E, Unit> function1) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public <E extends Event> HandlerEntry registerHandler(KClass<E> kClass, Function1<? super E, Unit> function1, HandlerPriority handlerPriority) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public <E extends Event> HandlerEntry registerHandler(KClass<E> kClass, Function1<? super E, Unit> function1, HandlerPriority handlerPriority, Attentions attentions) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public <E extends Event> HandlerEntry registerHandler(Class<E> aClass, EventHandler<? super E> eventHandler) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public <E extends Event> HandlerEntry registerHandler(Class<E> aClass, EventHandler<? super E> eventHandler, HandlerPriority handlerPriority) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public <E extends Event> HandlerEntry registerHandler(Class<E> aClass, EventHandler<? super E> eventHandler, HandlerPriority handlerPriority, Attentions attentions) {
         return null;
     }
 
     @Override
-    public <E extends Event> void dispatchEvent(ThrowableHandler handler, E event, Object... objects) {
+    public <E extends Event> void dispatchEvent(E e, Object... objects) {
 
     }
 
     @Override
+    public <E extends Event> void dispatchEvent(ThrowableHandler throwableHandler, E e, Object... objects) {
+
+    }
+
+    @NotNull
+    @Override
     public EventManagerNode createChildNode() {
-        return new NullEventManagerNode(this);
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ThrowableHandler getThrowableHandler() {
+        return null;
+    }
+
+    @Override
+    public void setThrowableHandler(ThrowableHandler throwableHandler) {
+
     }
 }
