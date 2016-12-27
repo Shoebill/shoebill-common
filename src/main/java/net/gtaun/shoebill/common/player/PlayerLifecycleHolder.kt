@@ -27,8 +27,8 @@ class PlayerLifecycleHolder @JvmOverloads constructor(eventManager: EventManager
         }, HandlerPriority.BOTTOM)
     }
 
-    inline fun <reified B : PlayerLifecycleObject> registerClass(lifecycleObject: Class<B>) =
-            registerClass(lifecycleObject, makeFactory(B::class))
+    fun <B : PlayerLifecycleObject> registerClass(lifecycleObject: Class<B>) =
+            registerClass(lifecycleObject, makeFactory(lifecycleObject.kotlin))
 
 
     companion object {

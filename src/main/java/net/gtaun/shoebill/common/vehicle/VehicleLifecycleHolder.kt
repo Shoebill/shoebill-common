@@ -24,8 +24,8 @@ class VehicleLifecycleHolder @JvmOverloads constructor(eventManager: EventManage
         }, HandlerPriority.BOTTOM)
     }
 
-    inline fun <reified B : VehicleLifecycleObject> registerClass(lifecycleObject: Class<B>) =
-            registerClass(lifecycleObject, makeFactory(B::class))
+    fun <B : VehicleLifecycleObject> registerClass(lifecycleObject: Class<B>) =
+            registerClass(lifecycleObject, makeFactory(lifecycleObject.kotlin))
 
 
     companion object {

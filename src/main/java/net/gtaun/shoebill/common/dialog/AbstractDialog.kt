@@ -53,7 +53,7 @@ abstract class AbstractDialog(protected var style: DialogStyle, val player: Play
         fun onShow(handler: DialogHandler) = onShow { handler }
         fun onClose(handler: DialogCloseHandler) = onClose { handler }
         fun onCancel(handler: DialogHandler) = onCancel { handler }
-        fun parentDialog(parentDialog: T) = parentDialog { parentDialog }
+        fun parentDialog(parentDialog: AbstractDialog) = parentDialog { parentDialog }
 
         fun caption(init: B.() -> String): B {
             dialog.caption = init(this as B)
@@ -100,7 +100,7 @@ abstract class AbstractDialog(protected var style: DialogStyle, val player: Play
             return this
         }
 
-        fun parentDialog(init: B.() -> T): B {
+        fun parentDialog(init: B.() -> AbstractDialog): B {
             dialog.parentDialog = init(this as B)
             return this
         }
