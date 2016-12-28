@@ -19,13 +19,9 @@ package net.gtaun.shoebill.common.dialog
 import net.gtaun.shoebill.data.Color
 import java.util.function.IntSupplier
 
-class ListDialogItemRadio : ListDialogItem {
+open class ListDialogItemRadio : ListDialogItem {
 
-    class RadioItemBuilder : AbstractItemBuilder<ListDialogItemRadio, RadioItemBuilder> {
-
-        constructor() : super() {
-            item = ListDialogItemRadio()
-        }
+    open class RadioItemBuilder : AbstractItemBuilder<ListDialogItemRadio, RadioItemBuilder>() {
 
         fun item(item: RadioItem) = item { item }
         fun colorChecked(color: Color) = colorChecked { color }
@@ -66,9 +62,13 @@ class ListDialogItemRadio : ListDialogItem {
             return this
         }
 
+        init {
+            item = ListDialogItemRadio()
+        }
+
     }
 
-    class RadioItem {
+    open class RadioItem {
         var itemText: String? = null
             private set
         var checkedColor: Color? = null

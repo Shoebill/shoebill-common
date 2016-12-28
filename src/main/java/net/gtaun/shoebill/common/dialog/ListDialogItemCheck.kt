@@ -19,13 +19,9 @@ package net.gtaun.shoebill.common.dialog
 import net.gtaun.shoebill.data.Color
 import java.util.function.BooleanSupplier
 
-class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedColor: Color) : ListDialogItem(itemText) {
+open class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedColor: Color) : ListDialogItem(itemText) {
 
-    class CheckItemBuilder : AbstractItemBuilder<ListDialogItemCheck, CheckItemBuilder> {
-
-        constructor() : super() {
-            item = ListDialogItemCheck("Unnamed")
-        }
+    open class CheckItemBuilder : AbstractItemBuilder<ListDialogItemCheck, CheckItemBuilder>() {
 
         fun item(init: CheckItemBuilder.() -> CheckItem): CheckItemBuilder {
             item.addItem(init(this))
@@ -39,6 +35,10 @@ class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedColor:
             CheckItem(itemText, checkedColor, statusSupplier)
         }
 
+        init {
+            item = ListDialogItemCheck("Unnamed")
+        }
+
     }
 
     open class CheckItem(itemText: String, var checkedColor: Color?, var statusSupplier: BooleanSupplier?) {
@@ -46,14 +46,11 @@ class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedColor:
         var itemText: String = itemText
             protected set
 
-        constructor(itemText: String, statusSupplier: BooleanSupplier) : this(itemText, null, statusSupplier) {
-        }
+        constructor(itemText: String, statusSupplier: BooleanSupplier) : this(itemText, null, statusSupplier)
 
-        protected constructor(itemText: String, checkedColor: Color) : this(itemText, checkedColor, null) {
-        }
+        protected constructor(itemText: String, checkedColor: Color) : this(itemText, checkedColor, null)
 
-        protected constructor(itemText: String) : this(itemText, null, null) {
-        }
+        protected constructor(itemText: String) : this(itemText, null, null)
 
         val isChecked: Boolean
             get() = statusSupplier?.asBoolean ?: false

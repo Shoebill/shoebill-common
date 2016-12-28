@@ -29,15 +29,13 @@ import java.util.ArrayList
  * @author MK124
  * @author Marvin Haschker
  */
-class InputDialog
+open class InputDialog
 @JvmOverloads constructor(player: Player, parentEventManager: EventManager, val passwordMode: Boolean = false) :
         AbstractDialog(if (passwordMode) DialogStyle.PASSWORD else DialogStyle.INPUT, player, parentEventManager) {
 
     @Suppress("unused")
-    class InputDialogBuilder : AbstractDialog.Builder<InputDialog, InputDialogBuilder> {
-        constructor(player: Player, parentEventManager: EventManager) : super() {
-            dialog = InputDialog(player, parentEventManager)
-        }
+    open class InputDialogBuilder(player: Player, parentEventManager: EventManager) :
+            AbstractDialog.Builder<InputDialog, InputDialogBuilder>() {
 
         fun message(message: String) = message { message }
         fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
@@ -56,6 +54,10 @@ class InputDialog
         fun onClickOk(init: InputDialogBuilder.() -> ClickOkHandler): InputDialogBuilder {
             dialog.clickOkHandler = init(this)
             return this
+        }
+
+        init {
+            dialog = InputDialog(player, parentEventManager)
         }
     }
 

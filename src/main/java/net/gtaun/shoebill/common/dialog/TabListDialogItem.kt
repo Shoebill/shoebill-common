@@ -4,17 +4,17 @@ package net.gtaun.shoebill.common.dialog
  * Created by marvin on 29.11.15.
  * Copyright (c) 2015 Marvin Haschker. All rights reserved.
  */
-class TabListDialogItem : ListDialogItem() {
+open class TabListDialogItem : ListDialogItem() {
 
-    class TabListDialogItemBuilder : AbstractItemBuilder<TabListDialogItem, TabListDialogItemBuilder> {
-
-        constructor() : super() {
-            item = TabListDialogItem()
-        }
+    open class TabListDialogItemBuilder : AbstractItemBuilder<TabListDialogItem, TabListDialogItemBuilder>() {
 
         fun column(index: Int, item: ListDialogItem): TabListDialogItemBuilder {
             this.item.addColumn(index, item)
             return this
+        }
+
+        init {
+            item = TabListDialogItem()
         }
 
     }

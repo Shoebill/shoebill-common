@@ -69,10 +69,9 @@ open class ListDialogItem {
         fun build(): T = item
     }
 
-    class ListDialogItemBuilder : AbstractItemBuilder<ListDialogItem, ListDialogItemBuilder> {
-        constructor() : super() {
-            item = ListDialogItem()
-        }
+    open class ListDialogItemBuilder : AbstractItemBuilder<ListDialogItem, ListDialogItemBuilder>() {init {
+        item = ListDialogItem()
+    }
     }
 
     var currentDialog: ListDialog? = null
@@ -82,8 +81,7 @@ open class ListDialogItem {
     protected var itemEnabledSupplier: ItemBooleanSupplier? = null
     protected var selectHandler: ItemSelectHandler? = null
 
-    constructor() {
-    }
+    constructor()
 
     @JvmOverloads
     constructor(text: String, enabledSupplier: ItemBooleanSupplier? = null,

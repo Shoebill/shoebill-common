@@ -26,11 +26,8 @@ import net.gtaun.util.event.EventManager
  */
 open class PageListDialog protected constructor(player: Player, eventManager: EventManager) : ListDialog(player, eventManager) {
 
-    class PageListDialogBuilder : AbstractListDialogBuilder<PageListDialog, PageListDialogBuilder> {
-
-        constructor(player: Player, parentEventManager: EventManager) : super() {
-            dialog = PageListDialog(player, parentEventManager)
-        }
+    open class PageListDialogBuilder(player: Player, parentEventManager: EventManager) :
+            AbstractListDialogBuilder<PageListDialog, PageListDialogBuilder>() {
 
         fun itemsPerPage(count: Int) = itemsPerPage { count }
         fun currentPage(page: Int) = currentPage { page }
@@ -61,6 +58,10 @@ open class PageListDialog protected constructor(player: Player, eventManager: Ev
         fun onPageTurn(init: PageListDialogBuilder.() -> PageTurnHandler): PageListDialogBuilder {
             dialog.pageTurnHandler = init(this)
             return this
+        }
+
+        init {
+            dialog = PageListDialog(player, parentEventManager)
         }
 
     }

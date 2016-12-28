@@ -42,10 +42,10 @@ open class ListDialog constructor(player: Player, eventManager: EventManager) :
         }
     }
 
-    class ListDialogBuilder : AbstractListDialogBuilder<ListDialog, ListDialogBuilder> {
-        constructor(player: Player, parentEventManager: EventManager) : super() {
-            dialog = ListDialog(player, parentEventManager)
-        }
+    open class ListDialogBuilder(player: Player, parentEventManager: EventManager) :
+            AbstractListDialogBuilder<ListDialog, ListDialogBuilder>() {init {
+        dialog = ListDialog(player, parentEventManager)
+    }
     }
 
     val items: MutableList<ListDialogItem>

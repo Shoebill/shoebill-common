@@ -10,15 +10,16 @@ import net.gtaun.util.event.EventManager
  */
 open class TabListDialog protected constructor(player: Player, eventManager: EventManager) : ListDialog(player, eventManager) {
 
-    class TabListDialogBuilder : AbstractListDialogBuilder<TabListDialog, TabListDialogBuilder> {
-
-        constructor(player: Player, parentEventManager: EventManager) : super() {
-            dialog = TabListDialog(player, parentEventManager)
-        }
+    open class TabListDialogBuilder(player: Player, parentEventManager: EventManager) :
+            AbstractListDialogBuilder<TabListDialog, TabListDialogBuilder>() {
 
         fun header(index: Int, header: String): TabListDialogBuilder {
             dialog.setHeader(index, header)
             return this
+        }
+
+        init {
+            dialog = TabListDialog(player, parentEventManager)
         }
 
     }

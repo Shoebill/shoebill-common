@@ -21,13 +21,9 @@ import net.gtaun.shoebill.data.Color
 import java.util.function.BooleanSupplier
 import java.util.function.Supplier
 
-class ListDialogItemSwitch : ListDialogItem {
+open class ListDialogItemSwitch : ListDialogItem {
 
-    class SwitchItemBuilder : AbstractItemBuilder<ListDialogItemSwitch, SwitchItemBuilder> {
-
-        constructor() : super() {
-            item = ListDialogItemSwitch("Unnamed")
-        }
+    open class SwitchItemBuilder : AbstractItemBuilder<ListDialogItemSwitch, SwitchItemBuilder>() {
 
         fun onSwitch(onText: String) = onSwitch { onText }
         fun offSwitch(offText: String) = offSwitch { offText }
@@ -72,6 +68,10 @@ class ListDialogItemSwitch : ListDialogItem {
             val pair = init(this)
             item.setSwitchColor(pair.first, pair.second)
             return this
+        }
+
+        init {
+            item = ListDialogItemSwitch("Unnamed")
         }
 
     }

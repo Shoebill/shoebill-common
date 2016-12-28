@@ -25,11 +25,11 @@ import net.gtaun.util.event.EventManager
  * @author MK124
  * @author Marvin Haschker
  */
-class MsgboxDialog(player: Player, parentEventManager: EventManager) :
+open class MsgboxDialog(player: Player, parentEventManager: EventManager) :
         AbstractDialog(DialogStyle.MSGBOX, player, parentEventManager) {
 
     @Suppress("unused")
-    class MsgboxDialogBuilder(player: Player, parentEventManager: EventManager) :
+    open class MsgboxDialogBuilder(player: Player, parentEventManager: EventManager) :
             AbstractDialog.Builder<MsgboxDialog, MsgboxDialogBuilder>() {
 
         fun message(message: String) = message { message }
