@@ -24,49 +24,49 @@ open class ListDialogItem {
 
         protected lateinit var item: T
 
-        fun init(init: B.(B) -> Unit): B {
+        open fun init(init: B.(B) -> Unit): B {
             init(this as B, this)
             return this
         }
 
-        fun text(text: String) = text { text }
-        fun textSupplier(supplier: DialogTextSupplier) = textSupplier { supplier }
-        fun enabled(enabled: Boolean) = enabled { enabled }
-        fun enabledSupplier(supplier: ItemBooleanSupplier) = enabledSupplier { supplier }
-        fun onSelect(handler: Consumer<ListDialogItem>) = onSelect { handler.accept(it) }
-        fun onSelectHandler(handler: ItemSelectHandler) = onSelectHandler { handler }
+        open fun text(text: String) = text { text }
+        open fun textSupplier(supplier: DialogTextSupplier) = textSupplier { supplier }
+        open fun enabled(enabled: Boolean) = enabled { enabled }
+        open fun enabledSupplier(supplier: ItemBooleanSupplier) = enabledSupplier { supplier }
+        open fun onSelect(handler: Consumer<ListDialogItem>) = onSelect { handler.accept(it) }
+        open fun onSelectHandler(handler: ItemSelectHandler) = onSelectHandler { handler }
 
-        fun text(init: B.() -> String): B {
+        open fun text(init: B.() -> String): B {
             item.itemText = init(this as B)
             return this
         }
 
-        fun textSupplier(init: B.() -> DialogTextSupplier): B {
+        open fun textSupplier(init: B.() -> DialogTextSupplier): B {
             item.itemTextSupplier = init(this as B)
             return this
         }
 
-        fun enabled(init: B.() -> Boolean): B {
+        open fun enabled(init: B.() -> Boolean): B {
             item.itemEnabledSupplier = ItemBooleanSupplier { init(this as B) }
             return this as B
         }
 
-        fun enabledSupplier(init: B.() -> ItemBooleanSupplier): B {
+        open fun enabledSupplier(init: B.() -> ItemBooleanSupplier): B {
             item.itemEnabledSupplier = init(this as B)
             return this
         }
 
-        fun onSelect(init: (ListDialogItem) -> Unit): B {
+        open fun onSelect(init: (ListDialogItem) -> Unit): B {
             item.selectHandler = ItemSelectHandler { init(it) }
             return this as B
         }
 
-        fun onSelectHandler(init: B.() -> ItemSelectHandler): B {
+        open fun onSelectHandler(init: B.() -> ItemSelectHandler): B {
             item.selectHandler = init(this as B)
             return this
         }
 
-        fun build(): T = item
+        open fun build(): T = item
     }
 
     open class ListDialogItemBuilder : AbstractItemBuilder<ListDialogItem, ListDialogItemBuilder>() {init {
@@ -74,12 +74,12 @@ open class ListDialogItem {
     }
     }
 
-    var currentDialog: ListDialog? = null
+    open var currentDialog: ListDialog? = null
         set
 
-    protected var itemTextSupplier: DialogTextSupplier? = null
-    protected var itemEnabledSupplier: ItemBooleanSupplier? = null
-    protected var selectHandler: ItemSelectHandler? = null
+    var itemTextSupplier: DialogTextSupplier? = null
+    var itemEnabledSupplier: ItemBooleanSupplier? = null
+    var selectHandler: ItemSelectHandler? = null
 
     constructor()
 

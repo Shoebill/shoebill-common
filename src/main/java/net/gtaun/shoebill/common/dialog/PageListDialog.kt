@@ -29,33 +29,33 @@ open class PageListDialog protected constructor(player: Player, eventManager: Ev
     open class PageListDialogBuilder(player: Player, parentEventManager: EventManager) :
             AbstractListDialogBuilder<PageListDialog, PageListDialogBuilder>() {
 
-        fun itemsPerPage(count: Int) = itemsPerPage { count }
-        fun currentPage(page: Int) = currentPage { page }
-        fun previousPage(text: String) = previousPage { text }
-        fun nextPage(text: String) = nextPage { text }
-        fun onPageTurn(handler: PageTurnHandler) = onPageTurn { handler }
+        open fun itemsPerPage(count: Int) = itemsPerPage { count }
+        open fun currentPage(page: Int) = currentPage { page }
+        open fun previousPage(text: String) = previousPage { text }
+        open fun nextPage(text: String) = nextPage { text }
+        open fun onPageTurn(handler: PageTurnHandler) = onPageTurn { handler }
 
-        fun itemsPerPage(init: PageListDialogBuilder.() -> Int): PageListDialogBuilder {
+        open fun itemsPerPage(init: PageListDialogBuilder.() -> Int): PageListDialogBuilder {
             dialog.itemsPerPage = init(this)
             return this
         }
 
-        fun currentPage(init: PageListDialogBuilder.() -> Int): PageListDialogBuilder {
+        open fun currentPage(init: PageListDialogBuilder.() -> Int): PageListDialogBuilder {
             dialog.currentPage = init(this)
             return this
         }
 
-        fun previousPage(init: PageListDialogBuilder.() -> String): PageListDialogBuilder {
+        open fun previousPage(init: PageListDialogBuilder.() -> String): PageListDialogBuilder {
             dialog.prevPageItemText = init(this)
             return this
         }
 
-        fun nextPage(init: PageListDialogBuilder.() -> String): PageListDialogBuilder {
+        open fun nextPage(init: PageListDialogBuilder.() -> String): PageListDialogBuilder {
             dialog.nextPageItemText = init(this)
             return this
         }
 
-        fun onPageTurn(init: PageListDialogBuilder.() -> PageTurnHandler): PageListDialogBuilder {
+        open fun onPageTurn(init: PageListDialogBuilder.() -> PageTurnHandler): PageListDialogBuilder {
             dialog.pageTurnHandler = init(this)
             return this
         }
@@ -66,22 +66,22 @@ open class PageListDialog protected constructor(player: Player, eventManager: Ev
 
     }
 
-    var itemsPerPage = 10
-    var currentPage: Int = 0
+    open var itemsPerPage = 10
+    open var currentPage: Int = 0
 
-    var prevPageItemText = "<< Prev Page <<"
-    var nextPageItemText = ">> Next Page >>"
+    open var prevPageItemText = "<< Prev Page <<"
+    open var nextPageItemText = ">> Next Page >>"
 
-    var pageTurnHandler: PageTurnHandler? = null
-    val enabledItems: List<ListDialogItem>
+    open var pageTurnHandler: PageTurnHandler? = null
+    open val enabledItems: List<ListDialogItem>
         get() = items.filter { it.isEnabled }
 
-    val maxPage: Int
+    open val maxPage: Int
         get() = (items.size - 1) / itemsPerPage
 
     override fun show() = show(listString)
 
-    protected val listString: String
+    open val listString: String
         get() {
             var listStr = ""
             displayedItems.clear()
@@ -120,7 +120,7 @@ open class PageListDialog protected constructor(player: Player, eventManager: Ev
             return listStr
         }
 
-    protected fun show(page: Int) {
+    open fun show(page: Int) {
         if (currentPage != page) {
             currentPage = page
             if (currentPage > maxPage)
@@ -133,7 +133,7 @@ open class PageListDialog protected constructor(player: Player, eventManager: Ev
         show()
     }
 
-    fun onPageTurn() = pageTurnHandler?.onPageTurn(this)
+    open fun onPageTurn() = pageTurnHandler?.onPageTurn(this)
 
     @FunctionalInterface
     interface PageTurnHandler {

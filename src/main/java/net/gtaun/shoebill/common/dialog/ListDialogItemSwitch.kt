@@ -25,46 +25,46 @@ open class ListDialogItemSwitch : ListDialogItem {
 
     open class SwitchItemBuilder : AbstractItemBuilder<ListDialogItemSwitch, SwitchItemBuilder>() {
 
-        fun onSwitch(onText: String) = onSwitch { onText }
-        fun offSwitch(offText: String) = offSwitch { offText }
-        fun switchText(onText: String, offText: String) = switchText { Pair(onText, offText) }
-        fun statusSupplier(supplier: BooleanSupplier) = statusSupplier { supplier }
-        fun onColor(on: Color) = onColor { on }
-        fun offColor(off: Color) = offColor { off }
-        fun switchColor(on: Color, off: Color) = switchColor { Pair(on, off) }
+        open fun onSwitch(onText: String) = onSwitch { onText }
+        open fun offSwitch(offText: String) = offSwitch { offText }
+        open fun switchText(onText: String, offText: String) = switchText { Pair(onText, offText) }
+        open fun statusSupplier(supplier: BooleanSupplier) = statusSupplier { supplier }
+        open fun onColor(on: Color) = onColor { on }
+        open fun offColor(off: Color) = offColor { off }
+        open fun switchColor(on: Color, off: Color) = switchColor { Pair(on, off) }
 
-        fun onSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
+        open fun onSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
             item.setSwitchText(init(this), item.switchTextSupplier(false))
             return this
         }
 
-        fun offSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
+        open fun offSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
             item.setSwitchText(item.switchTextSupplier(true), init(this))
             return this
         }
 
-        fun switchText(init: SwitchItemBuilder.() -> Pair<String, String>): SwitchItemBuilder {
+        open fun switchText(init: SwitchItemBuilder.() -> Pair<String, String>): SwitchItemBuilder {
             val pair = init(this)
             item.setSwitchText(pair.first, pair.second)
             return this
         }
 
-        fun onColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
+        open fun onColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
             item.setSwitchColor(init(this), item.switchColorSupplier(false))
             return this
         }
 
-        fun offColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
+        open fun offColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
             item.setSwitchColor(item.switchColorSupplier(true), init(this))
             return this
         }
 
-        fun statusSupplier(init: SwitchItemBuilder.() -> BooleanSupplier): SwitchItemBuilder {
+        open fun statusSupplier(init: SwitchItemBuilder.() -> BooleanSupplier): SwitchItemBuilder {
             item.statusSupplier = init(this)
             return this
         }
 
-        fun switchColor(init: SwitchItemBuilder.() -> Pair<Color, Color>): SwitchItemBuilder {
+        open fun switchColor(init: SwitchItemBuilder.() -> Pair<Color, Color>): SwitchItemBuilder {
             val pair = init(this)
             item.setSwitchColor(pair.first, pair.second)
             return this
@@ -76,18 +76,18 @@ open class ListDialogItemSwitch : ListDialogItem {
 
     }
 
-    var switchTextSupplier = DEFAULT_SWITCH_TEXT_SUPPLIER
-    var switchColorSupplier = DEFAULT_SWITCH_COLOR_SUPPLIER
-    var statusSupplier: BooleanSupplier? = null
+    open var switchTextSupplier = DEFAULT_SWITCH_TEXT_SUPPLIER
+    open var switchColorSupplier = DEFAULT_SWITCH_COLOR_SUPPLIER
+    open var statusSupplier: BooleanSupplier? = null
 
     constructor(itemText: String) : super(itemText)
     constructor(textSupplier: DialogTextSupplier) : super(textSupplier)
 
-    fun setSwitchText(on: String, off: String) {
+    open fun setSwitchText(on: String, off: String) {
         switchTextSupplier = { s -> if (s) on else off }
     }
 
-    fun setSwitchColor(on: Color, off: Color) {
+    open fun setSwitchColor(on: Color, off: Color) {
         switchColorSupplier = { s -> if (s) on else off }
     }
 
@@ -100,7 +100,7 @@ open class ListDialogItemSwitch : ListDialogItem {
     override val isEnabled: Boolean
         get() = true
 
-    val isSwitched: Boolean
+    open val isSwitched: Boolean
         get() = statusSupplier?.asBoolean ?: false
 
     companion object {

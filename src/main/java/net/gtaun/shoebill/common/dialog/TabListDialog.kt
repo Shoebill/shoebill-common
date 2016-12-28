@@ -13,7 +13,7 @@ open class TabListDialog protected constructor(player: Player, eventManager: Eve
     open class TabListDialogBuilder(player: Player, parentEventManager: EventManager) :
             AbstractListDialogBuilder<TabListDialog, TabListDialogBuilder>() {
 
-        fun header(index: Int, header: String): TabListDialogBuilder {
+        open fun header(index: Int, header: String): TabListDialogBuilder {
             dialog.setHeader(index, header)
             return this
         }
@@ -24,14 +24,14 @@ open class TabListDialog protected constructor(player: Player, eventManager: Eve
 
     }
 
-    private val headers = arrayOf<String?>(null, null, null, null)
+    open val headers = arrayOfNulls<String?>(4)
 
     init {
         style = DialogStyle.TABLIST
     }
 
-    fun setHeader(index: Int, title: String) {
-        if (index < 0 || index > 3) throw IllegalArgumentException("Index must be between 0 and 4")
+    open fun setHeader(index: Int, title: String) {
+        if (index < 0 || index > 3) throw IllegalArgumentException("Index must be [0..3]")
         headers[index] = title
     }
 
@@ -62,7 +62,7 @@ open class TabListDialog protected constructor(player: Player, eventManager: Eve
             return listStr
         }
 
-    val usedHeaderCount: Int
+    open val usedHeaderCount: Int
         get() = headers.filterNotNull().size
 
     companion object {

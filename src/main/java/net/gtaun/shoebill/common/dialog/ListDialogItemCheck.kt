@@ -23,15 +23,15 @@ open class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedC
 
     open class CheckItemBuilder : AbstractItemBuilder<ListDialogItemCheck, CheckItemBuilder>() {
 
-        fun item(init: CheckItemBuilder.() -> CheckItem): CheckItemBuilder {
+        open fun item(init: CheckItemBuilder.() -> CheckItem): CheckItemBuilder {
             item.addItem(init(this))
             return this
         }
 
-        fun item(item: CheckItem) = item { item }
+        open fun item(item: CheckItem) = item { item }
 
         @JvmOverloads
-        fun item(itemText: String, checkedColor: Color? = null, statusSupplier: BooleanSupplier? = null) = item {
+        open fun item(itemText: String, checkedColor: Color? = null, statusSupplier: BooleanSupplier? = null) = item {
             CheckItem(itemText, checkedColor, statusSupplier)
         }
 
@@ -43,7 +43,7 @@ open class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedC
 
     open class CheckItem(itemText: String, var checkedColor: Color?, var statusSupplier: BooleanSupplier?) {
 
-        var itemText: String = itemText
+        open var itemText: String = itemText
             protected set
 
         constructor(itemText: String, statusSupplier: BooleanSupplier) : this(itemText, null, statusSupplier)
@@ -52,10 +52,9 @@ open class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedC
 
         protected constructor(itemText: String) : this(itemText, null, null)
 
-        val isChecked: Boolean
+        open val isChecked: Boolean
             get() = statusSupplier?.asBoolean ?: false
     }
-
 
     private val options: MutableList<CheckItem> = mutableListOf()
     private var checkItemColorSupplier: ConditionSupplier<Color>? = null
@@ -67,9 +66,9 @@ open class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedC
         setCheckItemColorSupplier(checkedColor, uncheckedColor)
     }
 
-    fun addItem(item: CheckItem) = options.add(item)
+    open fun addItem(item: CheckItem) = options.add(item)
 
-    fun setCheckItemColorSupplier(checkedColor: Color, uncheckedColor: Color) {
+    open fun setCheckItemColorSupplier(checkedColor: Color, uncheckedColor: Color) {
         checkItemColorSupplier = ConditionSupplier { c -> if (c) checkedColor else uncheckedColor }
     }
 

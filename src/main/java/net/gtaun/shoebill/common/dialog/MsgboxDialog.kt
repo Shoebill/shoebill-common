@@ -32,15 +32,15 @@ open class MsgboxDialog(player: Player, parentEventManager: EventManager) :
     open class MsgboxDialogBuilder(player: Player, parentEventManager: EventManager) :
             AbstractDialog.Builder<MsgboxDialog, MsgboxDialogBuilder>() {
 
-        fun message(message: String) = message { message }
-        fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
+        open fun message(message: String) = message { message }
+        open fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
 
-        fun message(init: MsgboxDialogBuilder.() -> String): MsgboxDialogBuilder {
+        open fun message(init: MsgboxDialogBuilder.() -> String): MsgboxDialogBuilder {
             dialog.message = init(this)
             return this
         }
 
-        fun messageSupplier(init: MsgboxDialogBuilder.() -> DialogTextSupplier): MsgboxDialogBuilder {
+        open fun messageSupplier(init: MsgboxDialogBuilder.() -> DialogTextSupplier): MsgboxDialogBuilder {
             dialog.messageSupplier = init(this)
             return this
         }
@@ -50,16 +50,16 @@ open class MsgboxDialog(player: Player, parentEventManager: EventManager) :
         }
     }
 
-    var messageSupplier = DialogTextSupplier { "None" }
-    var clickOkHandler: ClickOkHandler? = null
+    open var messageSupplier = DialogTextSupplier { "None" }
+    open var clickOkHandler: ClickOkHandler? = null
 
-    var message: String
+    open var message: String
         get() = this.messageSupplier[this]
         set(message) {
             this.messageSupplier = DialogTextSupplier { message }
         }
 
-    fun setMessage(messageSupplier: DialogTextSupplier) {
+    open fun setMessage(messageSupplier: DialogTextSupplier) {
         this.messageSupplier = messageSupplier
     }
 
@@ -67,7 +67,7 @@ open class MsgboxDialog(player: Player, parentEventManager: EventManager) :
 
     override fun onClickOk(event: DialogResponseEvent) = onClickOk()
 
-    private fun onClickOk() {
+    open fun onClickOk() {
         clickOkHandler?.onClickOk(this) ?: return Unit
     }
 

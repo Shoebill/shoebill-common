@@ -33,10 +33,10 @@ open class ListDialog constructor(player: Player, eventManager: EventManager) :
     @Suppress("UNCHECKED_CAST")
     abstract class AbstractListDialogBuilder<T : ListDialog, B : AbstractListDialogBuilder<T, B>> :
             Builder<T, B>() {
-        fun item(item: ListDialogItem) = item { item }
-        fun item(itemText: String) = item { ListDialogItem(itemText) }
+        open fun item(item: ListDialogItem) = item { item }
+        open fun item(itemText: String) = item { ListDialogItem(itemText) }
 
-        fun item(init: B.() -> ListDialogItem): B {
+        open fun item(init: B.() -> ListDialogItem): B {
             dialog.addItem(init(this as B))
             return this
         }
@@ -49,8 +49,8 @@ open class ListDialog constructor(player: Player, eventManager: EventManager) :
     }
 
     val items: MutableList<ListDialogItem>
-    val displayedItems: MutableList<ListDialogItem> = mutableListOf()
-    var clickOkHandler: ClickOkHandler? = null
+    open val displayedItems: MutableList<ListDialogItem> = mutableListOf()
+    open var clickOkHandler: ClickOkHandler? = null
 
     init {
         items = object : ArrayList<ListDialogItem>() {
@@ -108,20 +108,20 @@ open class ListDialog constructor(player: Player, eventManager: EventManager) :
         onClickOk(item)
     }
 
-    private fun onClickOk(item: ListDialogItem) {
+    open fun onClickOk(item: ListDialogItem) {
         clickOkHandler?.onClickOk(this, item) ?: return Unit
     }
 
-    fun addItem(item: ListDialogItem) = items.add(item)
+    open fun addItem(item: ListDialogItem) = items.add(item)
 
     @JvmOverloads
-    fun addItem(itemText: String, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
-                handler: ListDialogItem.ItemSelectHandler? = null) =
+    open fun addItem(itemText: String, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
+                     handler: ListDialogItem.ItemSelectHandler? = null) =
             items.add(ListDialogItem(itemText, enabledSupplier, handler))
 
     @JvmOverloads
-    fun addItem(supplier: DialogTextSupplier, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
-                handler: ListDialogItem.ItemSelectHandler? = null) =
+    open fun addItem(supplier: DialogTextSupplier, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
+                     handler: ListDialogItem.ItemSelectHandler? = null) =
             items.add(ListDialogItem(supplier, enabledSupplier, handler))
 
     @FunctionalInterface

@@ -8,7 +8,7 @@ open class TabListDialogItem : ListDialogItem() {
 
     open class TabListDialogItemBuilder : AbstractItemBuilder<TabListDialogItem, TabListDialogItemBuilder>() {
 
-        fun column(index: Int, item: ListDialogItem): TabListDialogItemBuilder {
+        open fun column(index: Int, item: ListDialogItem): TabListDialogItemBuilder {
             this.item.addColumn(index, item)
             return this
         }
@@ -19,9 +19,9 @@ open class TabListDialogItem : ListDialogItem() {
 
     }
 
-    private val columns = arrayOfNulls<ListDialogItem>(4)
+    open val columns = arrayOfNulls<ListDialogItem>(4)
 
-    fun addColumn(index: Int, item: ListDialogItem) {
+    open fun addColumn(index: Int, item: ListDialogItem) {
         if (index < 0 || index > 3) throw IllegalArgumentException("Index must be between 0 and 4")
         columns[index] = item
     }
@@ -47,7 +47,7 @@ open class TabListDialogItem : ListDialogItem() {
             super.itemText = value
         }
 
-    private val columnCount: Int
+    open val columnCount: Int
         get() = columns.filterNotNull().filter { it.isEnabled }.count()
 
     companion object {

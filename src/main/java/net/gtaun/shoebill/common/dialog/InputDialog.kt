@@ -37,21 +37,21 @@ open class InputDialog
     open class InputDialogBuilder(player: Player, parentEventManager: EventManager) :
             AbstractDialog.Builder<InputDialog, InputDialogBuilder>() {
 
-        fun message(message: String) = message { message }
-        fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
-        fun onClickOk(handler: ClickOkHandler) = onClickOk { handler }
+        open fun message(message: String) = message { message }
+        open fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
+        open fun onClickOk(handler: ClickOkHandler) = onClickOk { handler }
 
-        fun message(init: InputDialogBuilder.() -> String): InputDialogBuilder {
+        open fun message(init: InputDialogBuilder.() -> String): InputDialogBuilder {
             dialog.message = init(this)
             return this
         }
 
-        fun messageSupplier(init: InputDialogBuilder.() -> DialogTextSupplier): InputDialogBuilder {
+        open fun messageSupplier(init: InputDialogBuilder.() -> DialogTextSupplier): InputDialogBuilder {
             dialog.messageSupplier = init(this)
             return this
         }
 
-        fun onClickOk(init: InputDialogBuilder.() -> ClickOkHandler): InputDialogBuilder {
+        open fun onClickOk(init: InputDialogBuilder.() -> ClickOkHandler): InputDialogBuilder {
             dialog.clickOkHandler = init(this)
             return this
         }
@@ -61,16 +61,16 @@ open class InputDialog
         }
     }
 
-    private var messageSupplier = DialogTextSupplier { "None" }
-    var clickOkHandler: ClickOkHandler? = null
+    open var messageSupplier = DialogTextSupplier { "None" }
+    open var clickOkHandler: ClickOkHandler? = null
 
-    var message: String
+    open var message: String
         get() = messageSupplier[this]
         set(message) {
             this.messageSupplier = DialogTextSupplier { message }
         }
 
-    fun setMessage(messageSupplier: DialogTextSupplier) {
+    open fun setMessage(messageSupplier: DialogTextSupplier) {
         this.messageSupplier = messageSupplier
     }
 
@@ -80,7 +80,7 @@ open class InputDialog
 
     override fun onClickOk(event: DialogResponseEvent) = onClickOk(event.inputText)
 
-    fun onClickOk(inputText: String) {
+    open fun onClickOk(inputText: String) {
         clickOkHandler?.onClickOk(this, inputText) ?: return Unit
     }
 

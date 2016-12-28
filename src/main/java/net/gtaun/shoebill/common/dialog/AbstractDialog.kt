@@ -44,68 +44,68 @@ abstract class AbstractDialog(protected var style: DialogStyle, val player: Play
             return this
         }
 
-        fun caption(caption: String) = caption { caption }
-        fun captionSupplier(supplier: DialogTextSupplier) = captionSupplier { supplier }
-        fun buttonOk(buttonOk: String) = buttonOk { buttonOk }
-        fun buttonOkSupplier(supplier: DialogTextSupplier) = buttonOkSupplier { supplier }
-        fun buttonCancel(buttonCancel: String) = buttonCancel { buttonCancel }
-        fun buttonCancelSupplier(supplier: DialogTextSupplier) = buttonCancelSupplier { supplier }
-        fun onShow(handler: DialogHandler) = onShow { handler }
-        fun onClose(handler: DialogCloseHandler) = onClose { handler }
-        fun onCancel(handler: DialogHandler) = onCancel { handler }
-        fun parentDialog(parentDialog: AbstractDialog) = parentDialog { parentDialog }
+        open fun caption(caption: String) = caption { caption }
+        open fun captionSupplier(supplier: DialogTextSupplier) = captionSupplier { supplier }
+        open fun buttonOk(buttonOk: String) = buttonOk { buttonOk }
+        open fun buttonOkSupplier(supplier: DialogTextSupplier) = buttonOkSupplier { supplier }
+        open fun buttonCancel(buttonCancel: String) = buttonCancel { buttonCancel }
+        open fun buttonCancelSupplier(supplier: DialogTextSupplier) = buttonCancelSupplier { supplier }
+        open fun onShow(handler: DialogHandler) = onShow { handler }
+        open fun onClose(handler: DialogCloseHandler) = onClose { handler }
+        open fun onCancel(handler: DialogHandler) = onCancel { handler }
+        open fun parentDialog(parentDialog: AbstractDialog) = parentDialog { parentDialog }
 
-        fun caption(init: B.() -> String): B {
+        open fun caption(init: B.() -> String): B {
             dialog.caption = init(this as B)
             return this
         }
 
-        fun captionSupplier(init: B.() -> DialogTextSupplier): B {
+        open fun captionSupplier(init: B.() -> DialogTextSupplier): B {
             dialog.captionSupplier = init(this as B)
             return this
         }
 
-        fun buttonOk(init: B.() -> String): B {
+        open fun buttonOk(init: B.() -> String): B {
             dialog.buttonOk = init(this as B)
             return this
         }
 
-        fun buttonOkSupplier(init: B.() -> DialogTextSupplier): B {
+        open fun buttonOkSupplier(init: B.() -> DialogTextSupplier): B {
             dialog.buttonOkSupplier = init(this as B)
             return this
         }
 
-        fun buttonCancel(init: B.() -> String): B {
+        open fun buttonCancel(init: B.() -> String): B {
             dialog.buttonCancel = init(this as B)
             return this
         }
 
-        fun buttonCancelSupplier(init: B.() -> DialogTextSupplier): B {
+        open fun buttonCancelSupplier(init: B.() -> DialogTextSupplier): B {
             dialog.setButtonCancel(init(this as B))
             return this
         }
 
-        fun onShow(init: B.() -> DialogHandler): B {
+        open fun onShow(init: B.() -> DialogHandler): B {
             dialog.showHandler = init(this as B)
             return this
         }
 
-        fun onClose(init: B.() -> DialogCloseHandler): B {
+        open fun onClose(init: B.() -> DialogCloseHandler): B {
             dialog.closeHandler = init(this as B)
             return this
         }
 
-        fun onCancel(init: B.() -> DialogHandler): B {
+        open fun onCancel(init: B.() -> DialogHandler): B {
             dialog.clickCancelHandler = init(this as B)
             return this
         }
 
-        fun parentDialog(init: B.() -> AbstractDialog): B {
+        open fun parentDialog(init: B.() -> AbstractDialog): B {
             dialog.parentDialog = init(this as B)
             return this
         }
 
-        fun build(): T = dialog
+        open fun build(): T = dialog
     }
 
     @FunctionalInterface
@@ -116,17 +116,17 @@ abstract class AbstractDialog(protected var style: DialogStyle, val player: Play
     protected val eventManagerNode: EventManagerNode = parentEventManager.createChildNode()
     private val eventManagerInternal: EventManagerNode = parentEventManager.createChildNode()
 
-    val dialogId: DialogId = DialogId.create()
+    open val dialogId: DialogId = DialogId.create()
 
-    var parentDialog: AbstractDialog? = null
+    open var parentDialog: AbstractDialog? = null
 
-    var captionSupplier = DialogTextSupplier { "None" }
-    var buttonOkSupplier = DialogTextSupplier { "OK" }
-    var buttonCancelSupplier = DialogTextSupplier { "Cancel" }
+    open var captionSupplier = DialogTextSupplier { "None" }
+    open var buttonOkSupplier = DialogTextSupplier { "OK" }
+    open var buttonCancelSupplier = DialogTextSupplier { "Cancel" }
 
-    var showHandler: DialogHandler? = null
-    var closeHandler: DialogCloseHandler? = null
-    var clickCancelHandler: DialogHandler? = null
+    open var showHandler: DialogHandler? = null
+    open var closeHandler: DialogCloseHandler? = null
+    open var clickCancelHandler: DialogHandler? = null
 
     @Throws(Throwable::class)
     protected fun finalize() {
@@ -138,42 +138,42 @@ abstract class AbstractDialog(protected var style: DialogStyle, val player: Play
         eventManagerNode.destroy()
     }
 
-    fun showParentDialog() {
+    open fun showParentDialog() {
         eventManagerNode.cancelAll()
         parentDialog?.show()
     }
 
-    fun setCaption(captionSupplier: DialogTextSupplier) {
+    open fun setCaption(captionSupplier: DialogTextSupplier) {
         this.captionSupplier = captionSupplier
     }
 
-    var caption: String
+    open var caption: String
         get() = captionSupplier[this]
         set(caption) {
             captionSupplier = DialogTextSupplier { caption }
         }
 
-    fun setButtonOk(buttonOkSupplier: DialogTextSupplier) {
+    open fun setButtonOk(buttonOkSupplier: DialogTextSupplier) {
         this.buttonOkSupplier = buttonOkSupplier
     }
 
-    fun setButtonCancel(buttonCancelSupplier: DialogTextSupplier) {
+    open fun setButtonCancel(buttonCancelSupplier: DialogTextSupplier) {
         this.buttonCancelSupplier = buttonCancelSupplier
     }
 
-    var buttonOk: String
+    open var buttonOk: String
         get() = buttonOkSupplier[this]
         set(buttonOk) {
             buttonOkSupplier = DialogTextSupplier { buttonOk }
         }
 
-    var buttonCancel: String
+    open var buttonCancel: String
         get() = buttonCancelSupplier[this]
         set(buttonCancel) {
             buttonCancelSupplier = DialogTextSupplier { buttonCancel }
         }
 
-    fun show(text: String) {
+    open fun show(text: String) {
         onShow()
 
         eventManagerInternal.cancelAll()
@@ -202,13 +202,12 @@ abstract class AbstractDialog(protected var style: DialogStyle, val player: Play
 
     abstract fun show()
 
-    protected fun onShow() = showHandler?.handle(this)
+    open fun onShow() = showHandler?.handle(this)
 
-    internal open fun onClickOk(event: DialogResponseEvent) {
-    }
+    open fun onClickOk(event: DialogResponseEvent) {}
 
-    protected fun onClose(type: DialogCloseType) = closeHandler?.onClose(this, type)
-    protected fun onClickCancel() = clickCancelHandler?.handle(this)
+    open fun onClose(type: DialogCloseType) = closeHandler?.onClose(this, type)
+    open fun onClickCancel() = clickCancelHandler?.handle(this)
 
     companion object {
         fun DialogCloseHandler(handler: (AbstractDialog, DialogCloseType) -> Unit) = object : DialogCloseHandler {
