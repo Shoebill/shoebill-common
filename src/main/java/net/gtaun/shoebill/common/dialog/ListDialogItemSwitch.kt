@@ -16,55 +16,58 @@
 
 package net.gtaun.shoebill.common.dialog
 
+import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.data.Color
 
 import java.util.function.BooleanSupplier
 import java.util.function.Supplier
 
-open class ListDialogItemSwitch : ListDialogItem {
+@AllOpen
+class ListDialogItemSwitch : ListDialogItem {
 
-    open class SwitchItemBuilder : AbstractItemBuilder<ListDialogItemSwitch, SwitchItemBuilder>() {
+    @AllOpen
+    class SwitchItemBuilder : AbstractItemBuilder<ListDialogItemSwitch, SwitchItemBuilder>() {
 
-        open fun onSwitch(onText: String) = onSwitch { onText }
-        open fun offSwitch(offText: String) = offSwitch { offText }
-        open fun switchText(onText: String, offText: String) = switchText { Pair(onText, offText) }
-        open fun statusSupplier(supplier: BooleanSupplier) = statusSupplier { supplier }
-        open fun onColor(on: Color) = onColor { on }
-        open fun offColor(off: Color) = offColor { off }
-        open fun switchColor(on: Color, off: Color) = switchColor { Pair(on, off) }
+        fun onSwitch(onText: String) = onSwitch { onText }
+        fun offSwitch(offText: String) = offSwitch { offText }
+        fun switchText(onText: String, offText: String) = switchText { Pair(onText, offText) }
+        fun statusSupplier(supplier: BooleanSupplier) = statusSupplier { supplier }
+        fun onColor(on: Color) = onColor { on }
+        fun offColor(off: Color) = offColor { off }
+        fun switchColor(on: Color, off: Color) = switchColor { Pair(on, off) }
 
-        open fun onSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
+        fun onSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
             item.setSwitchText(init(this), item.switchTextSupplier(false))
             return this
         }
 
-        open fun offSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
+        fun offSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
             item.setSwitchText(item.switchTextSupplier(true), init(this))
             return this
         }
 
-        open fun switchText(init: SwitchItemBuilder.() -> Pair<String, String>): SwitchItemBuilder {
+        fun switchText(init: SwitchItemBuilder.() -> Pair<String, String>): SwitchItemBuilder {
             val pair = init(this)
             item.setSwitchText(pair.first, pair.second)
             return this
         }
 
-        open fun onColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
+        fun onColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
             item.setSwitchColor(init(this), item.switchColorSupplier(false))
             return this
         }
 
-        open fun offColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
+        fun offColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
             item.setSwitchColor(item.switchColorSupplier(true), init(this))
             return this
         }
 
-        open fun statusSupplier(init: SwitchItemBuilder.() -> BooleanSupplier): SwitchItemBuilder {
+        fun statusSupplier(init: SwitchItemBuilder.() -> BooleanSupplier): SwitchItemBuilder {
             item.statusSupplier = init(this)
             return this
         }
 
-        open fun switchColor(init: SwitchItemBuilder.() -> Pair<Color, Color>): SwitchItemBuilder {
+        fun switchColor(init: SwitchItemBuilder.() -> Pair<Color, Color>): SwitchItemBuilder {
             val pair = init(this)
             item.setSwitchColor(pair.first, pair.second)
             return this
@@ -76,18 +79,18 @@ open class ListDialogItemSwitch : ListDialogItem {
 
     }
 
-    open var switchTextSupplier = DEFAULT_SWITCH_TEXT_SUPPLIER
-    open var switchColorSupplier = DEFAULT_SWITCH_COLOR_SUPPLIER
-    open var statusSupplier: BooleanSupplier? = null
+    var switchTextSupplier = DEFAULT_SWITCH_TEXT_SUPPLIER
+    var switchColorSupplier = DEFAULT_SWITCH_COLOR_SUPPLIER
+    var statusSupplier: BooleanSupplier? = null
 
     constructor(itemText: String) : super(itemText)
     constructor(textSupplier: DialogTextSupplier) : super(textSupplier)
 
-    open fun setSwitchText(on: String, off: String) {
+    fun setSwitchText(on: String, off: String) {
         switchTextSupplier = { s -> if (s) on else off }
     }
 
-    open fun setSwitchColor(on: Color, off: Color) {
+    fun setSwitchColor(on: Color, off: Color) {
         switchColorSupplier = { s -> if (s) on else off }
     }
 
@@ -100,7 +103,7 @@ open class ListDialogItemSwitch : ListDialogItem {
     override val isEnabled: Boolean
         get() = true
 
-    open val isSwitched: Boolean
+    val isSwitched: Boolean
         get() = statusSupplier?.asBoolean ?: false
 
     companion object {

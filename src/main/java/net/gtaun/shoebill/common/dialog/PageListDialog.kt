@@ -16,6 +16,8 @@
 
 package net.gtaun.shoebill.common.dialog
 
+import net.gtaun.shoebill.Shoebill
+import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.data.Color
 import net.gtaun.shoebill.entities.Player
 import net.gtaun.util.event.EventManager
@@ -24,74 +26,76 @@ import net.gtaun.util.event.EventManager
  * @author MK124
  * @author Marvin Haschker
  */
-open class PageListDialog protected constructor(player: Player, eventManager: EventManager) : ListDialog(player, eventManager) {
+@AllOpen
+class PageListDialog protected constructor(eventManager: EventManager) : ListDialog(eventManager) {
 
-    open class PageListDialogBuilder(player: Player, parentEventManager: EventManager) :
+    @AllOpen
+    class PageListDialogBuilder(parentEventManager: EventManager) :
             AbstractListDialogBuilder<PageListDialog, PageListDialogBuilder>() {
 
-        open fun itemsPerPage(count: Int) = itemsPerPage { count }
-        open fun currentPage(page: Int) = currentPage { page }
-        open fun previousPage(text: String) = previousPage { text }
-        open fun nextPage(text: String) = nextPage { text }
-        open fun onPageTurn(handler: PageTurnHandler) = onPageTurn { handler }
+        fun itemsPerPage(count: Int) = itemsPerPage { count }
+        fun currentPage(page: Int) = currentPage { page }
+        fun previousPage(text: String) = previousPage { text }
+        fun nextPage(text: String) = nextPage { text }
+        fun onPageTurn(handler: PageTurnHandler) = onPageTurn { handler }
 
-        open fun itemsPerPage(init: PageListDialogBuilder.() -> Int): PageListDialogBuilder {
+        fun itemsPerPage(init: PageListDialogBuilder.() -> Int): PageListDialogBuilder {
             dialog.itemsPerPage = init(this)
             return this
         }
 
-        open fun currentPage(init: PageListDialogBuilder.() -> Int): PageListDialogBuilder {
+        fun currentPage(init: PageListDialogBuilder.() -> Int): PageListDialogBuilder {
             dialog.currentPage = init(this)
             return this
         }
 
-        open fun previousPage(init: PageListDialogBuilder.() -> String): PageListDialogBuilder {
+        fun previousPage(init: PageListDialogBuilder.() -> String): PageListDialogBuilder {
             dialog.prevPageItemText = init(this)
             return this
         }
 
-        open fun nextPage(init: PageListDialogBuilder.() -> String): PageListDialogBuilder {
+        fun nextPage(init: PageListDialogBuilder.() -> String): PageListDialogBuilder {
             dialog.nextPageItemText = init(this)
             return this
         }
 
-        open fun onPageTurn(init: PageListDialogBuilder.() -> PageTurnHandler): PageListDialogBuilder {
+        fun onPageTurn(init: PageListDialogBuilder.() -> PageTurnHandler): PageListDialogBuilder {
             dialog.pageTurnHandler = init(this)
             return this
         }
 
         init {
-            dialog = PageListDialog(player, parentEventManager)
+            dialog = PageListDialog(parentEventManager)
         }
 
     }
 
-    open var itemsPerPage = 10
-    open var currentPage: Int = 0
+    var itemsPerPage = 10
+    var currentPage: Int = 0
 
-    open var prevPageItemText = "<< Prev Page <<"
-    open var nextPageItemText = ">> Next Page >>"
+    var prevPageItemText = "<< Prev Page <<"
+    var nextPageItemText = ">> Next Page >>"
 
-    open var pageTurnHandler: PageTurnHandler? = null
-    open val enabledItems: List<ListDialogItem>
+    var pageTurnHandler: PageTurnHandler? = null
+    val enabledItems: List<ListDialogItem>
         get() = items.filter { it.isEnabled }
 
-    open val maxPage: Int
+    val maxPage: Int
         get() = (items.size - 1) / itemsPerPage
 
-    override fun show() = show(listString)
+    override fun show(player: Player) = show(player, listString)
 
-    open val listString: String
+    val listString: String
         get() {
             var listStr = ""
             displayedItems.clear()
 
             if (enabledItems.size >= itemsPerPage + 1) {
                 displayedItems.add(object : ListDialogItem(Color.GRAY.embeddingString + prevPageItemText) {
-                    override fun onItemSelect() {
+                    override fun onItemSelect(player: Player) {
                         var page = currentPage - 1
                         if (page < 0) page = maxPage
-                        show(page)
+                        show(player, page)
                     }
                 })
             }
@@ -107,10 +111,10 @@ open class PageListDialog protected constructor(player: Player, eventManager: Ev
 
             if (displayedItems.size >= itemsPerPage + 1)
                 displayedItems.add(object : ListDialogItem(Color.GRAY.embeddingString + nextPageItemText) {
-                    override fun onItemSelect() {
+                    override fun onItemSelect(player: Player) {
                         var page = currentPage + 1
                         if (page > maxPage) page = 0
-                        show(page)
+                        show(player, page)
                     }
                 })
 
@@ -120,34 +124,35 @@ open class PageListDialog protected constructor(player: Player, eventManager: Ev
             return listStr
         }
 
-    open fun show(page: Int) {
+    fun show(player: Player, page: Int) {
         if (currentPage != page) {
             currentPage = page
             if (currentPage > maxPage)
                 currentPage = maxPage
             else if (currentPage < 0) currentPage = 0
 
-            onPageTurn()
+            onPageTurn(player)
         }
 
-        show()
+        show(player)
     }
 
-    open fun onPageTurn() = pageTurnHandler?.onPageTurn(this)
+    fun onPageTurn(player: Player) = pageTurnHandler?.onPageTurn(this, player)
 
     @FunctionalInterface
     interface PageTurnHandler {
-        fun onPageTurn(dialog: PageListDialog)
+        fun onPageTurn(dialog: PageListDialog, player: Player)
     }
 
     companion object {
 
         @JvmStatic
-        fun create(player: Player, parentEventManager: EventManager) = PageListDialogBuilder(player, parentEventManager)
+        @JvmOverloads
+        fun create(eventManager: EventManager = Shoebill.get().eventManager) = PageListDialogBuilder(eventManager)
 
-        fun PageTurnHandler(handler: (PageListDialog) -> Unit) = object : PageTurnHandler {
-            override fun onPageTurn(dialog: PageListDialog) {
-                handler(dialog)
+        fun PageTurnHandler(handler: (PageListDialog, Player) -> Unit) = object : PageTurnHandler {
+            override fun onPageTurn(dialog: PageListDialog, player: Player) {
+                handler(dialog, player)
             }
         }
     }

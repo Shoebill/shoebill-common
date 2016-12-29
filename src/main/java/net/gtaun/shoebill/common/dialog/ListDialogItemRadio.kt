@@ -16,48 +16,52 @@
 
 package net.gtaun.shoebill.common.dialog
 
+import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.data.Color
+import net.gtaun.shoebill.entities.Player
 import java.util.function.IntSupplier
 
-open class ListDialogItemRadio : ListDialogItem {
+@AllOpen
+class ListDialogItemRadio : ListDialogItem {
 
-    open class RadioItemBuilder : AbstractItemBuilder<ListDialogItemRadio, RadioItemBuilder>() {
+    @AllOpen
+    class RadioItemBuilder : AbstractItemBuilder<ListDialogItemRadio, RadioItemBuilder>() {
 
-        open fun item(item: RadioItem) = item { item }
-        open fun colorChecked(color: Color) = colorChecked { color }
-        open fun colorUnchecked(color: Color) = colorUnchecked { color }
-        open fun selectedIndex(index: Int) = selectedIndex { index }
-        open fun selectedIndexSupplier(supplier: IntSupplier) = selectedIndexSupplier { supplier.asInt }
-        open fun onRadioItemSelect(handler: ItemSelectHandler) = onRadioItemSelect { handler }
+        fun item(item: RadioItem) = item { item }
+        fun colorChecked(color: Color) = colorChecked { color }
+        fun colorUnchecked(color: Color) = colorUnchecked { color }
+        fun selectedIndex(index: Int) = selectedIndex { index }
+        fun selectedIndexSupplier(supplier: IntSupplier) = selectedIndexSupplier { supplier.asInt }
+        fun onRadioItemSelect(handler: ItemSelectHandler) = onRadioItemSelect { handler }
 
-        open fun item(init: RadioItemBuilder.() -> RadioItem): RadioItemBuilder {
+        fun item(init: RadioItemBuilder.() -> RadioItem): RadioItemBuilder {
             item.addItem(init(this))
             return this
         }
 
-        open fun colorChecked(init: RadioItemBuilder.() -> Color): RadioItemBuilder {
+        fun colorChecked(init: RadioItemBuilder.() -> Color): RadioItemBuilder {
             val offColor = item.radioItemColorSupplier?.get(false) ?: Color.RED
             item.setRadioColor(init(this), offColor)
             return this
         }
 
-        open fun colorUnchecked(init: RadioItemBuilder.() -> Color): RadioItemBuilder {
+        fun colorUnchecked(init: RadioItemBuilder.() -> Color): RadioItemBuilder {
             val onColor = item.radioItemColorSupplier?.get(true) ?: Color.GREEN
             item.setRadioColor(onColor, init(this))
             return this
         }
 
-        open fun selectedIndex(init: RadioItemBuilder.() -> Int): RadioItemBuilder {
+        fun selectedIndex(init: RadioItemBuilder.() -> Int): RadioItemBuilder {
             item.selectedIndexSupplier = IntSupplier { init(this) }
             return this
         }
 
-        open fun selectedIndexSupplier(init: RadioItemBuilder.() -> Int): RadioItemBuilder {
+        fun selectedIndexSupplier(init: RadioItemBuilder.() -> Int): RadioItemBuilder {
             item.selectedIndexSupplier = IntSupplier { init(this) }
             return this
         }
 
-        open fun onRadioItemSelect(init: RadioItemBuilder.() -> ItemSelectHandler): RadioItemBuilder {
+        fun onRadioItemSelect(init: RadioItemBuilder.() -> ItemSelectHandler): RadioItemBuilder {
             item.radioItemSelectHandler = init(this)
             return this
         }
@@ -68,12 +72,11 @@ open class ListDialogItemRadio : ListDialogItem {
 
     }
 
-    open class RadioItem {
-        var itemText: String? = null
-            private set
-
-        var checkedColor: Color? = null
-        var selectHandler: RadioItemSelectHandler? = null
+    @AllOpen
+    class RadioItem {
+        final var itemText: String? = null
+        final var checkedColor: Color? = null
+        final var selectHandler: RadioItemSelectHandler? = null
 
         @JvmOverloads
         constructor(itemString: String? = null, checkedColor: Color? = null,
@@ -85,25 +88,25 @@ open class ListDialogItemRadio : ListDialogItem {
 
         constructor(itemString: String, selectHandler: RadioItemSelectHandler) : this(itemString, null, selectHandler)
 
-        open fun onSelect(dialogItem: ListDialogItemRadio) = selectHandler?.onSelect(dialogItem)
+        fun onSelect(dialogItem: ListDialogItemRadio, player: Player) = selectHandler?.onSelect(dialogItem, player)
     }
 
 
     @FunctionalInterface
     interface ItemSelectHandler {
-        fun onSelect(dialogItem: ListDialogItemRadio, item: RadioItem, index: Int)
+        fun onSelect(dialogItem: ListDialogItemRadio, player: Player, item: RadioItem, index: Int)
     }
 
     @FunctionalInterface
     interface RadioItemSelectHandler {
-        fun onSelect(dialogItem: ListDialogItemRadio)
+        fun onSelect(dialogItem: ListDialogItemRadio, player: Player)
     }
 
 
     private val options: MutableList<RadioItem> = mutableListOf()
-    open var radioItemColorSupplier: ConditionSupplier<Color>? = null
-    open var selectedIndexSupplier: IntSupplier? = null
-    open var radioItemSelectHandler: ItemSelectHandler? = null
+    var radioItemColorSupplier: ConditionSupplier<Color>? = null
+    var selectedIndexSupplier: IntSupplier? = null
+    var radioItemSelectHandler: ItemSelectHandler? = null
 
     constructor() : super()
 
@@ -115,7 +118,7 @@ open class ListDialogItemRadio : ListDialogItem {
 
     fun addItem(item: RadioItem) = options.add(item)
 
-    fun setRadioColor(checkedColor: Color, uncheckedColor: Color) {
+    final fun setRadioColor(checkedColor: Color, uncheckedColor: Color) {
         radioItemColorSupplier = ConditionSupplier { c -> if (c) checkedColor else uncheckedColor }
     }
 
@@ -139,18 +142,19 @@ open class ListDialogItemRadio : ListDialogItem {
             super.itemText = value
         }
 
-    override fun onItemSelect() {
+    override fun onItemSelect(player: Player) {
         if (options.isEmpty()) return
         val index = (selected + 1) % options.size
         val item = options[index]
-        item.onSelect(this)
-        onItemSelect(item, index)
-        super.onItemSelect()
+        item.onSelect(this, player)
+        onItemSelect(item, player, index)
+        super.onItemSelect(player)
     }
 
-    open fun onItemSelect(item: RadioItem, index: Int) = radioItemSelectHandler?.onSelect(this, item, index)
+    fun onItemSelect(item: RadioItem, player: Player, index: Int) =
+            radioItemSelectHandler?.onSelect(this, player, item, index)
 
-    open val selected: Int
+    val selected: Int
         get() = selectedIndexSupplier?.asInt ?: -1
 
     companion object {
@@ -158,15 +162,15 @@ open class ListDialogItemRadio : ListDialogItem {
         @JvmStatic
         fun create() = RadioItemBuilder()
 
-        fun RadioItemSelectHandler(handler: (ListDialogItemRadio) -> Unit) = object : RadioItemSelectHandler {
-            override fun onSelect(dialogItem: ListDialogItemRadio) {
-                handler(dialogItem)
+        fun RadioItemSelectHandler(handler: (ListDialogItemRadio, Player) -> Unit) = object : RadioItemSelectHandler {
+            override fun onSelect(dialogItem: ListDialogItemRadio, player: Player) {
+                handler(dialogItem, player)
             }
         }
 
-        fun ItemSelectHandler(handler: (ListDialogItemRadio, RadioItem, Int) -> Unit) = object : ItemSelectHandler {
-            override fun onSelect(dialogItem: ListDialogItemRadio, item: RadioItem, index: Int) {
-                handler(dialogItem, item, index)
+        fun ItemSelectHandler(handler: (ListDialogItemRadio, Player, RadioItem, Int) -> Unit) = object : ItemSelectHandler {
+            override fun onSelect(dialogItem: ListDialogItemRadio, player: Player, item: RadioItem, index: Int) {
+                handler(dialogItem, player, item, index)
             }
 
         }

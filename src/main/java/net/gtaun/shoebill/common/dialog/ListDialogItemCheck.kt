@@ -16,22 +16,26 @@
 
 package net.gtaun.shoebill.common.dialog
 
+import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.data.Color
 import java.util.function.BooleanSupplier
 
-open class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedColor: Color) : ListDialogItem(itemText) {
+@AllOpen
+class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedColor: Color) :
+        ListDialogItem(itemText) {
 
-    open class CheckItemBuilder : AbstractItemBuilder<ListDialogItemCheck, CheckItemBuilder>() {
+    @AllOpen
+    class CheckItemBuilder : AbstractItemBuilder<ListDialogItemCheck, CheckItemBuilder>() {
 
-        open fun item(init: CheckItemBuilder.() -> CheckItem): CheckItemBuilder {
+        fun item(init: CheckItemBuilder.() -> CheckItem): CheckItemBuilder {
             item.addItem(init(this))
             return this
         }
 
-        open fun item(item: CheckItem) = item { item }
+        fun item(item: CheckItem) = item { item }
 
         @JvmOverloads
-        open fun item(itemText: String, checkedColor: Color? = null, statusSupplier: BooleanSupplier? = null) = item {
+        fun item(itemText: String, checkedColor: Color? = null, statusSupplier: BooleanSupplier? = null) = item {
             CheckItem(itemText, checkedColor, statusSupplier)
         }
 
@@ -41,9 +45,10 @@ open class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedC
 
     }
 
-    open class CheckItem(itemText: String, var checkedColor: Color?, var statusSupplier: BooleanSupplier?) {
+    @AllOpen
+    class CheckItem(itemText: String, var checkedColor: Color?, var statusSupplier: BooleanSupplier?) {
 
-        open var itemText: String = itemText
+        var itemText: String = itemText
             protected set
 
         constructor(itemText: String, statusSupplier: BooleanSupplier) : this(itemText, null, statusSupplier)
@@ -52,7 +57,7 @@ open class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedC
 
         protected constructor(itemText: String) : this(itemText, null, null)
 
-        open val isChecked: Boolean
+        val isChecked: Boolean
             get() = statusSupplier?.asBoolean ?: false
     }
 
@@ -66,9 +71,9 @@ open class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedC
         setCheckItemColorSupplier(checkedColor, uncheckedColor)
     }
 
-    open fun addItem(item: CheckItem) = options.add(item)
+    fun addItem(item: CheckItem) = options.add(item)
 
-    open fun setCheckItemColorSupplier(checkedColor: Color, uncheckedColor: Color) {
+    final fun setCheckItemColorSupplier(checkedColor: Color, uncheckedColor: Color) {
         checkItemColorSupplier = ConditionSupplier { c -> if (c) checkedColor else uncheckedColor }
     }
 

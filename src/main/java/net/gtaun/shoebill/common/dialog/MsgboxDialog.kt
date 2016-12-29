@@ -16,6 +16,8 @@
 
 package net.gtaun.shoebill.common.dialog
 
+import net.gtaun.shoebill.Shoebill
+import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.constant.DialogStyle
 import net.gtaun.shoebill.entities.Player
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent
@@ -25,65 +27,67 @@ import net.gtaun.util.event.EventManager
  * @author MK124
  * @author Marvin Haschker
  */
-open class MsgboxDialog(player: Player, parentEventManager: EventManager) :
-        AbstractDialog(DialogStyle.MSGBOX, player, parentEventManager) {
+@AllOpen
+class MsgboxDialog(parentEventManager: EventManager) : AbstractDialog(DialogStyle.MSGBOX, parentEventManager) {
 
     @Suppress("unused")
-    open class MsgboxDialogBuilder(player: Player, parentEventManager: EventManager) :
+    @AllOpen
+    class MsgboxDialogBuilder(parentEventManager: EventManager) :
             AbstractDialog.Builder<MsgboxDialog, MsgboxDialogBuilder>() {
 
-        open fun message(message: String) = message { message }
-        open fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
+        fun message(message: String) = message { message }
+        fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
 
-        open fun message(init: MsgboxDialogBuilder.() -> String): MsgboxDialogBuilder {
+        fun message(init: MsgboxDialogBuilder.() -> String): MsgboxDialogBuilder {
             dialog.message = init(this)
             return this
         }
 
-        open fun messageSupplier(init: MsgboxDialogBuilder.() -> DialogTextSupplier): MsgboxDialogBuilder {
+        fun messageSupplier(init: MsgboxDialogBuilder.() -> DialogTextSupplier): MsgboxDialogBuilder {
             dialog.messageSupplier = init(this)
             return this
         }
 
         init {
-            dialog = MsgboxDialog(player, parentEventManager)
+            dialog = MsgboxDialog(parentEventManager)
         }
     }
 
-    open var messageSupplier = DialogTextSupplier { "None" }
-    open var clickOkHandler: ClickOkHandler? = null
+    var messageSupplier = DialogTextSupplier { "None" }
+    var clickOkHandler: ClickOkHandler? = null
 
-    open var message: String
+    var message: String
         get() = this.messageSupplier[this]
         set(message) {
             this.messageSupplier = DialogTextSupplier { message }
         }
 
-    open fun setMessage(messageSupplier: DialogTextSupplier) {
+    fun setMessage(messageSupplier: DialogTextSupplier) {
         this.messageSupplier = messageSupplier
     }
 
-    override fun show() = show(messageSupplier[this])
+    override fun show(player: Player) = show(player, messageSupplier[this])
 
-    override fun onClickOk(event: DialogResponseEvent) = onClickOk()
+    override fun onClickOk(event: DialogResponseEvent) = onClickOk(event.player)
 
-    open fun onClickOk() {
-        clickOkHandler?.onClickOk(this) ?: return Unit
+    fun onClickOk(player: Player) {
+        clickOkHandler?.onClickOk(this, player) ?: return Unit
     }
 
     @FunctionalInterface
     interface ClickOkHandler {
-        fun onClickOk(dialog: MsgboxDialog)
+        fun onClickOk(dialog: MsgboxDialog, player: Player)
     }
 
     companion object {
 
         @JvmStatic
-        fun create(player: Player, parentEventManager: EventManager) = MsgboxDialogBuilder(player, parentEventManager)
+        @JvmOverloads
+        fun create(eventManager: EventManager = Shoebill.get().eventManager) = MsgboxDialogBuilder(eventManager)
 
-        fun ClickOkHandler(handler: (MsgboxDialog) -> Unit) = object : ClickOkHandler {
-            override fun onClickOk(dialog: MsgboxDialog) {
-                handler(dialog)
+        fun ClickOkHandler(handler: (MsgboxDialog, Player) -> Unit) = object : ClickOkHandler {
+            override fun onClickOk(dialog: MsgboxDialog, player: Player) {
+                handler(dialog, player)
             }
         }
     }

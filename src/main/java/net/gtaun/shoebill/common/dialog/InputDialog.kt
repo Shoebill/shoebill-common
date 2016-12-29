@@ -16,87 +16,89 @@
 
 package net.gtaun.shoebill.common.dialog
 
+import net.gtaun.shoebill.Shoebill
+import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.constant.DialogStyle
-import net.gtaun.shoebill.event.dialog.DialogResponseEvent
 import net.gtaun.shoebill.entities.Player
+import net.gtaun.shoebill.event.dialog.DialogResponseEvent
 import net.gtaun.util.event.EventManager
-import net.gtaun.util.event.EventManagerNode
 
-import java.util.ArrayList
-
-@Suppress("CanBeParameter")
 /**
  * @author MK124
  * @author Marvin Haschker
  */
-open class InputDialog
-@JvmOverloads constructor(player: Player, parentEventManager: EventManager, val passwordMode: Boolean = false) :
-        AbstractDialog(if (passwordMode) DialogStyle.PASSWORD else DialogStyle.INPUT, player, parentEventManager) {
+@Suppress("CanBeParameter")
+@AllOpen
+class InputDialog
+@JvmOverloads constructor(parentEventManager: EventManager, val passwordMode: Boolean = false) :
+        AbstractDialog(if (passwordMode) DialogStyle.PASSWORD else DialogStyle.INPUT, parentEventManager) {
 
     @Suppress("unused")
-    open class InputDialogBuilder(player: Player, parentEventManager: EventManager) :
+    @AllOpen
+    class InputDialogBuilder(parentEventManager: EventManager) :
             AbstractDialog.Builder<InputDialog, InputDialogBuilder>() {
 
-        open fun message(message: String) = message { message }
-        open fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
-        open fun onClickOk(handler: ClickOkHandler) = onClickOk { handler }
+        fun message(message: String) = message { message }
+        fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
+        fun onClickOk(handler: ClickOkHandler) = onClickOk { handler }
 
-        open fun message(init: InputDialogBuilder.() -> String): InputDialogBuilder {
+        fun message(init: InputDialogBuilder.() -> String): InputDialogBuilder {
             dialog.message = init(this)
             return this
         }
 
-        open fun messageSupplier(init: InputDialogBuilder.() -> DialogTextSupplier): InputDialogBuilder {
+        fun messageSupplier(init: InputDialogBuilder.() -> DialogTextSupplier): InputDialogBuilder {
             dialog.messageSupplier = init(this)
             return this
         }
 
-        open fun onClickOk(init: InputDialogBuilder.() -> ClickOkHandler): InputDialogBuilder {
+        fun onClickOk(init: InputDialogBuilder.() -> ClickOkHandler): InputDialogBuilder {
             dialog.clickOkHandler = init(this)
             return this
         }
 
         init {
-            dialog = InputDialog(player, parentEventManager)
+            dialog = InputDialog(parentEventManager)
         }
     }
 
-    open var messageSupplier = DialogTextSupplier { "None" }
-    open var clickOkHandler: ClickOkHandler? = null
+    var messageSupplier = DialogTextSupplier { "None" }
+    var clickOkHandler: ClickOkHandler? = null
 
-    open var message: String
+    var message: String
         get() = messageSupplier[this]
         set(message) {
             this.messageSupplier = DialogTextSupplier { message }
         }
 
-    open fun setMessage(messageSupplier: DialogTextSupplier) {
+    fun setMessage(messageSupplier: DialogTextSupplier) {
         this.messageSupplier = messageSupplier
     }
 
-    override fun show() {
-        show(messageSupplier[this])
+    override fun show(player: Player) {
+        show(player, messageSupplier[this])
     }
 
-    override fun onClickOk(event: DialogResponseEvent) = onClickOk(event.inputText)
+    override fun onClickOk(event: DialogResponseEvent) = onClickOk(event.player, event.inputText)
 
-    open fun onClickOk(inputText: String) {
-        clickOkHandler?.onClickOk(this, inputText) ?: return Unit
+    fun onClickOk(player: Player, inputText: String) {
+        clickOkHandler?.onClickOk(this, player, inputText) ?: return Unit
     }
 
     @FunctionalInterface
     interface ClickOkHandler {
-        fun onClickOk(dialog: InputDialog, text: String)
+        fun onClickOk(dialog: InputDialog, player: Player, text: String)
     }
 
     companion object {
 
         @JvmStatic
-        fun create(player: Player, eventManager: EventManager) = InputDialogBuilder(player, eventManager)
+        @JvmOverloads
+        fun create(eventManager: EventManager = Shoebill.get().eventManager) = InputDialogBuilder(eventManager)
 
-        fun ClickOkHandler(handler: (InputDialog, String) -> Unit) = object : ClickOkHandler {
-            override fun onClickOk(dialog: InputDialog, text: String) {
-                handler(dialog, text)
+        fun ClickOkHandler(handler: (InputDialog, Player, String) -> Unit) = object : ClickOkHandler {
+            override fun onClickOk(dialog: InputDialog, player: Player, text: String) {
+                handler(dialog, player, text)
             }
         }
     }

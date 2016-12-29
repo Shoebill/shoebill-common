@@ -1,36 +1,39 @@
 package net.gtaun.shoebill.common.dialog
 
+import net.gtaun.shoebill.Shoebill
+import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.constant.DialogStyle
-import net.gtaun.shoebill.entities.Player
 import net.gtaun.util.event.EventManager
 
 /**
  * Created by marvin on 29.11.15.
  * Copyright (c) 2015 Marvin Haschker. All rights reserved.
  */
-open class TabListDialog protected constructor(player: Player, eventManager: EventManager) : ListDialog(player, eventManager) {
+@AllOpen
+class TabListDialog protected constructor(eventManager: EventManager) : ListDialog(eventManager) {
 
-    open class TabListDialogBuilder(player: Player, parentEventManager: EventManager) :
+    @AllOpen
+    class TabListDialogBuilder(parentEventManager: EventManager) :
             AbstractListDialogBuilder<TabListDialog, TabListDialogBuilder>() {
 
-        open fun header(index: Int, header: String): TabListDialogBuilder {
+        fun header(index: Int, header: String): TabListDialogBuilder {
             dialog.setHeader(index, header)
             return this
         }
 
         init {
-            dialog = TabListDialog(player, parentEventManager)
+            dialog = TabListDialog(parentEventManager)
         }
 
     }
 
-    open val headers = arrayOfNulls<String?>(4)
+    val headers = arrayOfNulls<String?>(4)
 
     init {
         style = DialogStyle.TABLIST
     }
 
-    open fun setHeader(index: Int, title: String) {
+    fun setHeader(index: Int, title: String) {
         if (index < 0 || index > 3) throw IllegalArgumentException("Index must be [0..3]")
         headers[index] = title
     }
@@ -62,13 +65,14 @@ open class TabListDialog protected constructor(player: Player, eventManager: Eve
             return listStr
         }
 
-    open val usedHeaderCount: Int
+    val usedHeaderCount: Int
         get() = headers.filterNotNull().size
 
     companion object {
 
         @JvmStatic
-        fun create(player: Player, parentEventManager: EventManager) = TabListDialogBuilder(player, parentEventManager)
+        @JvmOverloads
+        fun create(eventManager: EventManager = Shoebill.get().eventManager) = TabListDialogBuilder(eventManager)
 
         internal val MAX_HEADERS = 4
     }

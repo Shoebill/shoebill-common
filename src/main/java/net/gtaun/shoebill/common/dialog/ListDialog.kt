@@ -16,6 +16,8 @@
 
 package net.gtaun.shoebill.common.dialog
 
+import net.gtaun.shoebill.Shoebill
+import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.constant.DialogStyle
 import net.gtaun.shoebill.entities.Player
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent
@@ -27,30 +29,32 @@ import java.util.*
  * @author MK124
  * @author Marvin Haschker
  */
-open class ListDialog constructor(player: Player, eventManager: EventManager) :
-        AbstractDialog(DialogStyle.LIST, player, eventManager) {
+@AllOpen
+class ListDialog constructor(eventManager: EventManager) : AbstractDialog(DialogStyle.LIST, eventManager) {
 
     @Suppress("UNCHECKED_CAST")
-    abstract class AbstractListDialogBuilder<T : ListDialog, B : AbstractListDialogBuilder<T, B>> :
-            Builder<T, B>() {
-        open fun item(item: ListDialogItem) = item { item }
-        open fun item(itemText: String) = item { ListDialogItem(itemText) }
+    @AllOpen
+    abstract class AbstractListDialogBuilder<T : ListDialog, B : AbstractListDialogBuilder<T, B>> : Builder<T, B>() {
+        fun item(item: ListDialogItem) = item { item }
+        fun item(itemText: String) = item { ListDialogItem(itemText) }
 
-        open fun item(init: B.() -> ListDialogItem): B {
+        fun item(init: B.() -> ListDialogItem): B {
             dialog.addItem(init(this as B))
             return this
         }
     }
 
-    open class ListDialogBuilder(player: Player, parentEventManager: EventManager) :
-            AbstractListDialogBuilder<ListDialog, ListDialogBuilder>() {init {
-        dialog = ListDialog(player, parentEventManager)
-    }
+    @AllOpen
+    class ListDialogBuilder(parentEventManager: EventManager) :
+            AbstractListDialogBuilder<ListDialog, ListDialogBuilder>() {
+        init {
+            dialog = ListDialog(parentEventManager)
+        }
     }
 
     val items: MutableList<ListDialogItem>
-    open val displayedItems: MutableList<ListDialogItem> = mutableListOf()
-    open var clickOkHandler: ClickOkHandler? = null
+    val displayedItems: MutableList<ListDialogItem> = mutableListOf()
+    var clickOkHandler: ClickOkHandler? = null
 
     init {
         items = object : ArrayList<ListDialogItem>() {
@@ -81,9 +85,9 @@ open class ListDialog constructor(player: Player, eventManager: EventManager) :
         }
     }
 
-    override fun show() = show(itemString)
+    override fun show(player: Player) = show(player, itemString)
 
-    open val itemString: String
+    val itemString: String
         get() {
             var listStr = ""
             displayedItems.clear()
@@ -104,39 +108,40 @@ open class ListDialog constructor(player: Player, eventManager: EventManager) :
         val itemId = event.listItem
         val item = displayedItems[itemId]
 
-        item.onItemSelect()
-        onClickOk(item)
+        item.onItemSelect(event.player)
+        onClickOk(event.player, item)
     }
 
-    open fun onClickOk(item: ListDialogItem) {
-        clickOkHandler?.onClickOk(this, item) ?: return Unit
+    fun onClickOk(player: Player, item: ListDialogItem) {
+        clickOkHandler?.onClickOk(this, player, item) ?: return Unit
     }
 
-    open fun addItem(item: ListDialogItem) = items.add(item)
+    fun addItem(item: ListDialogItem) = items.add(item)
 
     @JvmOverloads
-    open fun addItem(itemText: String, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
-                     handler: ListDialogItem.ItemSelectHandler? = null) =
+    fun addItem(itemText: String, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
+                handler: ListDialogItem.ItemSelectHandler? = null) =
             items.add(ListDialogItem(itemText, enabledSupplier, handler))
 
     @JvmOverloads
-    open fun addItem(supplier: DialogTextSupplier, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
-                     handler: ListDialogItem.ItemSelectHandler? = null) =
+    fun addItem(supplier: DialogTextSupplier, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
+                handler: ListDialogItem.ItemSelectHandler? = null) =
             items.add(ListDialogItem(supplier, enabledSupplier, handler))
 
     @FunctionalInterface
     interface ClickOkHandler {
-        fun onClickOk(dialog: ListDialog, item: ListDialogItem)
+        fun onClickOk(dialog: ListDialog, player: Player, item: ListDialogItem)
     }
 
     companion object {
 
         @JvmStatic
-        fun create(player: Player, eventManager: EventManager) = ListDialogBuilder(player, eventManager)
+        @JvmOverloads
+        fun create(eventManager: EventManager = Shoebill.get().eventManager) = ListDialogBuilder(eventManager)
 
-        fun ClickOkHandler(handler: (ListDialog, ListDialogItem) -> Unit) = object : ClickOkHandler {
-            override fun onClickOk(dialog: ListDialog, item: ListDialogItem) {
-                handler(dialog, item)
+        fun ClickOkHandler(handler: (ListDialog, Player, ListDialogItem) -> Unit) = object : ClickOkHandler {
+            override fun onClickOk(dialog: ListDialog, player: Player, item: ListDialogItem) {
+                handler(dialog, player, item)
             }
         }
     }

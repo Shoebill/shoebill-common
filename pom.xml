@@ -12,8 +12,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.0.5-3</kotlin.version>
-        <dokka.version>0.9.8</dokka.version>
+        <kotlin.version>1.0.6</kotlin.version>
+        <dokka.version>0.9.11</dokka.version>
     </properties>
 
     <distributionManagement>
@@ -36,6 +36,14 @@
             <url>http://repo.gtaun.net/content/repositories/snapshots</url>
         </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jcenter</id>
+            <name>JCenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <licenses>
         <license>
@@ -135,6 +143,24 @@
                         </goals>
                     </execution>
                 </executions>
+
+                <configuration>
+                    <compilerPlugins>
+                        <plugin>all-open</plugin>
+                    </compilerPlugins>
+
+                    <pluginOptions>
+                        <option>all-open:annotation=net.gtaun.shoebill.common.AllOpen</option>
+                    </pluginOptions>
+                </configuration>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-allopen</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>

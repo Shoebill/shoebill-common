@@ -16,6 +16,8 @@
 
 package net.gtaun.shoebill.common.dialog
 
+import net.gtaun.shoebill.entities.Player
+
 @FunctionalInterface
 interface ConditionSupplier<out T> {
     operator fun get(condition: Boolean): T
@@ -29,12 +31,12 @@ fun <T> ConditionSupplier(handler: (Boolean) -> T) = object : ConditionSupplier<
 
 @FunctionalInterface
 interface DialogHandler {
-    fun handle(dialog: AbstractDialog)
+    fun handle(dialog: AbstractDialog, player: Player)
 }
 
-fun DialogHandler(handler: (AbstractDialog) -> Unit) = object : DialogHandler {
-    override fun handle(dialog: AbstractDialog) {
-        handler(dialog)
+fun DialogHandler(handler: (AbstractDialog, Player) -> Unit) = object : DialogHandler {
+    override fun handle(dialog: AbstractDialog, player: Player) {
+        handler(dialog, player)
     }
 }
 

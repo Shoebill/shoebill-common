@@ -16,70 +16,81 @@
 
 package net.gtaun.shoebill.common.dialog
 
-import java.util.function.Consumer
+import net.gtaun.shoebill.common.AllOpen
+import net.gtaun.shoebill.entities.Player
+import java.util.function.BiConsumer
 
-open class ListDialogItem {
+@AllOpen
+class ListDialogItem {
 
+    @AllOpen
     abstract class AbstractItemBuilder<T : ListDialogItem, B : AbstractItemBuilder<T, B>> {
 
         protected lateinit var item: T
 
-        open fun init(init: B.(B) -> Unit): B {
+        fun init(init: B.(B) -> Unit): B {
             init(this as B, this)
             return this
         }
 
-        open fun text(text: String) = text { text }
-        open fun textSupplier(supplier: DialogTextSupplier) = textSupplier { supplier }
-        open fun enabled(enabled: Boolean) = enabled { enabled }
-        open fun enabledSupplier(supplier: ItemBooleanSupplier) = enabledSupplier { supplier }
-        open fun onSelect(handler: Consumer<ListDialogItem>) = onSelect { handler.accept(it) }
-        open fun onSelectHandler(handler: ItemSelectHandler) = onSelectHandler { handler }
+        fun text(text: String) = text { text }
+        fun textSupplier(supplier: DialogTextSupplier) = textSupplier { supplier }
+        fun enabled(enabled: Boolean) = enabled { enabled }
+        fun enabledSupplier(supplier: ItemBooleanSupplier) = enabledSupplier { supplier }
 
-        open fun text(init: B.() -> String): B {
+        fun onSelect(handler: BiConsumer<ListDialogItem, Player>) = onSelect {
+            item, player ->
+            handler.accept(item, player)
+        }
+
+        fun onSelectHandler(handler: ItemSelectHandler) = onSelectHandler { handler }
+
+        fun text(init: B.() -> String): B {
             item.itemText = init(this as B)
             return this
         }
 
-        open fun textSupplier(init: B.() -> DialogTextSupplier): B {
+        fun textSupplier(init: B.() -> DialogTextSupplier): B {
             item.itemTextSupplier = init(this as B)
             return this
         }
 
-        open fun enabled(init: B.() -> Boolean): B {
+        fun enabled(init: B.() -> Boolean): B {
             item.itemEnabledSupplier = ItemBooleanSupplier { init(this as B) }
             return this as B
         }
 
-        open fun enabledSupplier(init: B.() -> ItemBooleanSupplier): B {
+        fun enabledSupplier(init: B.() -> ItemBooleanSupplier): B {
             item.itemEnabledSupplier = init(this as B)
             return this
         }
 
-        open fun onSelect(init: (ListDialogItem) -> Unit): B {
-            item.selectHandler = ItemSelectHandler { init(it) }
+        fun onSelect(init: (ListDialogItem, Player) -> Unit): B {
+            item.selectHandler = ItemSelectHandler { item, player -> init(item, player) }
             return this as B
         }
 
-        open fun onSelectHandler(init: B.() -> ItemSelectHandler): B {
+        fun onSelectHandler(init: B.() -> ItemSelectHandler): B {
             item.selectHandler = init(this as B)
             return this
         }
 
-        open fun build(): T = item
+        fun build(): T = item
     }
 
-    open class ListDialogItemBuilder : AbstractItemBuilder<ListDialogItem, ListDialogItemBuilder>() {init {
-        item = ListDialogItem()
-    }
+    @AllOpen
+    class ListDialogItemBuilder : AbstractItemBuilder<ListDialogItem, ListDialogItemBuilder>() {
+        init {
+            item = ListDialogItem()
+        }
     }
 
-    open var currentDialog: ListDialog? = null
+    var currentDialog: ListDialog? = null
         set
 
-    var itemTextSupplier: DialogTextSupplier? = null
-    var itemEnabledSupplier: ItemBooleanSupplier? = null
-    var selectHandler: ItemSelectHandler? = null
+    final var itemTextSupplier: DialogTextSupplier? = null
+    final var itemEnabledSupplier: ItemBooleanSupplier? = null
+    final var selectHandler: ItemSelectHandler? = null
 
     constructor()
 
@@ -99,17 +110,17 @@ open class ListDialogItem {
         selectHandler = handler
     }
 
-    open var itemText: String
+    var itemText: String
         get() = itemTextSupplier?.get(currentDialog) ?: "-"
         set(itemText) {
             itemTextSupplier = DialogTextSupplier { itemText }
         }
 
-    open val isEnabled: Boolean
+    val isEnabled: Boolean
         get() = itemEnabledSupplier == null || itemEnabledSupplier?.get() ?: true
 
-    open fun onItemSelect() {
-        selectHandler?.onItemSelect(this) ?: return Unit
+    fun onItemSelect(player: Player) {
+        selectHandler?.onItemSelect(this, player) ?: return Unit
     }
 
     @FunctionalInterface
@@ -119,7 +130,7 @@ open class ListDialogItem {
 
     @FunctionalInterface
     interface ItemSelectHandler {
-        fun onItemSelect(item: ListDialogItem)
+        fun onItemSelect(item: ListDialogItem, player: Player)
     }
 
     companion object {
@@ -133,9 +144,9 @@ open class ListDialogItem {
             }
         }
 
-        fun ItemSelectHandler(handler: (ListDialogItem) -> Unit) = object : ItemSelectHandler {
-            override fun onItemSelect(item: ListDialogItem) {
-                return handler(item)
+        fun ItemSelectHandler(handler: (ListDialogItem, Player) -> Unit) = object : ItemSelectHandler {
+            override fun onItemSelect(item: ListDialogItem, player: Player) {
+                return handler(item, player)
             }
         }
     }
