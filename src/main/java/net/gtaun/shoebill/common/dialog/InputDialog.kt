@@ -35,28 +35,34 @@ class InputDialog
 
     @Suppress("unused")
     @AllOpen
-    class InputDialogBuilder(parentEventManager: EventManager) :
-            AbstractDialog.Builder<InputDialog, InputDialogBuilder>() {
+    abstract class AbstractInputDialogBuilder<T : InputDialog, B : InputDialog.AbstractInputDialogBuilder<T, B>> :
+            Builder<T, B>() {
 
         fun message(message: String) = message { message }
-        fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
+        fun messageSupplier(supplier: DialogTextSupplier): B {
+            dialog.messageSupplier = supplier
+            return this as B
+        }
+
         fun onClickOk(handler: ClickOkHandler) = onClickOk { handler }
 
-        fun message(init: InputDialogBuilder.() -> String): InputDialogBuilder {
-            dialog.message = init(this)
+        fun message(init: B.() -> String): B {
+            dialog.message = init(this as B)
             return this
         }
 
-        fun messageSupplier(init: InputDialogBuilder.() -> DialogTextSupplier): InputDialogBuilder {
-            dialog.messageSupplier = init(this)
+        fun messageSupplier(init: B.(T) -> String) =
+                messageSupplier(DialogTextSupplier { init(this as B, dialog) })
+
+        fun onClickOk(init: B.() -> ClickOkHandler): B {
+            dialog.clickOkHandler = init(this as B)
             return this
         }
+    }
 
-        fun onClickOk(init: InputDialogBuilder.() -> ClickOkHandler): InputDialogBuilder {
-            dialog.clickOkHandler = init(this)
-            return this
-        }
-
+    @AllOpen
+    class InputDialogBuilder(parentEventManager: EventManager) :
+            AbstractInputDialogBuilder<InputDialog, InputDialogBuilder>() {
         init {
             dialog = InputDialog(parentEventManager)
         }

@@ -49,11 +49,24 @@ abstract class AbstractDialog(protected var style: DialogStyle, parentEventManag
         }
 
         fun caption(caption: String) = caption { caption }
-        fun captionSupplier(supplier: DialogTextSupplier) = captionSupplier { supplier }
         fun buttonOk(buttonOk: String) = buttonOk { buttonOk }
-        fun buttonOkSupplier(supplier: DialogTextSupplier) = buttonOkSupplier { supplier }
         fun buttonCancel(buttonCancel: String) = buttonCancel { buttonCancel }
-        fun buttonCancelSupplier(supplier: DialogTextSupplier) = buttonCancelSupplier { supplier }
+
+        fun captionSupplier(supplier: DialogTextSupplier): B {
+            dialog.captionSupplier = supplier
+            return this as B
+        }
+
+        fun buttonOkSupplier(supplier: DialogTextSupplier): B {
+            dialog.buttonOkSupplier = supplier
+            return this as B
+        }
+
+        fun buttonCancelSupplier(supplier: DialogTextSupplier): B {
+            dialog.buttonCancelSupplier = supplier
+            return this as B
+        }
+
         fun onShow(handler: DialogHandler) = onShow { handler }
         fun onClose(handler: DialogCloseHandler) = onClose { handler }
         fun onCancel(handler: DialogHandler) = onCancel { handler }
@@ -64,30 +77,24 @@ abstract class AbstractDialog(protected var style: DialogStyle, parentEventManag
             return this
         }
 
-        fun captionSupplier(init: B.() -> DialogTextSupplier): B {
-            dialog.captionSupplier = init(this as B)
-            return this
-        }
+        fun captionSupplier(init: B.(AbstractDialog) -> String): B =
+                captionSupplier(DialogTextSupplier { init(this as B, it) })
 
         fun buttonOk(init: B.() -> String): B {
             dialog.buttonOk = init(this as B)
             return this
         }
 
-        fun buttonOkSupplier(init: B.() -> DialogTextSupplier): B {
-            dialog.buttonOkSupplier = init(this as B)
-            return this
-        }
+        fun buttonOkSupplier(init: B.(AbstractDialog) -> String): B =
+                buttonOkSupplier(DialogTextSupplier { init(this as B, it) })
 
         fun buttonCancel(init: B.() -> String): B {
             dialog.buttonCancel = init(this as B)
             return this
         }
 
-        fun buttonCancelSupplier(init: B.() -> DialogTextSupplier): B {
-            dialog.setButtonCancel(init(this as B))
-            return this
-        }
+        fun buttonCancelSupplier(init: B.(AbstractDialog) -> String): B =
+                buttonCancelSupplier(DialogTextSupplier { init(this as B, it) })
 
         fun onShow(init: B.() -> DialogHandler): B {
             dialog.showHandler = init(this as B)

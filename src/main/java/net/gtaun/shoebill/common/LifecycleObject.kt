@@ -8,6 +8,7 @@ import net.gtaun.util.event.EventManager
  * Copyright (c) 2016 Marvin Haschker. All rights reserved.
  */
 
+@AllOpen
 abstract class LifecycleObject
 @JvmOverloads constructor(eventManager: EventManager = Shoebill.get().eventManager) :
         AbstractShoebillContext(eventManager)

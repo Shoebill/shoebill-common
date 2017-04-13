@@ -14,6 +14,7 @@ import java.util.List;
  * Copyright (c) Marvin Haschker 2016.
  */
 public class NullPlayer extends Player {
+
     @Override
     public boolean isOnline() {
         return true;
@@ -1038,5 +1039,15 @@ public class NullPlayer extends Player {
     @Override
     public Weather getWeather() {
         return null;
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        return false;
+    }
+
+    @Override
+    public void sendMessage(String s) {
+
     }
 }

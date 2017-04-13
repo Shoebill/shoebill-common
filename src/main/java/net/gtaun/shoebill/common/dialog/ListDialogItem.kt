@@ -34,9 +34,16 @@ class ListDialogItem {
         }
 
         fun text(text: String) = text { text }
-        fun textSupplier(supplier: DialogTextSupplier) = textSupplier { supplier }
+        fun textSupplier(supplier: DialogTextSupplier): B {
+            item.textSupplier = supplier
+            return this as B
+        }
+
         fun enabled(enabled: Boolean) = enabled { enabled }
-        fun enabledSupplier(supplier: ItemBooleanSupplier) = enabledSupplier { supplier }
+        fun enabledSupplier(supplier: ItemBooleanSupplier): B {
+            item.enabledSupplier = supplier
+            return this as B
+        }
 
         fun onSelect(handler: BiConsumer<ListDialogItem, Player>) = onSelect {
             item, player ->
@@ -50,20 +57,14 @@ class ListDialogItem {
             return this
         }
 
-        fun textSupplier(init: B.() -> DialogTextSupplier): B {
-            item.itemTextSupplier = init(this as B)
-            return this
-        }
+        fun textSupplier(init: B.(T) -> String) = textSupplier(DialogTextSupplier { init(this as B, item) })
 
         fun enabled(init: B.() -> Boolean): B {
-            item.itemEnabledSupplier = ItemBooleanSupplier { init(this as B) }
+            item.enabledSupplier = ItemBooleanSupplier { init(this as B) }
             return this as B
         }
 
-        fun enabledSupplier(init: B.() -> ItemBooleanSupplier): B {
-            item.itemEnabledSupplier = init(this as B)
-            return this
-        }
+        fun enabledSupplier(init: B.(T) -> Boolean) = enabledSupplier(ItemBooleanSupplier { init(this as B, item) })
 
         fun onSelect(init: (ListDialogItem, Player) -> Unit): B {
             item.selectHandler = ItemSelectHandler { item, player -> init(item, player) }
@@ -88,8 +89,8 @@ class ListDialogItem {
     var currentDialog: ListDialog? = null
         set
 
-    final var itemTextSupplier: DialogTextSupplier? = null
-    final var itemEnabledSupplier: ItemBooleanSupplier? = null
+    final var textSupplier: DialogTextSupplier? = null
+    final var enabledSupplier: ItemBooleanSupplier? = null
     final var selectHandler: ItemSelectHandler? = null
 
     constructor()
@@ -97,27 +98,27 @@ class ListDialogItem {
     @JvmOverloads
     constructor(text: String, enabledSupplier: ItemBooleanSupplier? = null,
                 handler: ItemSelectHandler? = null) {
-        itemTextSupplier = DialogTextSupplier { text }
-        itemEnabledSupplier = enabledSupplier
+        textSupplier = DialogTextSupplier { text }
+        this.enabledSupplier = enabledSupplier
         selectHandler = handler
     }
 
     @JvmOverloads
     constructor(textSupplier: DialogTextSupplier, enabledSupplier: ItemBooleanSupplier? = null,
                 handler: ItemSelectHandler? = null) {
-        itemTextSupplier = textSupplier
-        itemEnabledSupplier = enabledSupplier
+        this.textSupplier = textSupplier
+        this.enabledSupplier = enabledSupplier
         selectHandler = handler
     }
 
     var itemText: String
-        get() = itemTextSupplier?.get(currentDialog) ?: "-"
+        get() = currentDialog?.let { textSupplier?.get(it) } ?: "-"
         set(itemText) {
-            itemTextSupplier = DialogTextSupplier { itemText }
+            textSupplier = DialogTextSupplier { itemText }
         }
 
     val isEnabled: Boolean
-        get() = itemEnabledSupplier == null || itemEnabledSupplier?.get() ?: true
+        get() = enabledSupplier == null || enabledSupplier?.get() ?: true
 
     fun onItemSelect(player: Player) {
         selectHandler?.onItemSelect(this, player) ?: return Unit

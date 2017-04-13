@@ -4,6 +4,7 @@ import net.gtaun.util.event.EventManager
 
 import java.util.*
 
+@AllOpen
 class ShoebillContextManager(parentEventManager: EventManager) : AbstractShoebillContext(parentEventManager) {
 
     private val contextContainers =

@@ -6,10 +6,11 @@ import net.gtaun.util.event.EventManagerNode
 
 import java.util.HashSet
 
+@AllOpen
 abstract class AbstractShoebillContext(parentEventManager: EventManager) : Destroyable {
 
     private var isInitialized = false
-    private var eventManagerNode: EventManagerNode = parentEventManager.createChildNode()
+    protected var eventManagerNode: EventManagerNode = parentEventManager.createChildNode()
     private val destroyables = mutableSetOf<Destroyable>()
 
     fun addDestroyable(destroyable: Destroyable) = destroyables.add(destroyable)

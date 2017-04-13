@@ -32,22 +32,27 @@ class MsgboxDialog(parentEventManager: EventManager) : AbstractDialog(DialogStyl
 
     @Suppress("unused")
     @AllOpen
-    class MsgboxDialogBuilder(parentEventManager: EventManager) :
-            AbstractDialog.Builder<MsgboxDialog, MsgboxDialogBuilder>() {
+    abstract class AbstractMsgboxDialogBuilder<T : MsgboxDialog, B : MsgboxDialog.AbstractMsgboxDialogBuilder<T, B>> :
+            Builder<T, B>() {
 
         fun message(message: String) = message { message }
-        fun messageSupplier(supplier: DialogTextSupplier) = messageSupplier { supplier }
+        fun messageSupplier(supplier: DialogTextSupplier): B {
+            dialog.messageSupplier = supplier
+            return this as B
+        }
 
-        fun message(init: MsgboxDialogBuilder.() -> String): MsgboxDialogBuilder {
-            dialog.message = init(this)
+        fun message(init: B.() -> String): B {
+            dialog.message = init(this as B)
             return this
         }
 
-        fun messageSupplier(init: MsgboxDialogBuilder.() -> DialogTextSupplier): MsgboxDialogBuilder {
-            dialog.messageSupplier = init(this)
-            return this
-        }
+        fun messageSupplier(init: B.(T) -> String) =
+                messageSupplier(DialogTextSupplier { init(this as B, dialog) })
+    }
 
+    @AllOpen
+    class MsgboxDialogBuilder(parentEventManager: EventManager) :
+            AbstractMsgboxDialogBuilder<MsgboxDialog, MsgboxDialogBuilder>() {
         init {
             dialog = MsgboxDialog(parentEventManager)
         }

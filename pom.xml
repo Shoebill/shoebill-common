@@ -12,7 +12,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.0.6</kotlin.version>
+        <kotlin.version>1.1.1</kotlin.version>
         <dokka.version>0.9.11</dokka.version>
     </properties>
 

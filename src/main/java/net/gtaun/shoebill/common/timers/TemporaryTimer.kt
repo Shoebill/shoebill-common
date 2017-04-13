@@ -13,11 +13,10 @@ class TemporaryTimer @JvmOverloads constructor(
         count: Int = Timer.COUNT_INFINITE,
         callback: TimerCallback? = null) : Timer() {
 
-    private val timer: Timer
+    private val timer: Timer = Timer.create(interval, count, callback)
     private var hasBeenStarted = false
 
     init {
-        timer = Timer.create(interval, count, callback)
         timers.add(this)
     }
 

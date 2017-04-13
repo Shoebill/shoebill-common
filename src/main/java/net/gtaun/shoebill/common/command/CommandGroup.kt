@@ -253,34 +253,34 @@ open class CommandGroup {
     }
 
     companion object {
-        private val TYPE_PARSER = HashMap<Class<*>, Function<String, Any>>()
+        private val TYPE_PARSER = HashMap<Class<*>, Function<String, Any?>>()
 
         init {
 
-            TYPE_PARSER.put(Integer.TYPE, Function<String, Any> { Integer.parseInt(it) })
-            TYPE_PARSER.put(Int::class.java, Function<String, Any> { Integer.parseInt(it) })
+            TYPE_PARSER.put(Integer.TYPE, Function<String, Any?> { Integer.parseInt(it) })
+            TYPE_PARSER.put(Int::class.java, Function<String, Any?> { Integer.parseInt(it) })
 
-            TYPE_PARSER.put(String::class.java, Function<String, Any> { it })
+            TYPE_PARSER.put(String::class.java, Function<String, Any?> { it })
 
-            TYPE_PARSER.put(java.lang.Short.TYPE, Function<String, Any> { java.lang.Short.parseShort(it) })
-            TYPE_PARSER.put(Short::class.java, Function<String, Any> { java.lang.Short.parseShort(it) })
+            TYPE_PARSER.put(java.lang.Short.TYPE, Function<String, Any?> { java.lang.Short.parseShort(it) })
+            TYPE_PARSER.put(Short::class.java, Function<String, Any?> { java.lang.Short.parseShort(it) })
 
-            TYPE_PARSER.put(java.lang.Byte.TYPE, Function<String, Any> { java.lang.Byte.parseByte(it) })
-            TYPE_PARSER.put(Byte::class.java, Function<String, Any> { java.lang.Byte.parseByte(it) })
+            TYPE_PARSER.put(java.lang.Byte.TYPE, Function<String, Any?> { java.lang.Byte.parseByte(it) })
+            TYPE_PARSER.put(Byte::class.java, Function<String, Any?> { java.lang.Byte.parseByte(it) })
 
-            TYPE_PARSER.put(Character.TYPE, Function<String, Any> { s -> if (s.length > 0) s[0] else 0 })
-            TYPE_PARSER.put(Char::class.java, Function<String, Any> { s -> if (s.length > 0) s[0] else 0 })
+            TYPE_PARSER.put(Character.TYPE, Function<String, Any?> { s -> if (s.isNotEmpty()) s[0] else 0 })
+            TYPE_PARSER.put(Char::class.java, Function<String, Any?> { s -> if (s.isNotEmpty()) s[0] else 0 })
 
-            TYPE_PARSER.put(java.lang.Float.TYPE, Function<String, Any> { java.lang.Float.parseFloat(it) })
-            TYPE_PARSER.put(Float::class.java, Function<String, Any> { java.lang.Float.parseFloat(it) })
+            TYPE_PARSER.put(java.lang.Float.TYPE, Function<String, Any?> { java.lang.Float.parseFloat(it) })
+            TYPE_PARSER.put(Float::class.java, Function<String, Any?> { java.lang.Float.parseFloat(it) })
 
-            TYPE_PARSER.put(java.lang.Double.TYPE, Function<String, Any> { java.lang.Double.parseDouble(it) })
-            TYPE_PARSER.put(Double::class.java, Function<String, Any> { java.lang.Double.parseDouble(it) })
+            TYPE_PARSER.put(java.lang.Double.TYPE, Function<String, Any?> { java.lang.Double.parseDouble(it) })
+            TYPE_PARSER.put(Double::class.java, Function<String, Any?> { java.lang.Double.parseDouble(it) })
 
-            TYPE_PARSER.put(Boolean::class.java, Function<String, Any> { java.lang.Boolean.parseBoolean(it) })
+            TYPE_PARSER.put(Boolean::class.java, Function<String, Any?> { java.lang.Boolean.parseBoolean(it) })
 
-            TYPE_PARSER.put(Player::class.java, Function<String, Any> { Player.getByNameOrId(it) })
-            TYPE_PARSER.put(Color::class.java, Function<String, Any> { s -> Color(Integer.parseUnsignedInt(s, 16)) })
+            TYPE_PARSER.put(Player::class.java, Function<String, Any?> { Player.getByNameOrId(it) })
+            TYPE_PARSER.put(Color::class.java, Function<String, Any?> { s -> Color(Integer.parseUnsignedInt(s, 16)) })
         }
 
         private fun generateCommandEntries(`object`: Any): Collection<CommandEntryInternal> {
@@ -400,10 +400,10 @@ open class CommandGroup {
         @Throws(NumberFormatException::class)
         private fun parseParam(type: Class<*>, param: String): Any? = TYPE_PARSER[type]?.apply(param)
 
-        fun replaceTypeParser(type: Class<*>, function: Function<String, Any>) = TYPE_PARSER.put(type, function)
-        fun getTypeParser(type: Class<*>): Function<String, Any>? = TYPE_PARSER[type]
+        fun replaceTypeParser(type: Class<*>, function: Function<String, Any?>) = TYPE_PARSER.put(type, function)
+        fun getTypeParser(type: Class<*>): Function<String, Any?>? = TYPE_PARSER[type]
 
-        val typeParsers: Map<Class<*>, Function<String, Any>>
+        val typeParsers: Map<Class<*>, Function<String, Any?>>
             get() = HashMap(TYPE_PARSER)
 
         private fun getChildGroup(commandGroup: CommandGroup, name: String): CommandGroup? {

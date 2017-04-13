@@ -10,7 +10,8 @@ import net.gtaun.util.event.EventManagerNode
  * Copyright (c) 2016 Marvin Haschker. All rights reserved.
  */
 
-open class LifecycleHolder<T> @JvmOverloads
+@AllOpen
+class LifecycleHolder<T> @JvmOverloads
 constructor(eventManager: EventManager = Shoebill.get().eventManager) : Destroyable {
 
     protected val eventManagerNode: EventManagerNode = eventManager.createChildNode()

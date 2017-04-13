@@ -31,7 +31,12 @@ class ListDialogItemRadio : ListDialogItem {
         fun colorChecked(color: Color) = colorChecked { color }
         fun colorUnchecked(color: Color) = colorUnchecked { color }
         fun selectedIndex(index: Int) = selectedIndex { index }
-        fun selectedIndexSupplier(supplier: IntSupplier) = selectedIndexSupplier { supplier.asInt }
+
+        fun selectedIndexSupplier(supplier: IntSupplier): RadioItemBuilder {
+            item.selectedIndexSupplier = supplier
+            return this
+        }
+
         fun onRadioItemSelect(handler: ItemSelectHandler) = onRadioItemSelect { handler }
 
         fun item(init: RadioItemBuilder.() -> RadioItem): RadioItemBuilder {
@@ -56,10 +61,8 @@ class ListDialogItemRadio : ListDialogItem {
             return this
         }
 
-        fun selectedIndexSupplier(init: RadioItemBuilder.() -> Int): RadioItemBuilder {
-            item.selectedIndexSupplier = IntSupplier { init(this) }
-            return this
-        }
+        fun selectedIndexSupplier(init: RadioItemBuilder.() -> Int) =
+                selectedIndexSupplier(IntSupplier { init(this) })
 
         fun onRadioItemSelect(init: RadioItemBuilder.() -> ItemSelectHandler): RadioItemBuilder {
             item.radioItemSelectHandler = init(this)

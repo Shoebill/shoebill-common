@@ -23,6 +23,7 @@ import net.gtaun.shoebill.resource.Plugin
  * @author MK124
  * @author Marvin Haschker
  */
+@AllOpen
 abstract class ConfigurablePlugin protected constructor() : Plugin() {
     fun configure(player: Player): Boolean = false
 }

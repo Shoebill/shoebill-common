@@ -35,20 +35,18 @@ object VehicleUtils {
         return Player.get().filter({ it.state == PlayerState.PASSENGER && it.vehicle === vehicle })
                 .sortedBy { it.vehicleSeat }
     }
-
-    @JvmStatic
-    var Vehicle.driver: Player?
-        get() = getVehicleDriver(this)
-        set(player) {
-            player?.setVehicle(this, 0)
-        }
-
-    @JvmStatic
-    var Vehicle.passengers: List<Player>
-        get() = getVehiclePassengers(this)
-        set(value) {
-            value.forEachIndexed { i, player ->
-                player.setVehicle(this, i + 1)
-            }
-        }
 }
+
+var Vehicle.driver: Player?
+    get() = VehicleUtils.getVehicleDriver(this)
+    set(player) {
+        player?.setVehicle(this, 0)
+    }
+
+var Vehicle.passengers: List<Player>
+    get() = VehicleUtils.getVehiclePassengers(this)
+    set(value) {
+        value.forEachIndexed { i, player ->
+            player.setVehicle(this, i + 1)
+        }
+    }

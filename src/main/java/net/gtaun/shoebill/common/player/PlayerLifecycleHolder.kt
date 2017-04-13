@@ -2,6 +2,7 @@ package net.gtaun.shoebill.common.player
 
 import net.gtaun.shoebill.Shoebill
 import net.gtaun.shoebill.common.LifecycleHolder
+import net.gtaun.shoebill.common.vehicle.VehicleLifecycleObject
 import net.gtaun.shoebill.entities.Player
 import net.gtaun.shoebill.event.player.PlayerConnectEvent
 import net.gtaun.shoebill.event.player.PlayerDisconnectEvent
@@ -38,8 +39,7 @@ class PlayerLifecycleHolder @JvmOverloads constructor(eventManager: EventManager
                 val constructor = clazz.constructors.filter {
                     it.parameters.size == 1 &&
                             it.parameters.first().type == Player::class
-                }
-                        .firstOrNull() ?: throw Exception("No valid constructor available for class $clazz.")
+                }.firstOrNull() ?: throw Exception("No valid constructor available for $clazz.")
                 return constructor.call(input)
             }
 

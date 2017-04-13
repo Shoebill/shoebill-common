@@ -35,13 +35,12 @@ class ListDialog constructor(eventManager: EventManager) : AbstractDialog(Dialog
     @Suppress("UNCHECKED_CAST")
     @AllOpen
     abstract class AbstractListDialogBuilder<T : ListDialog, B : AbstractListDialogBuilder<T, B>> : Builder<T, B>() {
-        fun item(item: ListDialogItem) = item { item }
-        fun item(itemText: String) = item { ListDialogItem(itemText) }
-
         fun item(init: B.() -> ListDialogItem): B {
             dialog.addItem(init(this as B))
             return this
         }
+
+        fun item(item: String) = item { ListDialogItem(item) }
     }
 
     @AllOpen

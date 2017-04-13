@@ -16,6 +16,11 @@ class TabListDialog protected constructor(eventManager: EventManager) : ListDial
     class TabListDialogBuilder(parentEventManager: EventManager) :
             AbstractListDialogBuilder<TabListDialog, TabListDialogBuilder>() {
 
+        fun header(index: Int, headerSupplier: DialogTextSupplier): TabListDialogBuilder {
+            dialog.setHeader(index, headerSupplier)
+            return this
+        }
+
         fun header(index: Int, header: String): TabListDialogBuilder {
             dialog.setHeader(index, header)
             return this
@@ -27,16 +32,18 @@ class TabListDialog protected constructor(eventManager: EventManager) : ListDial
 
     }
 
-    val headers = arrayOfNulls<String?>(4)
+    val headers = arrayOfNulls<DialogTextSupplier?>(4)
 
     init {
         style = DialogStyle.TABLIST
     }
 
-    fun setHeader(index: Int, title: String) {
+    fun setHeader(index: Int, titleSupplier: DialogTextSupplier) {
         if (index < 0 || index > 3) throw IllegalArgumentException("Index must be [0..3]")
-        headers[index] = title
+        headers[index] = titleSupplier
     }
+
+    fun setHeader(index: Int, title: String) = setHeader(index, DialogTextSupplier { title })
 
     override val itemString: String
         get() {
@@ -45,8 +52,10 @@ class TabListDialog protected constructor(eventManager: EventManager) : ListDial
             if (headerCount > 0) {
                 style = DialogStyle.TABLIST_HEADERS
                 for (i in 0..headerCount - 1) {
-                    if (headers[i]?.length ?: 0 < 1) continue
-                    listStr += headers[i]
+                    val headerText = headers[i]?.get(this) ?: continue
+                    if (headerText.isEmpty()) continue
+
+                    listStr += headerText
                     if (i + 1 < headerCount)
                         listStr += "\t"
                     else {

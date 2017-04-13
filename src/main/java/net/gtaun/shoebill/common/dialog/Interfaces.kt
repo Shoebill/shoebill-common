@@ -42,11 +42,11 @@ fun DialogHandler(handler: (AbstractDialog, Player) -> Unit) = object : DialogHa
 
 @FunctionalInterface
 interface DialogTextSupplier {
-    operator fun get(dialog: AbstractDialog?): String
+    operator fun get(dialog: AbstractDialog): String
 }
 
-fun DialogTextSupplier(handler: (AbstractDialog?) -> String) = object : DialogTextSupplier {
-    override fun get(dialog: AbstractDialog?): String {
+fun DialogTextSupplier(handler: (AbstractDialog) -> String) = object : DialogTextSupplier {
+    override fun get(dialog: AbstractDialog): String {
         return handler(dialog)
     }
 }
