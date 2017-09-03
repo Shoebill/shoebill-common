@@ -58,7 +58,7 @@ public class PageListDialog extends ListDialog {
         }
     }
 
-    private static class PageListDialogBuilder extends AbstractPageListDialogBuilder<PageListDialog, PageListDialogBuilder> {
+    public static class PageListDialogBuilder extends AbstractPageListDialogBuilder<PageListDialog, PageListDialogBuilder> {
         protected PageListDialogBuilder(Player player, EventManager parentEventManager) {
             super(new PageListDialog(player, parentEventManager));
         }
