@@ -25,7 +25,7 @@ public class TabListDialog extends ListDialog {
         }
     }
 
-    private static class TabListDialogBuilder extends AbstractTabListDialogBuilder<TabListDialog, TabListDialogBuilder> {
+    public static class TabListDialogBuilder extends AbstractTabListDialogBuilder<TabListDialog, TabListDialogBuilder> {
         protected TabListDialogBuilder(Player player, EventManager parentEventManager) {
             super(new TabListDialog(player, parentEventManager));
         }
