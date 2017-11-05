@@ -87,7 +87,6 @@ class ListDialogItem {
     }
 
     var currentDialog: ListDialog? = null
-        set
 
     final var textSupplier: DialogTextSupplier? = null
     final var enabledSupplier: ItemBooleanSupplier? = null
@@ -124,31 +123,9 @@ class ListDialogItem {
         selectHandler?.onItemSelect(this, player) ?: return Unit
     }
 
-    @FunctionalInterface
-    interface ItemBooleanSupplier {
-        fun get(): Boolean
-    }
-
-    @FunctionalInterface
-    interface ItemSelectHandler {
-        fun onItemSelect(item: ListDialogItem, player: Player)
-    }
-
     companion object {
 
         @JvmStatic
         fun create() = ListDialogItemBuilder()
-
-        fun ItemBooleanSupplier(handler: () -> Boolean) = object : ItemBooleanSupplier {
-            override fun get(): Boolean {
-                return handler()
-            }
-        }
-
-        fun ItemSelectHandler(handler: (ListDialogItem, Player) -> Unit) = object : ItemSelectHandler {
-            override fun onItemSelect(item: ListDialogItem, player: Player) {
-                return handler(item, player)
-            }
-        }
     }
 }

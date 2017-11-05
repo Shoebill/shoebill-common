@@ -19,31 +19,31 @@ constructor(eventManager: EventManager = Shoebill.get().eventManager) : Destroya
     private val lifecycleFactories = mutableMapOf<Class<out LifecycleObject>,
             LifecycleFactory<T, LifecycleObject>>()
 
-    open fun <B : LifecycleObject> registerClass(lifecycleObject: Class<B>, factory: LifecycleFactory<T, B>) {
+    fun <B : LifecycleObject> registerClass(lifecycleObject: Class<B>, factory: LifecycleFactory<T, B>) {
         lifecycleFactories.put(lifecycleObject, factory)
         lifecycleObjects.forEach { buildObject(it.key, lifecycleObject) }
     }
 
-    open fun <B : LifecycleObject> unregisterClass(lifecycleObject: Class<B>) {
+    fun <B : LifecycleObject> unregisterClass(lifecycleObject: Class<B>) {
         lifecycleObjects.forEach { destroyObject(it.key, lifecycleObject) }
         lifecycleFactories.remove(lifecycleObject)
     }
 
     @Suppress("UNCHECKED_CAST")
-    open fun <B : LifecycleObject> getObject(input: T, clazz: Class<B>): B? {
+    fun <B : LifecycleObject> getObject(input: T, clazz: Class<B>): B? {
         val objects = lifecycleObjects[input] ?: return null
-        val lifecycleObject = objects.filter { it.javaClass == clazz }.firstOrNull() ?: return null
+        val lifecycleObject = objects.firstOrNull { it.javaClass == clazz } ?: return null
         return lifecycleObject as B
     }
 
-    open fun <B : LifecycleObject> getObjects(clazz: Class<B>): List<B> {
+    fun <B : LifecycleObject> getObjects(clazz: Class<B>): List<B> {
         return lifecycleObjects.filter { it.value.filter { it.javaClass == clazz }.count() > 0 }
                 .map { it.value }
                 .first()
                 .map { it as B }
     }
 
-    open fun buildObjects(input: T) {
+    fun buildObjects(input: T) {
         val list = lifecycleFactories.map {
             val obj = it.value.create(input)
             obj.init()
@@ -52,7 +52,7 @@ constructor(eventManager: EventManager = Shoebill.get().eventManager) : Destroya
         lifecycleObjects.put(input, list)
     }
 
-    open fun <B : LifecycleObject> buildObject(input: T, clazz: Class<B>) {
+    fun <B : LifecycleObject> buildObject(input: T, clazz: Class<B>) {
         val factory = lifecycleFactories.filter { it.key == clazz }.map { it.value }.firstOrNull() ?: return
         val playerList = lifecycleObjects[input] ?: return
         val obj = factory.create(input)
@@ -60,15 +60,15 @@ constructor(eventManager: EventManager = Shoebill.get().eventManager) : Destroya
         playerList.add(obj)
     }
 
-    open fun destroyObjects(input: T) {
+    fun destroyObjects(input: T) {
         val list = lifecycleObjects[input] ?: return
         list.forEach { it.destroy() }
         lifecycleObjects.remove(input)
     }
 
-    open fun <B : LifecycleObject> destroyObject(input: T, clazz: Class<B>) {
+    fun <B : LifecycleObject> destroyObject(input: T, clazz: Class<B>) {
         val playerList = lifecycleObjects[input] ?: return
-        val obj = playerList.filter { it.javaClass == clazz }.firstOrNull() ?: return
+        val obj = playerList.firstOrNull { it.javaClass == clazz } ?: return
         obj.destroy()
         playerList.remove(obj)
     }

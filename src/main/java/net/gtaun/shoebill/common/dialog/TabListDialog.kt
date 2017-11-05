@@ -51,7 +51,7 @@ class TabListDialog protected constructor(eventManager: EventManager) : ListDial
             val headerCount = usedHeaderCount
             if (headerCount > 0) {
                 style = DialogStyle.TABLIST_HEADERS
-                for (i in 0..headerCount - 1) {
+                for (i in 0 until headerCount) {
                     val headerText = headers[i]?.get(this) ?: continue
                     if (headerText.isEmpty()) continue
 

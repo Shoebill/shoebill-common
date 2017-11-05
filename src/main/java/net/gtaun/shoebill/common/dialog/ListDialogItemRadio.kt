@@ -19,55 +19,61 @@ package net.gtaun.shoebill.common.dialog
 import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.data.Color
 import net.gtaun.shoebill.entities.Player
+import java.util.function.BooleanSupplier
 import java.util.function.IntSupplier
 
 @AllOpen
 class ListDialogItemRadio : ListDialogItem {
 
+    @Suppress("UNCHECKED_CAST")
     @AllOpen
-    class RadioItemBuilder : AbstractItemBuilder<ListDialogItemRadio, RadioItemBuilder>() {
+    abstract class AbstractRadioItemBuilder<T : ListDialogItemRadio, B : AbstractRadioItemBuilder<T, B>> : AbstractItemBuilder<T, B>() {
 
         fun item(item: RadioItem) = item { item }
         fun colorChecked(color: Color) = colorChecked { color }
         fun colorUnchecked(color: Color) = colorUnchecked { color }
         fun selectedIndex(index: Int) = selectedIndex { index }
 
-        fun selectedIndexSupplier(supplier: IntSupplier): RadioItemBuilder {
+        fun selectedIndexSupplier(supplier: IntSupplier): B {
             item.selectedIndexSupplier = supplier
-            return this
+            return this as B
         }
 
         fun onRadioItemSelect(handler: ItemSelectHandler) = onRadioItemSelect { handler }
 
-        fun item(init: RadioItemBuilder.() -> RadioItem): RadioItemBuilder {
-            item.addItem(init(this))
+        fun item(init: B.() -> RadioItem): B {
+            item.addItem(init(this as B))
             return this
         }
 
-        fun colorChecked(init: RadioItemBuilder.() -> Color): RadioItemBuilder {
+        fun colorChecked(init: B.() -> Color): B {
             val offColor = item.radioItemColorSupplier?.get(false) ?: Color.RED
-            item.setRadioColor(init(this), offColor)
+            item.setRadioColor(init(this as B), offColor)
             return this
         }
 
-        fun colorUnchecked(init: RadioItemBuilder.() -> Color): RadioItemBuilder {
+        fun colorUnchecked(init: B.() -> Color): B {
             val onColor = item.radioItemColorSupplier?.get(true) ?: Color.GREEN
-            item.setRadioColor(onColor, init(this))
+            item.setRadioColor(onColor, init(this as B))
             return this
         }
 
-        fun selectedIndex(init: RadioItemBuilder.() -> Int): RadioItemBuilder {
-            item.selectedIndexSupplier = IntSupplier { init(this) }
-            return this
+        fun selectedIndex(init: B.() -> Int): B {
+            item.selectedIndexSupplier = IntSupplier { init(this as B) }
+            return this as B
         }
 
-        fun selectedIndexSupplier(init: RadioItemBuilder.() -> Int) =
-                selectedIndexSupplier(IntSupplier { init(this) })
+        fun selectedIndexSupplier(init: B.() -> Int) =
+                selectedIndexSupplier(IntSupplier { init(this as B) })
 
-        fun onRadioItemSelect(init: RadioItemBuilder.() -> ItemSelectHandler): RadioItemBuilder {
-            item.radioItemSelectHandler = init(this)
+        fun onRadioItemSelect(init: B.() -> ItemSelectHandler): B {
+            item.radioItemSelectHandler = init(this as B)
             return this
         }
+    }
+
+    @AllOpen
+    class RadioItemBuilder : AbstractRadioItemBuilder<ListDialogItemRadio, RadioItemBuilder>() {
 
         init {
             item = ListDialogItemRadio()
@@ -131,13 +137,13 @@ class ListDialogItemRadio : ListDialogItem {
             for (i in options.indices) {
                 val selected = selected
                 val item = options[i]
-                if (i == selected) {
+                text += if (i == selected) {
                     if (item.checkedColor != null)
-                        text += item.checkedColor!!.embeddingString + " [" + item.itemText + "]"
+                        item.checkedColor!!.embeddingString + " [" + item.itemText + "]"
                     else
-                        text += radioItemColorSupplier!![true].embeddingString + " [" + item.itemText + "]"
+                        radioItemColorSupplier!![true].embeddingString + " [" + item.itemText + "]"
                 } else
-                    text += radioItemColorSupplier!![false].embeddingString + " [" + item.itemText + "]"
+                    radioItemColorSupplier!![false].embeddingString + " [" + item.itemText + "]"
             }
             return text
         }

@@ -118,13 +118,13 @@ class ListDialog constructor(eventManager: EventManager) : AbstractDialog(Dialog
     fun addItem(item: ListDialogItem) = items.add(item)
 
     @JvmOverloads
-    fun addItem(itemText: String, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
-                handler: ListDialogItem.ItemSelectHandler? = null) =
+    fun addItem(itemText: String, enabledSupplier: ItemBooleanSupplier? = null,
+                handler: ItemSelectHandler? = null) =
             items.add(ListDialogItem(itemText, enabledSupplier, handler))
 
     @JvmOverloads
-    fun addItem(supplier: DialogTextSupplier, enabledSupplier: ListDialogItem.ItemBooleanSupplier? = null,
-                handler: ListDialogItem.ItemSelectHandler? = null) =
+    fun addItem(supplier: DialogTextSupplier, enabledSupplier: ItemBooleanSupplier? = null,
+                handler: ItemSelectHandler? = null) =
             items.add(ListDialogItem(supplier, enabledSupplier, handler))
 
     @FunctionalInterface

@@ -24,13 +24,13 @@ class PlayerCommandManager(eventManager: EventManager) : CommandGroup(), Destroy
     override val isDestroyed: Boolean
         get() = eventManagerNode.isDestroyed
 
-    fun installCommandHandler(priority: HandlerPriority): HandlerEntry? =
+    fun installCommandHandler(priority: HandlerPriority) =
             eventManagerNode.registerHandler(PlayerCommandEvent::class, { e ->
                 if (processCommand(e.player, e.command.substring(1)))
                     e.setProcessed()
             }, priority)
 
-    fun installTextHandler(priority: HandlerPriority, prefix: String): HandlerEntry? =
+    fun installTextHandler(priority: HandlerPriority, prefix: String) =
             eventManagerNode.registerHandler(PlayerTextEvent::class, { e ->
                 val text = e.text
                 if (!text.startsWith(prefix)) return@registerHandler
@@ -58,10 +58,10 @@ class PlayerCommandManager(eventManager: EventManager) : CommandGroup(), Destroy
 
     companion object {
 
-        val DEFAULT_USAGE_MESSAGE_SUPPLIER = UsageMessageSupplier { player, prefix, command ->
+        val DEFAULT_USAGE_MESSAGE_SUPPLIER = UsageMessageSupplier { _, prefix, command ->
             val stringBuilder = StringBuilder("Usage: " + prefix + command.command)
             if (command.parameters.isNotEmpty()) {
-                for (i in 0..command.parameters.size - 1) {
+                for (i in 0 until command.parameters.size) {
                     stringBuilder.append(" [").append(command.parameters[i].name).append("]")
                 }
             }

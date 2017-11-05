@@ -18,17 +18,20 @@ package net.gtaun.shoebill.common.dialog
 
 import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.data.Color
+import net.gtaun.shoebill.entities.Player
+import java.util.function.BiConsumer
 import java.util.function.BooleanSupplier
 
 @AllOpen
 class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedColor: Color) :
         ListDialogItem(itemText) {
 
+    @Suppress("UNCHECKED_CAST")
     @AllOpen
-    class CheckItemBuilder : AbstractItemBuilder<ListDialogItemCheck, CheckItemBuilder>() {
+    abstract class AbstractCheckItemBuilder<T : ListDialogItemCheck, B : AbstractCheckItemBuilder<T, B>> : AbstractItemBuilder<T, B>() {
 
-        fun item(init: CheckItemBuilder.() -> CheckItem): CheckItemBuilder {
-            item.addItem(init(this))
+        fun item(init: B.() -> CheckItem): B {
+            item.addItem(init(this as B))
             return this
         }
 
@@ -38,6 +41,10 @@ class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedColor:
         fun item(itemText: String, checkedColor: Color? = null, statusSupplier: BooleanSupplier? = null) = item {
             CheckItem(itemText, checkedColor, statusSupplier)
         }
+    }
+
+    @AllOpen
+    class CheckItemBuilder : AbstractCheckItemBuilder<ListDialogItemCheck, CheckItemBuilder>() {
 
         init {
             item = ListDialogItemCheck("Unnamed")
@@ -81,13 +88,13 @@ class ListDialogItemCheck(itemText: String, checkedColor: Color, uncheckedColor:
         get() {
             var text = super.itemText
             for (item in options) {
-                if (item.isChecked) {
+                text += if (item.isChecked) {
                     if (item.checkedColor != null)
-                        text += item.checkedColor!!.embeddingString + " [" + item.itemText + "]"
+                        item.checkedColor!!.embeddingString + " [" + item.itemText + "]"
                     else
-                        text += checkItemColorSupplier!![true].embeddingString + " [" + item.itemText + "]"
+                        checkItemColorSupplier!![true].embeddingString + " [" + item.itemText + "]"
                 } else
-                    text += checkItemColorSupplier!![false].embeddingString + " [" + item.itemText + "]"
+                    checkItemColorSupplier!![false].embeddingString + " [" + item.itemText + "]"
             }
             return text
         }

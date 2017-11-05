@@ -20,13 +20,15 @@ import net.gtaun.shoebill.common.AllOpen
 import net.gtaun.shoebill.data.Color
 
 import java.util.function.BooleanSupplier
+import java.util.function.IntSupplier
 import java.util.function.Supplier
 
 @AllOpen
 class ListDialogItemSwitch : ListDialogItem {
 
+    @Suppress("UNCHECKED_CAST")
     @AllOpen
-    class SwitchItemBuilder : AbstractItemBuilder<ListDialogItemSwitch, SwitchItemBuilder>() {
+    abstract class AbstractSwitchItemBuilder<T : ListDialogItemSwitch, B : AbstractSwitchItemBuilder<T, B>> : AbstractItemBuilder<T, B>() {
 
         fun onSwitch(onText: String) = onSwitch { onText }
         fun offSwitch(offText: String) = offSwitch { offText }
@@ -36,42 +38,46 @@ class ListDialogItemSwitch : ListDialogItem {
         fun offColor(off: Color) = offColor { off }
         fun switchColor(on: Color, off: Color) = switchColor { Pair(on, off) }
 
-        fun onSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
-            item.setSwitchText(init(this), item.switchTextSupplier(false))
+        fun onSwitch(init: B.() -> String): B {
+            item.setSwitchText(init(this as B), item.switchTextSupplier(false))
             return this
         }
 
-        fun offSwitch(init: SwitchItemBuilder.() -> String): SwitchItemBuilder {
-            item.setSwitchText(item.switchTextSupplier(true), init(this))
+        fun offSwitch(init: B.() -> String): B{
+            item.setSwitchText(item.switchTextSupplier(true), init(this as B))
             return this
         }
 
-        fun switchText(init: SwitchItemBuilder.() -> Pair<String, String>): SwitchItemBuilder {
-            val pair = init(this)
+        fun switchText(init: B.() -> Pair<String, String>): B {
+            val pair = init(this as B)
             item.setSwitchText(pair.first, pair.second)
             return this
         }
 
-        fun onColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
-            item.setSwitchColor(init(this), item.switchColorSupplier(false))
+        fun onColor(init: B.() -> Color): B{
+            item.setSwitchColor(init(this as B), item.switchColorSupplier(false))
             return this
         }
 
-        fun offColor(init: SwitchItemBuilder.() -> Color): SwitchItemBuilder {
-            item.setSwitchColor(item.switchColorSupplier(true), init(this))
+        fun offColor(init: B.() -> Color): B {
+            item.setSwitchColor(item.switchColorSupplier(true), init(this as B))
             return this
         }
 
-        fun statusSupplier(init: SwitchItemBuilder.() -> BooleanSupplier): SwitchItemBuilder {
-            item.statusSupplier = init(this)
+        fun statusSupplier(init: B.() -> BooleanSupplier): B {
+            item.statusSupplier = init(this as B)
             return this
         }
 
-        fun switchColor(init: SwitchItemBuilder.() -> Pair<Color, Color>): SwitchItemBuilder {
-            val pair = init(this)
+        fun switchColor(init: B.() -> Pair<Color, Color>): B {
+            val pair = init(this as B)
             item.setSwitchColor(pair.first, pair.second)
             return this
         }
+    }
+
+    @AllOpen
+    class SwitchItemBuilder : AbstractSwitchItemBuilder<ListDialogItemSwitch, SwitchItemBuilder>() {
 
         init {
             item = ListDialogItemSwitch("Unnamed")

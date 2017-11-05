@@ -25,7 +25,6 @@ import net.gtaun.shoebill.event.dialog.DialogCloseEvent.DialogCloseType
 import net.gtaun.shoebill.event.dialog.DialogResponseEvent
 import net.gtaun.util.event.Attentions
 import net.gtaun.util.event.EventManager
-import net.gtaun.util.event.EventManagerNode
 import net.gtaun.util.event.HandlerPriority
 
 
@@ -67,9 +66,21 @@ abstract class AbstractDialog(protected var style: DialogStyle, parentEventManag
             return this as B
         }
 
-        fun onShow(handler: DialogHandler) = onShow { handler }
-        fun onClose(handler: DialogCloseHandler) = onClose { handler }
-        fun onCancel(handler: DialogHandler) = onCancel { handler }
+        fun onShow(handler: DialogHandler): B {
+            dialog.showHandler = handler
+            return this as B
+        }
+
+        fun onClose(handler: DialogCloseHandler): B {
+            dialog.closeHandler = handler
+            return this as B
+        }
+
+        fun onCancel(handler: DialogHandler): B {
+            dialog.clickCancelHandler = handler
+            return this as B
+        }
+
         fun parentDialog(parentDialog: AbstractDialog) = parentDialog { parentDialog }
 
         fun caption(init: B.() -> String): B {
@@ -101,14 +112,33 @@ abstract class AbstractDialog(protected var style: DialogStyle, parentEventManag
             return this
         }
 
+        fun onShow(init: B.(AbstractDialog, Player) -> Unit): B {
+            dialog.showHandler = DialogHandler { abstractDialog, player -> init(this as B, abstractDialog, player) }
+            return this as B
+        }
+
         fun onClose(init: B.() -> DialogCloseHandler): B {
             dialog.closeHandler = init(this as B)
             return this
         }
 
+        fun onClose(init: B.(AbstractDialog, Player, DialogCloseType) -> Unit): B {
+            dialog.closeHandler = DialogCloseHandler { abstractDialog, player, dialogCloseType ->
+                init(this as B, abstractDialog, player, dialogCloseType)
+            }
+            return this as B
+        }
+
         fun onCancel(init: B.() -> DialogHandler): B {
             dialog.clickCancelHandler = init(this as B)
             return this
+        }
+
+        fun onCancel(init: B.(AbstractDialog, Player) -> Unit): B {
+            dialog.clickCancelHandler = DialogHandler { abstractDialog, player ->
+                init(this as B, abstractDialog, player)
+            }
+            return this as B
         }
 
         fun parentDialog(init: B.() -> AbstractDialog): B {
@@ -124,8 +154,8 @@ abstract class AbstractDialog(protected var style: DialogStyle, parentEventManag
         fun onClose(dialog: AbstractDialog, player: Player, type: DialogCloseType)
     }
 
-    private val eventManagerInternal: EventManagerNode = parentEventManager.createChildNode()
-    val dialogId: DialogId = DialogId.create()
+    private final val eventManagerInternal = parentEventManager.createChildNode()
+    private final val dialogId: DialogId = DialogId.create()
 
     init {
         eventManagerInternal.registerHandler(DialogResponseEvent::class, { e ->
@@ -157,9 +187,7 @@ abstract class AbstractDialog(protected var style: DialogStyle, parentEventManag
     var clickCancelHandler: DialogHandler? = null
 
     @Throws(Throwable::class)
-    protected fun finalize() {
-        destroy()
-    }
+    protected fun finalize() = destroy()
 
     protected fun destroy() {
         eventManagerInternal.destroy()

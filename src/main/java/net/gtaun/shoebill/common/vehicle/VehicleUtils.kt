@@ -28,7 +28,7 @@ object VehicleUtils {
 
     @JvmStatic
     fun getVehicleDriver(vehicle: Vehicle): Player? =
-            Player.get().filter { it.state == PlayerState.DRIVER && it.vehicle == vehicle }.firstOrNull()
+            Player.get().firstOrNull { it.state == PlayerState.DRIVER && it.vehicle == vehicle }
 
     @JvmStatic
     fun getVehiclePassengers(vehicle: Vehicle): List<Player> {

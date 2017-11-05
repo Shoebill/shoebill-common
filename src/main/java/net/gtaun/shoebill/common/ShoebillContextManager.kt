@@ -10,11 +10,9 @@ class ShoebillContextManager(parentEventManager: EventManager) : AbstractShoebil
     private val contextContainers =
             mutableMapOf<Class<out AbstractShoebillContext>, MutableSet<AbstractShoebillContext>>()
 
-    override fun onInit() {
-    }
+    override fun onInit() {}
 
-    override fun onDestroy() {
-    }
+    override fun onDestroy() {}
 
     fun <ContextType : AbstractShoebillContext> manage(context: ContextType): ContextType {
         val clazz = context.javaClass

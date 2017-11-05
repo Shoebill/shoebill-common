@@ -9,13 +9,20 @@ import net.gtaun.shoebill.common.AllOpen
 @AllOpen
 class TabListDialogItem : ListDialogItem() {
 
+    @Suppress("UNCHECKED_CAST")
     @AllOpen
-    class TabListDialogItemBuilder : AbstractItemBuilder<TabListDialogItem, TabListDialogItemBuilder>() {
+    abstract class AbstractTabListDialogItemBuilder<T : TabListDialogItem, B : AbstractTabListDialogItemBuilder<T, B>> :
+            AbstractItemBuilder<T, B>() {
 
-        fun column(index: Int, item: ListDialogItem): TabListDialogItemBuilder {
+        fun column(index: Int, item: T): B {
             this.item.addColumn(index, item)
-            return this
+            return this as B
         }
+
+    }
+
+    @AllOpen
+    class TabListDialogItemBuilder : AbstractTabListDialogItemBuilder<TabListDialogItem, TabListDialogItemBuilder>() {
 
         init {
             item = TabListDialogItem()
@@ -34,7 +41,7 @@ class TabListDialogItem : ListDialogItem() {
         get() {
             val stringBuilder = StringBuilder()
             val columnCount = columnCount
-            for (i in 0..columnCount - 1) {
+            for (i in 0 until columnCount) {
                 val item = columns[i]
                 if (item == null || !item.isEnabled) continue
                 stringBuilder.append(item.itemText)

@@ -31,7 +31,8 @@ open class CommandGroup {
     fun registerCommand(command: String, paramTypes: Array<Class<*>>, handler: CommandHandler, commandParameters: Array<CommandParameter>,
                         helpMessage: String? = null, category: String? = null, priority: Short = 0, caseSensitive: Boolean = false,
                         beforeCheckers: List<CustomCommandHandler> = listOf(), customHandlers: List<CustomCommandHandler> = listOf()) {
-        registerCommand(CommandEntryInternal(command, paramTypes, priority, helpMessage, caseSensitive, CommandEntryInternal.CommandHandlerInternal { player, params ->
+        registerCommand(CommandEntryInternal(command, paramTypes, priority, helpMessage, caseSensitive,
+                CommandEntryInternal.CommandHandlerInternal { player, params ->
             val paramQueue = LinkedList<Any>()
             Collections.addAll(paramQueue, *params)
             paramQueue.poll()
@@ -42,7 +43,7 @@ open class CommandGroup {
     private fun registerCommand(entry: CommandEntryInternal) {
         var entries: MutableCollection<CommandEntryInternal>? = commands[entry.command]
         if (entries == null) {
-            entries = ArrayList<CommandEntryInternal>()
+            entries = ArrayList()
             commands.put(entry.command, entries)
         }
         entries.add(entry)
@@ -61,11 +62,7 @@ open class CommandGroup {
     }
 
     fun containsChildGroup(group: CommandGroup): Boolean {
-        for (g in childGroups.entries) {
-            if (g === group) return true
-        }
-
-        return false
+        return childGroups.entries.any { it === group }
     }
 
     fun processCommand(player: Player, commandText: String): Boolean = processCommand("", player, commandText)
@@ -81,7 +78,7 @@ open class CommandGroup {
     protected fun processCommand(path: String, player: Player, command: String, paramText: String): Boolean {
         if (paramText.trim { it <= ' ' }.isEmpty()) {
             val childGroup = getChildGroup(this, command)
-            if (childGroup != null && childGroup.notFoundHandler != null) {
+            if (childGroup?.notFoundHandler != null) {
                 if (childGroup.notFoundHandler!!.handle(player, this, command))
                     return true
             }
@@ -100,18 +97,20 @@ open class CommandGroup {
         val pattern = Pattern.compile("([^\"]\\S*|\".+?\")\\s*")
         for (e in commands) {
             val entry = e.right
-            for (checker in entry.beforeCheckers)
-                if (!checker.handle(player, command, paramText)) return true
+            entry.beforeCheckers
+                    .filterNot { it.handle(player, command, paramText) }
+                    .forEach { return true }
 
-            for (handler in entry.customHandlers)
-                if (handler.handle(player, command, paramText)) return true
+            entry.customHandlers
+                    .filter { it.handle(player, command, paramText) }
+                    .forEach { return true }
 
             val types = entry.paramTypes
             val matches = ArrayList<String>()
             val m = pattern.matcher(paramText) // strings with spaces can be made like this: "my string"
             while (m.find()) matches.add(m.group(1).replace("\"", ""))
-            if (types.size == matches.size || types.size > 0 && types[types.size - 1] == String::class.java) {
-                if (types.size > 0 && types[types.size - 1] == String::class.java) {
+            if (types.size == matches.size || types.isNotEmpty() && types[types.size - 1] == String::class.java) {
+                if (types.isNotEmpty() && types[types.size - 1] == String::class.java) {
                     val stringBuilder = StringBuilder()
                     val stringParser = TYPE_PARSER[String::class.java]
                     for (i in matches.indices.reversed()) {
@@ -127,7 +126,7 @@ open class CommandGroup {
                         }
                     }
                     val finalString = stringBuilder.toString().trim { it <= ' ' }
-                    if (finalString.length > 0)
+                    if (finalString.isNotEmpty())
                         matches.add(finalString)
                 }
                 try {
@@ -149,10 +148,10 @@ open class CommandGroup {
             if (result) return true
         }
 
-        for (childGroup in groups) {
-            val result = childGroup.processCommand(path, player, command, paramText)
-            if (result) return true
-        }
+        groups
+                .map { it.processCommand(path, player, command, paramText) }
+                .filter { it }
+                .forEach { return true }
 
         if (!matchedCmds.isEmpty()) {
             sendUsageMessages(player, "/", commands)
@@ -246,10 +245,9 @@ open class CommandGroup {
 
     private fun sendUsageMessages(player: Player, prefix: String, commands: List<Pair<String, CommandEntryInternal>>) {
         if (this.usageMessageSupplier == null) return
-        for (e in commands) {
-            val usageMessage = getUsageMessage(player, e.left, prefix, e.right)
-            if (usageMessage != null) player.sendMessage(Color.RED, usageMessage)
-        }
+        commands
+                .mapNotNull { getUsageMessage(player, it.left, prefix, it.right) }
+                .forEach { player.sendMessage(Color.RED, it) }
     }
 
     companion object {
@@ -257,30 +255,30 @@ open class CommandGroup {
 
         init {
 
-            TYPE_PARSER.put(Integer.TYPE, Function<String, Any?> { Integer.parseInt(it) })
-            TYPE_PARSER.put(Int::class.java, Function<String, Any?> { Integer.parseInt(it) })
+            TYPE_PARSER.put(Integer.TYPE, Function { Integer.parseInt(it) })
+            TYPE_PARSER.put(Int::class.java, Function { Integer.parseInt(it) })
 
-            TYPE_PARSER.put(String::class.java, Function<String, Any?> { it })
+            TYPE_PARSER.put(String::class.java, Function { it })
 
-            TYPE_PARSER.put(java.lang.Short.TYPE, Function<String, Any?> { java.lang.Short.parseShort(it) })
-            TYPE_PARSER.put(Short::class.java, Function<String, Any?> { java.lang.Short.parseShort(it) })
+            TYPE_PARSER.put(java.lang.Short.TYPE, Function { java.lang.Short.parseShort(it) })
+            TYPE_PARSER.put(Short::class.java, Function { java.lang.Short.parseShort(it) })
 
-            TYPE_PARSER.put(java.lang.Byte.TYPE, Function<String, Any?> { java.lang.Byte.parseByte(it) })
-            TYPE_PARSER.put(Byte::class.java, Function<String, Any?> { java.lang.Byte.parseByte(it) })
+            TYPE_PARSER.put(java.lang.Byte.TYPE, Function { java.lang.Byte.parseByte(it) })
+            TYPE_PARSER.put(Byte::class.java, Function { java.lang.Byte.parseByte(it) })
 
-            TYPE_PARSER.put(Character.TYPE, Function<String, Any?> { s -> if (s.isNotEmpty()) s[0] else 0 })
-            TYPE_PARSER.put(Char::class.java, Function<String, Any?> { s -> if (s.isNotEmpty()) s[0] else 0 })
+            TYPE_PARSER.put(Character.TYPE, Function { s -> if (s.isNotEmpty()) s[0] else 0 })
+            TYPE_PARSER.put(Char::class.java, Function { s -> if (s.isNotEmpty()) s[0] else 0 })
 
-            TYPE_PARSER.put(java.lang.Float.TYPE, Function<String, Any?> { java.lang.Float.parseFloat(it) })
-            TYPE_PARSER.put(Float::class.java, Function<String, Any?> { java.lang.Float.parseFloat(it) })
+            TYPE_PARSER.put(java.lang.Float.TYPE, Function { java.lang.Float.parseFloat(it) })
+            TYPE_PARSER.put(Float::class.java, Function { java.lang.Float.parseFloat(it) })
 
-            TYPE_PARSER.put(java.lang.Double.TYPE, Function<String, Any?> { java.lang.Double.parseDouble(it) })
-            TYPE_PARSER.put(Double::class.java, Function<String, Any?> { java.lang.Double.parseDouble(it) })
+            TYPE_PARSER.put(java.lang.Double.TYPE, Function { java.lang.Double.parseDouble(it) })
+            TYPE_PARSER.put(Double::class.java, Function { java.lang.Double.parseDouble(it) })
 
-            TYPE_PARSER.put(Boolean::class.java, Function<String, Any?> { java.lang.Boolean.parseBoolean(it) })
+            TYPE_PARSER.put(Boolean::class.java, Function { java.lang.Boolean.parseBoolean(it) })
 
-            TYPE_PARSER.put(Player::class.java, Function<String, Any?> { Player.getByNameOrId(it) })
-            TYPE_PARSER.put(Color::class.java, Function<String, Any?> { s -> Color(Integer.parseUnsignedInt(s, 16)) })
+            TYPE_PARSER.put(Player::class.java, Function { Player.getByNameOrId(it) })
+            TYPE_PARSER.put(Color::class.java, Function { s -> Color(Integer.parseUnsignedInt(s, 16)) })
         }
 
         private fun generateCommandEntries(`object`: Any): Collection<CommandEntryInternal> {
@@ -306,7 +304,7 @@ open class CommandGroup {
                 val paramTypes: MutableList<Class<*>> = mutableListOf()
                 val commandParameters: MutableList<CommandParameter> = mutableListOf()
 
-                (1..methodParams.size - 1).forEach { index ->
+                (1 until methodParams.size).forEach { index ->
                     paramTypes.add(index - 1, methodParams[index].type)
                     methodParams[index].annotations?.forEach {
                         if (it.annotationClass == CommandParameter::class) {
@@ -420,9 +418,11 @@ open class CommandGroup {
         }
 
         private fun getAllCommands(commandGroup: CommandGroup, commands: MutableCollection<CommandEntry>, path: String) {
-            commandGroup.commands.entries.forEach { stringCollectionEntry -> stringCollectionEntry.value.forEach { commandEntryInternal -> commands.add(CommandEntry(commandEntryInternal, path)) } }
+            commandGroup.commands.entries.forEach { stringCollectionEntry -> stringCollectionEntry.value.forEach {
+                commandEntryInternal -> commands.add(CommandEntry(commandEntryInternal, path)) } }
             commandGroup.groups.forEach { commandGroup1 -> getAllCommands(commandGroup1, commands, "") }
-            commandGroup.childGroups.entries.forEach { stringCommandGroupEntry -> getAllCommands(stringCommandGroupEntry.value, commands, stringCommandGroupEntry.key) }
+            commandGroup.childGroups.entries.forEach { stringCommandGroupEntry ->
+                getAllCommands(stringCommandGroupEntry.value, commands, stringCommandGroupEntry.key) }
         }
     }
 

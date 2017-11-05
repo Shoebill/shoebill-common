@@ -36,10 +36,10 @@ class PlayerLifecycleHolder @JvmOverloads constructor(eventManager: EventManager
 
         fun <B : PlayerLifecycleObject> makeFactory(clazz: KClass<B>) = object : LifecycleFactory<Player, B> {
             override fun create(input: Player): B {
-                val constructor = clazz.constructors.filter {
+                val constructor = clazz.constructors.firstOrNull {
                     it.parameters.size == 1 &&
                             it.parameters.first().type == Player::class
-                }.firstOrNull() ?: throw Exception("No valid constructor available for $clazz.")
+                } ?: throw Exception("No valid constructor available for $clazz.")
                 return constructor.call(input)
             }
 

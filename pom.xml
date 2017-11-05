@@ -12,28 +12,28 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.1.1</kotlin.version>
-        <dokka.version>0.9.11</dokka.version>
+        <kotlin.version>1.1.51</kotlin.version>
+        <dokka.version>0.9.15</dokka.version>
     </properties>
 
     <distributionManagement>
         <repository>
             <id>deployment</id>
             <name>Releases</name>
-            <url>http://repo.gtaun.net/content/repositories/releases/</url>
+            <url>http://repo.sampx.ru/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
             <id>deployment</id>
             <name>Snapshots</name>
-            <url>http://repo.gtaun.net/content/repositories/snapshots/</url>
+            <url>http://repo.sampx.ru/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
     <repositories>
         <repository>
-            <id>gtaun-repo-snapshots</id>
-            <name>GTAUN Repo Snapshots</name>
-            <url>http://repo.gtaun.net/content/repositories/snapshots</url>
+            <id>gtaun-public-repo</id>
+            <name>GTAUN Public Repository</name>
+            <url>https://repo.sampx.ru/repository/maven-public/</url>
         </repository>
     </repositories>
 
@@ -80,8 +80,8 @@
     </developers>
 
     <ciManagement>
-        <system>jenkins</system>
-        <url>http://ci.gtaun.net</url>
+        <system>teamcity</system>
+        <url>http://ci.sampx.ru</url>
     </ciManagement>
 
     <dependencies>
@@ -100,7 +100,7 @@
 
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
+            <artifactId>kotlin-stdlib-jre8</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
 
@@ -166,7 +166,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5</version>
+                <version>3.7.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -199,7 +199,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>

@@ -101,7 +101,7 @@ class PageListDialog protected constructor(eventManager: EventManager) : ListDia
             }
 
             val offset = itemsPerPage * currentPage
-            for (i in 0..itemsPerPage - 1) {
+            for (i in 0 until itemsPerPage) {
                 val index = offset + i
                 if (enabledItems.size <= index) break
 

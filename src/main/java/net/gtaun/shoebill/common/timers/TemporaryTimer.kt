@@ -11,7 +11,7 @@ import net.gtaun.shoebill.entities.TimerCallback
 class TemporaryTimer @JvmOverloads constructor(
         interval: Int,
         count: Int = Timer.COUNT_INFINITE,
-        callback: TimerCallback? = null) : Timer() {
+        callback: TimerCallback) : Timer() {
 
     private val timer: Timer = Timer.create(interval, count, callback)
     private var hasBeenStarted = false
@@ -71,20 +71,13 @@ class TemporaryTimer @JvmOverloads constructor(
     /**
      * The callback of the temporary timer.
      */
-    override var callback: TimerCallback?
+    override var callback: TimerCallback
         get() = timer.callback
         set(callback) {
             timer.callback = callback
         }
 
     companion object : Collectable<TemporaryTimer> {
-
-        /**
-         * Creates a [TemporaryTimer] with params.
-         */
-        @JvmStatic
-        fun create(interval: Int, callback: TimerCallback? = null): TemporaryTimer = TemporaryTimer.create(interval,
-                COUNT_INFINITE, callback)
 
         /**
          * Creates a [TemporaryTimer] with params.
@@ -95,7 +88,7 @@ class TemporaryTimer @JvmOverloads constructor(
          */
         @JvmStatic
         @JvmOverloads
-        fun create(interval: Int, count: Int = COUNT_INFINITE, callback: TimerCallback? = null): TemporaryTimer =
+        fun create(interval: Int, count: Int = COUNT_INFINITE, callback: TimerCallback): TemporaryTimer =
                 TemporaryTimer(interval, count, callback)
 
         private var recycleTimer: Timer = Timer.create(5000, Timer.COUNT_INFINITE, TimerCallback {

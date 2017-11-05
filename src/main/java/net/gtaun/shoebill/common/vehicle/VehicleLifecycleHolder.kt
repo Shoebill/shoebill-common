@@ -32,11 +32,10 @@ class VehicleLifecycleHolder @JvmOverloads constructor(eventManager: EventManage
 
         fun <B : VehicleLifecycleObject> makeFactory(clazz: KClass<B>) = object : LifecycleFactory<Vehicle, B> {
             override fun create(input: Vehicle): B {
-                val constructor = clazz.constructors.filter {
+                val constructor = clazz.constructors.firstOrNull {
                     it.parameters.size == 1 &&
                             it.parameters.first().type == Vehicle::class
-                }
-                        .firstOrNull() ?: throw Exception("No valid constructor available for class $clazz.")
+                } ?: throw Exception("No valid constructor available for class $clazz.")
                 return constructor.call(input)
             }
 

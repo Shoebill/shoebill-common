@@ -38,6 +38,7 @@ fun DialogHandler(handler: (AbstractDialog, Player) -> Unit) = object : DialogHa
     override fun handle(dialog: AbstractDialog, player: Player) {
         handler(dialog, player)
     }
+
 }
 
 @FunctionalInterface
@@ -46,7 +47,27 @@ interface DialogTextSupplier {
 }
 
 fun DialogTextSupplier(handler: (AbstractDialog) -> String) = object : DialogTextSupplier {
-    override fun get(dialog: AbstractDialog): String {
-        return handler(dialog)
+    override fun get(dialog: AbstractDialog): String = handler(dialog)
+}
+
+@FunctionalInterface
+interface ItemBooleanSupplier {
+    fun get(): Boolean
+}
+
+fun ItemBooleanSupplier(handler: () -> Boolean) = object : ItemBooleanSupplier {
+    override fun get(): Boolean {
+        return handler()
+    }
+}
+
+@FunctionalInterface
+interface ItemSelectHandler {
+    fun onItemSelect(item: ListDialogItem, player: Player)
+}
+
+fun ItemSelectHandler(handler: (ListDialogItem, Player) -> Unit) = object : ItemSelectHandler {
+    override fun onItemSelect(item: ListDialogItem, player: Player) {
+        return handler(item, player)
     }
 }
