@@ -61,10 +61,10 @@ class InputDialog
     }
 
     @AllOpen
-    class InputDialogBuilder(parentEventManager: EventManager) :
+    class InputDialogBuilder(parentEventManager: EventManager, passwordMode: Boolean = false) :
             AbstractInputDialogBuilder<InputDialog, InputDialogBuilder>() {
         init {
-            dialog = InputDialog(parentEventManager)
+            dialog = InputDialog(parentEventManager, passwordMode)
         }
     }
 
@@ -82,6 +82,7 @@ class InputDialog
     }
 
     override fun show(player: Player) {
+        super.show(player)
         show(player, messageSupplier[this])
     }
 
@@ -100,7 +101,8 @@ class InputDialog
 
         @JvmStatic
         @JvmOverloads
-        fun create(eventManager: EventManager = Shoebill.get().eventManager) = InputDialogBuilder(eventManager)
+        fun create(eventManager: EventManager = Shoebill.get().eventManager, passwordMode: Boolean = false) =
+                InputDialogBuilder(eventManager, passwordMode)
 
         fun ClickOkHandler(handler: (InputDialog, Player, String) -> Unit) = object : ClickOkHandler {
             override fun onClickOk(dialog: InputDialog, player: Player, text: String) {
